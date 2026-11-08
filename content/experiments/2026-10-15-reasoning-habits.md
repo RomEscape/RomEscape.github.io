@@ -11,6 +11,72 @@ published: true
 
 SFT, A1, B1′, A2, QFFT가 실제 출력에서 어떤 방식으로 생각하며 푸는가. 새 생성 없이 기존 출력(MATH500 × 16회)을 분석했습니다.
 
+## 실험 예시
+
+MATH500의 **q180**(난도 3, Prealgebra, 정답 `3`) 한 문항으로 본 실제 예시입니다. 이 분석은 새 생성 없이 저장된 응답을 그대로 읽습니다.
+
+### 실제 입력
+
+모델에는 시스템 문장과 문제만 넣었습니다.
+
+```
+<|im_start|>system
+Please reason step by step, and put your final answer within \boxed{}.<|im_end|>
+<|im_start|>user
+How many positive two-digit integers are factors of both 100 and 150?<|im_end|>
+<|im_start|>assistant
+```
+
+### 조건별로 한 일
+
+다섯 모델의 저장 응답(모델마다 16개, 표본 번호는 저장 순서)을 같은 규칙으로 셉니다. B1′은 원문이 없어 이 표에서 뺐습니다. '시작하는 말'은 응답 첫 단어, '긴 추론'은 공식 규칙(wait 수가 3보다 크거나, wait와 alternatively가 모두 나옴), 'Wait 나온 응답'은 wait 단어가 한 번이라도 있는 응답, '첫 500자 안 독백'은 앞 500자 안에 'I need', 'let me' 같은 1인칭 표현이 있는 응답입니다.
+
+| 모델 | 시작하는 말 | 평균 토큰 | 긴 추론 | Wait 나온 응답 | 첫 500자 안 독백 | 정답 |
+|---|---|---:|---:|---:|---:|---:|
+| SFT | Okay 16/16 | 2,344 | 16/16 | 16/16 | 16/16 | 15/16 |
+| A1 | Okay 16/16 | 2,780 | 16/16 | 16/16 | 16/16 | 14/16 |
+| A2 | To 16/16 | 1,824 | 8/16 | 10/16 | 0/16 | 14/16 |
+| QFFT | To 16/16 | 1,507 | 6/16 | 10/16 | 0/16 | 12/16 |
+| Base | To 16/16 | 336 | 0/16 | 0/16 | 0/16 | 1/16 |
+
+같은 문제인데 SFT·A1은 16개 모두 `Okay`로 시작해 독백을 하고, A2·QFFT는 모두 `To`로 시작하며 응답 일부에서만 Wait가 나옵니다.
+
+표지 직후 행동 판독의 예시도 하나 듭니다. A2 표본 14(2,328토큰)의 첫 `Alternatively`(844번째 토큰)입니다. 판독자에게는 모델 이름을 가렸습니다. 표지 뒤 첫 행동은 '실제 다른 풀이 실행'으로 판독됐습니다. 주장은 바뀌지 않았고(답 `3` 유지), 이 지점에서 꼭 필요한 행동은 아니었다고 판독됐습니다.
+
+### 실제 출력 일부
+
+SFT 표본 3의 앞부분입니다(2,313토큰). `Okay`로 시작하고 `Let me`가 나오는 독백체입니다.
+
+```
+Okay, so I need to figure out how many positive two-digit integers are factors of both 100 and 150. Let me start by understanding the problem step by step.
+```
+
+A2 표본 14의 `Alternatively` 지점입니다. 맨 앞 단어가 판독 대상 표지입니다.
+
+```
+Alternatively, another approach is to find the common factors by listing all two-digit numbers that divide both 100 and 150.
+
+Let's list all two-digit numbers (from 10 to 99) and check which ones divide both 100 and 150.
+
+But this might be time-consuming, but let's see:
+```
+
+A2 표본 14의 끝부분입니다. 마지막 줄의 `\boxed{3}`이 최종 답입니다.
+
+```
+Therefore, regardless of the method, the answer is 3.
+
+**Final Answer**
+\boxed{3}
+```
+
+### 채점
+
+표의 정답 수는 저장된 공식 채점을 그대로 씁니다. 마지막 `\boxed{...}` 안 내용을 꺼내 정답과 수학적으로 비교한 값입니다.
+
+- A2 표본 14: `\boxed{3}`에서 `3`을 꺼내 정답 `3`과 같아 정답입니다.
+- 이 문항에서 Base는 16개 중 1개만 정답입니다. Base의 답은 `1`이 14개, `2`가 1개, `3`이 1개로 대부분 틀렸습니다.
+
 ## 결과
 
 | 모델 | 주로 시작하는 말 | 정확도 | 평균 토큰 | 긴 추론 비율 | 첫 500자 안 독백 |
@@ -28,12 +94,12 @@ Wait가 나온 응답 비율(난도별):
 | 모델 | L1 | L2 | L3 | L4 | L5 |
 |---|---:|---:|---:|---:|---:|
 | SFT | 97.5% | 97.6% | 99.1% | 98.9% | 99.9% |
-| A2 | 24.9% | 30.0% | 37.9% | 45.5% | 66.5% |
+| A2 | 24.6% | 28.4% | 36.9% | 45.1% | 65.3% |
 | QFFT | 25.9% | 30.3% | 39.8% | 50.7% | 72.7% |
 
 - A2·QFFT는 설명체("To find …")로 시작해 어려운 문제에서만 독백("Wait, …")으로 넘어갑니다. SFT·A1·B1′은 난도와 무관하게 거의 항상 독백입니다.
 - A2의 적응성은 "어려울수록 Wait를 자주 쓰는 것"이 아니라 "어려울수록 독백에 들어가는 응답이 많아지는 것"입니다. 독백 안의 Wait 밀도는 난도와 무관하게 거의 일정합니다.
-- A2의 첫 Wait는 중앙값 약 700토큰 지점에서 나오고 99%가 첫 답보다 앞입니다. 답을 낸 뒤의 검산이 아니라 풀이 도중의 전환입니다.
+- A2의 첫 Wait는 중앙값 약 736토큰 지점에서 나오고 99%가 첫 답보다 앞입니다. 답을 낸 뒤의 검산이 아니라 풀이 도중의 전환입니다.
 - 표지 직후 행동 120개를 판독했습니다(재판독 일치도 κ=0.84). 실제로 오류를 고침 16, 고치려다 실패 34, 맞던 답을 망침 6, 변화 없음 60, 판단 불가 4.
 
 ## 한계
