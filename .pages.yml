@@ -1,0 +1,58 @@
+# Pages CMS(https://app.pagescms.org) 관리 화면 설정. GitHub로 로그인하면 아래 항목을 브라우저에서 고칠 수 있다.
+media:
+  input: uploads
+  output: /uploads
+content:
+  - name: experiments
+    label: 실험 기록
+    type: collection
+    path: content/experiments
+    filename: "{year}-{month}-{day}-{hour}{minute}{second}.md"
+    view:
+      fields: [title, date, status, published]
+    fields:
+      - { name: title, label: 제목, type: string, required: true }
+      - { name: date, label: 날짜, type: date }
+      - { name: project, label: 프로젝트, type: string }
+      - name: status
+        label: 상태
+        type: select
+        options:
+          values: [계획, 진행 중, 완료, 실패, 보류]
+      - { name: summary, label: 한 줄 요약, type: text }
+      - { name: published, label: 공개, type: boolean, default: true }
+      - { name: check, label: 공개 전 확인할 점(일지 불러오기가 채움), type: string }
+      - { name: source, label: 원본, type: string }
+      - { name: body, label: 내용, type: rich-text }
+  - name: talks
+    label: 발표자료
+    type: collection
+    path: content/talks
+    filename: "{year}-{month}-{day}-{hour}{minute}{second}.md"
+    view:
+      fields: [title, date, event, published]
+    fields:
+      - { name: title, label: 제목, type: string, required: true }
+      - { name: date, label: 발표 날짜, type: date }
+      - { name: event, label: 자리(회의·수업·학회), type: string }
+      - { name: file, label: 발표 파일(PPT·PPTX·PDF), type: file }
+      - { name: summary, label: 한 줄 요약, type: text }
+      - { name: published, label: 공개, type: boolean, default: true }
+      - { name: body, label: 메모, type: rich-text }
+  - name: site
+    label: 사이트 설정
+    type: file
+    path: site.yml
+    format: yaml
+    fields:
+      - { name: name, label: 사이트 이름, type: string }
+      - { name: tagline, label: 한 줄 소개, type: string }
+      - { name: intro, label: 홈 소개글(Markdown), type: text }
+      - { name: about, label: 소개 페이지(Markdown), type: text }
+      - name: links
+        label: 링크
+        type: object
+        list: true
+        fields:
+          - { name: label, label: 이름, type: string }
+          - { name: url, label: 주소, type: string }
