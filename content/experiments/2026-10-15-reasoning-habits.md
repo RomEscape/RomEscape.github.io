@@ -1,5 +1,5 @@
 ---
-title: 모델별 추론 습관 분석
+title: 모델마다 생각하는 습관은 어떻게 다를까
 date: 2026-10-15
 project: QFFT
 status: 완료
