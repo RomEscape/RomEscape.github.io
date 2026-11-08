@@ -21,7 +21,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent
 STATUSES = ['계획', '진행 중', '완료', '실패', '보류']
-NAV = [('home', 'index.html', '홈'), ('experiments', 'experiments/index.html', '실험 기록'),
+NAV = [('home', 'index.html', '홈'), ('research', 'research/index.html', '연구'), ('experiments', 'experiments/index.html', '실험 기록'),
        ('talks', 'talks/index.html', '발표자료'), ('about', 'about.html', '소개')]
 FRONT = re.compile(r'^---[ \t]*\n(.*?)\n---[ \t]*(?:\n|$)', re.S)
 
@@ -109,6 +109,14 @@ def talk_row(d, r):
             f'<a class="title" href="{r}talks/{quote(d["slug"])}.html">{esc(d.get("title") or d["slug"])}</a>{ev}{summ}</li>')
 
 
+def research_card(d, exps, r):
+    n = sum(1 for e in exps if d.get('project') and e.get('project') == d.get('project'))
+    meta = ' · '.join(x for x in [pill(d.get('status')), f'실험 기록 {n}개' if n else ''] if x)
+    summ = f'<p>{esc(d.get("summary"))}</p>' if d.get('summary') else ''
+    return (f'<article class="card"><h3><a href="{r}research/{quote(d["slug"])}.html">{esc(d.get("title") or d["slug"])}</a></h3>'
+            f'{summ}<p class="meta">{meta}</p></article>')
+
+
 def talk_files(d, root):
     """발표 파일의 (원본 경로, PDF 경로)를 사이트 기준 상대 경로로 돌려준다. PDF가 없으면 None."""
     f = str(d.get('file') or '').lstrip('/')
@@ -124,10 +132,12 @@ def build(root=ROOT, out=None):
     out = Path(out or root / '_site')
     site = yaml.safe_load((root / 'site.yml').read_text(encoding='utf-8')) or {}
     exps, talks = load(root, 'experiments'), load(root, 'talks')
+    research = sorted(load(root, 'research'), key=lambda d: (d.get('order') or 99, d['slug']))
     if out.exists():
         shutil.rmtree(out)
     (out / 'experiments').mkdir(parents=True)
     (out / 'talks').mkdir()
+    (out / 'research').mkdir()
     shutil.copytree(root / 'static', out / 'static')
     if (root / 'uploads').exists():
         shutil.copytree(root / 'uploads', out / 'uploads', ignore=shutil.ignore_patterns('.gitkeep'))
@@ -144,6 +154,7 @@ def build(root=ROOT, out=None):
     links = ''.join(f'<li><a href="{esc(l.get("url"))}">{esc(l.get("label"))}</a></li>' for l in site.get('links') or [] if l.get('url'))
     home = f'''<section class="hero"><h1>{esc(site.get('name') or '연구 기록')}</h1>
 <p class="tagline">{esc(site.get('tagline'))}</p><div class="prose">{md(site.get('intro'))}</div>{f'<ul class="links">{links}</ul>' if links else ''}</section>
+{f'<section><div class="sec-head"><h2>연구</h2><a href="research/index.html">전체 보기</a></div><div class="cards">' + ''.join(research_card(d, exps, '') for d in research) + '</div></section>' if research else ''}
 <div class="cols">
 <section><div class="sec-head"><h2>최근 실험 기록</h2><a href="experiments/index.html">전체 보기</a></div>
 {'<ul class="list">' + ''.join(exp_row(d, '') for d in exps[:6]) + '</ul>' if exps else empty_e}</section>
@@ -151,6 +162,19 @@ def build(root=ROOT, out=None):
 {'<ul class="list">' + ''.join(talk_row(d, '') for d in talks[:6]) + '</ul>' if talks else empty_t}</section>
 </div>'''
     write('index.html', page(site, '홈', home, 0, 'home'))
+
+    # 연구 주제: 개요 글 + 같은 프로젝트 이름의 실험 기록 자동 목록
+    body = '<h1>연구</h1>' + ('<div class="cards">' + ''.join(research_card(d, exps, '../') for d in research) + '</div>'
+                              if research else '<p class="empty">아직 공개한 연구 주제가 없습니다.</p>')
+    write('research/index.html', page(site, '연구', body, 1, 'research'))
+    for d in research:
+        rel = [e for e in exps if d.get('project') and e.get('project') == d.get('project')]
+        rel_html = ('<section class="related"><div class="sec-head"><h2>관련 실험 기록</h2></div><ul class="list">'
+                    + ''.join(exp_row(e, '../') for e in rel) + '</ul></section>') if rel else ''
+        meta = ' · '.join(x for x in [pill(d.get('status')), esc(d.get('project')) if d.get('project') else ''] if x)
+        body = f'''<p class="back"><a href="index.html">← 연구</a></p><h1>{esc(d.get('title') or d['slug'])}</h1>
+<p class="meta">{meta}</p>{f'<p class="lead">{esc(d.get("summary"))}</p>' if d.get('summary') else ''}<div class="prose">{md(d['body'])}</div>{rel_html}'''
+        write(f'research/{d["slug"]}.html', page(site, d.get('title') or d['slug'], body, 1, 'research'))
 
     # 실험 기록 목록(월별 묶음 + 상태·프로젝트 거르기)
     projects = sorted({d.get('project') for d in exps if d.get('project')})
@@ -275,8 +299,9 @@ def selftest():
         (t / 'static').mkdir()
         (t / 'static' / 'style.css').write_text('body{}')
         (t / 'site.yml').write_text('name: 시험\nintro: "**소개**"\nlinks:\n  - label: GitHub\n    url: https://github.com/\n', encoding='utf-8')
-        for kind in ('experiments', 'talks'):
+        for kind in ('experiments', 'talks', 'research'):
             (t / 'content' / kind).mkdir(parents=True)
+        (t / 'content/research/topic.md').write_text('---\ntitle: 연구 주제\nproject: QFFT\nstatus: 진행 중\nsummary: 요약\n---\n\n본문\n', encoding='utf-8')
         (t / 'content/experiments/2026-11-08-a.md').write_text('---\ntitle: 공개 기록\ndate: 2026-11-08\nstatus: 완료\nproject: QFFT\n---\n\n| a | b |\n|---|---|\n| 1 | 2 |\n\n![그림](/uploads/x.png)\n', encoding='utf-8')
         (t / 'content/experiments/2026-11-07-b.md').write_text('---\ntitle: 숨긴 기록\ndate: 2026-11-07\npublished: false\n---\n본문\n', encoding='utf-8')
         (t / 'content/talks/2026-11-03-c.md').write_text('---\ntitle: 회의 발표\ndate: 2026-11-03\nfile: /uploads/meeting.pptx\n---\n', encoding='utf-8')
@@ -292,6 +317,9 @@ def selftest():
         k = (out / 'talks/2026-11-03-c.html').read_text(encoding='utf-8')
         assert 'data="../uploads/pdf/meeting.pdf"' in k and 'href="../uploads/meeting.pptx" download' in k
         assert (out / 'uploads/pdf/meeting.pdf').exists() and '<strong>소개</strong>' in (out / 'index.html').read_text(encoding='utf-8')
+        rp = (out / 'research/topic.html').read_text(encoding='utf-8')
+        assert 'href="../experiments/2026-11-08-a.html"' in rp and '숨긴 기록' not in rp and '실험 기록 1개' in (out / 'research/index.html').read_text(encoding='utf-8')
+        assert 'href="research/index.html"' in (out / 'index.html').read_text(encoding='utf-8')
         j = t / 'j.md'
         j.write_text('# 일지\n\n## 2026-11-08 — B01 사전등록 [Claude 세션]\n\n**배경.** 서버 10.0.0.1 에 ssh 로 접속.\n\n'
                      '## 2026-11-08 — B01 결과: 사전 기준 통과\n\n결과 문단.\n\n## 정정 이력\n\n| 표 |\n', encoding='utf-8')

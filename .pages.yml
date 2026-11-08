@@ -3,6 +3,25 @@ media:
   input: uploads
   output: /uploads
 content:
+  - name: research
+    label: 연구 주제
+    type: collection
+    path: content/research
+    filename: "{year}-{month}-{day}-{hour}{minute}{second}.md"
+    view:
+      fields: [title, project, status, published]
+    fields:
+      - { name: title, label: 제목, type: string, required: true }
+      - { name: project, label: 프로젝트 이름(실험 기록의 프로젝트와 같게 쓰면 관련 기록이 자동으로 모임), type: string }
+      - { name: order, label: 보이는 순서(작을수록 먼저), type: number }
+      - name: status
+        label: 상태
+        type: select
+        options:
+          values: [계획, 진행 중, 완료, 실패, 보류]
+      - { name: summary, label: 한 줄 요약, type: text }
+      - { name: published, label: 공개, type: boolean, default: true }
+      - { name: body, label: 내용, type: rich-text }
   - name: experiments
     label: 실험 기록
     type: collection

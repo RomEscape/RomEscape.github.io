@@ -97,3 +97,13 @@ footer.inner{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;p
 .btn{display:inline-block;text-decoration:none;font-size:14.5px;font-weight:600;padding:6px 14px;border:1px solid var(--accent);border-radius:6px}
 .btn:first-child{background:var(--accent);color:var(--bg)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* 연구 주제 카드 */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px}
+.card{background:var(--sheet);border:1px solid var(--rule);border-top:3px solid var(--accent);padding:16px 18px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.card h3{font-size:18px;line-height:1.45;margin:0}
+.card h3 a{color:var(--ink);text-decoration:none}
+.card h3 a:hover{color:var(--accent);text-decoration:underline}
+.card p{margin:0;font-size:15px;color:var(--muted)}
+.card .meta{font-size:13.5px}
+.related{display:flex;flex-direction:column;gap:10px;margin-top:12px}
