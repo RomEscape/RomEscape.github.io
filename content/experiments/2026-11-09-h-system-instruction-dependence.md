@@ -3,13 +3,13 @@ title: 첫 토큰을 고정해도 시스템 지시문을 없애면 답이 짧아
 date: 2026-11-09
 project: QFFT
 status: 진행 중
-summary: 응답 글을 고정하고 프롬프트의 한 구역만 바꿔 다음 토큰 분포의 변화를 쟀고, 시스템 지시문을 없앴을 때 SFT가 A1보다 3.5–4.9배 크게 움직이는 것을 새 200문항에서 재현했다. 첫 토큰을 고정하고 실제로 답을 생성한 겹치지 않는 새 100문항에서 SFT와 다른 세 모델의 긴 풀이 격차는 시스템 턴이 있을 때 35–41%p, 없을 때 1.5–4.5%p였다. 학습 방식마다 모델이 하나뿐이고 첫 토큰을 고정한 결과라 아직 발견이라고 부르지 않는다.
+summary: 응답 글을 고정하고 프롬프트의 한 구역만 바꿔 다음 토큰 분포의 변화를 쟀고, 시스템 지시문을 없앴을 때 SFT가 A1보다 3.5–4.9배 크게 움직이는 것을 새 200문항에서 재현했다. 첫 토큰을 고정하고 실제로 답을 생성한 겹치지 않는 새 100문항에서 SFT와 다른 세 모델의 긴 풀이 격차는 시스템 턴이 있을 때 35–41%p, 없을 때 1.5–4.5%p였다. 그러나 첫 토큰을 고정하지 않고 생성하면 시스템 턴 제거의 효과는 A1(0.42배)이 SFT(0.63배)보다 커서, 미리 정한 규칙대로 SFT 고유 주장은 접었다. 학습 방식마다 모델이 하나뿐이라 아직 발견이라고 부르지 않는다.
 published: true
 ---
 
 ## 한 줄 요약
 
-첫 토큰이 지나간 뒤(16–256번째 토큰)에도 학습 방식에 따른 차이가 남아 있었습니다. **질문 내용을 바꿨을 때의 반응은 네 모델이 같습니다. 시스템 지시문을 없앴을 때의 반응은 질문을 보고 학습한 SFT만 3.5–4.9배 큽니다.** 미리 정한 기준으로 새 200문항에서 재현됐습니다. 이어서 실제로 답을 생성해 보니 첫 100문항에서는 세 모델이 모두 짧아져(SFT 0.52배, A1 0.66배, A2 0.79배) 판정을 보류했습니다. **겹치지 않는 새 100문항에서는 미리 정한 규칙으로 모델 순서가 재현됐습니다. 첫 토큰을 `To`로 고정했을 때 긴 풀이 비율은 SFT 79%, 나머지 세 모델 38–44%였고, 시스템 턴을 없애면 넷 모두 27–31.5%로 모였습니다.** 학습 방식마다 모델이 하나뿐이고 첫 토큰을 고정한 결과라 아직 발견이라고 부르지 않습니다.
+첫 토큰이 지나간 뒤(16–256번째 토큰)에도 학습 방식에 따른 차이가 남아 있었습니다. **질문 내용을 바꿨을 때의 반응은 네 모델이 같습니다. 시스템 지시문을 없앴을 때의 반응은 질문을 보고 학습한 SFT만 3.5–4.9배 큽니다.** 미리 정한 기준으로 새 200문항에서 재현됐습니다. 이어서 실제로 답을 생성해 보니 첫 100문항에서는 세 모델이 모두 짧아져(SFT 0.52배, A1 0.66배, A2 0.79배) 판정을 보류했습니다. **겹치지 않는 새 100문항에서는 미리 정한 규칙으로 모델 순서가 재현됐습니다. 첫 토큰을 `To`로 고정했을 때 긴 풀이 비율은 SFT 79%, 나머지 세 모델 38–44%였고, 시스템 턴을 없애면 넷 모두 27–31.5%로 모였습니다.** **첫 토큰을 고정하지 않고 생성하면 시스템 턴 제거의 효과는 오히려 A1(0.42배)이 SFT(0.63배)보다 컸고, 미리 정한 규칙대로 SFT 고유 주장은 접었습니다.** 사후 분석에서는 SFT가 `Okay`로 시작하거나 시스템 턴이 있으면 길게 풀고, 둘 다 없을 때만 짧았습니다. 학습 방식마다 모델이 하나뿐이어서 아직 발견이라고 부르지 않습니다.
 
 ## 왜 궁금했나
 
@@ -141,12 +141,48 @@ SFT와 A1은 각각 따로 학습한 모델이라, 차이가 학습의 우연일
 
 **아직 말할 수 없는 것.** 학습 방식마다 모델이 하나뿐이라 학습 우연일 수 있습니다. 첫 토큰을 `To`로 고정한 결과라 자연스럽게 생성했을 때와 다를 수 있습니다. SFT의 정답 유지는 구간 아래쪽이 −5.2%p로 기준을 넘지 못했고, 상자 지시가 없는 조건에는 형식 문제도 섞여 있습니다. 프롬프트로 답 길이를 조절한다는 일반론은 이미 알려져 있고, 여기서 후보로 남기는 것은 질문을 보고 학습한 쪽의 초과 장문화가 시스템 지시문에 묶여 있다는 진단입니다.
 
-**이미 있는 연구.** 프롬프트로 답 길이를 조절한다는 일반론은 알려져 있고, 학습과 평가의 시스템 프롬프트 유무를 교차한 실험도 이미 있습니다. [Flint 블로그](https://marcodsn.me/blog/reasoning-compression)와 공개 저장소는 압축된 풀이를 학습한 Qwen3.5-4B에서 이 2×2를 보고했고(심사 전 자료), 프롬프트로 학습한 모델이 프롬프트에 의존한다고 적었습니다. 저희는 긴 풀이를 학습한 모델에서 같은 방향의 의존을 보았고, 다른 점은 학습 때 질문을 봤는가에 따라 그 의존이 달라지는지를 본다는 데 있습니다. `To`로 시작을 강제하면 답이 크게 짧아진다는 보고([2507.03704](https://arxiv.org/abs/2507.03704))도 있어, 네 모델이 모인 현상이 `To`로 인한 바닥 효과일 수 있습니다. 다음 실험에서 이 점을 가립니다.
+**이미 있는 연구.** 프롬프트로 답 길이를 조절한다는 일반론은 알려져 있고, 학습과 평가의 시스템 프롬프트 유무를 교차한 실험도 이미 있습니다. [Flint 블로그](https://marcodsn.me/blog/reasoning-compression)와 공개 저장소는 압축된 풀이를 학습한 Qwen3.5-4B에서 이 2×2를 보고했고(심사 전 자료), 프롬프트로 학습한 모델이 프롬프트에 의존한다고 적었습니다. 저희는 긴 풀이를 학습한 모델에서 같은 방향의 의존을 보았고, 다른 점은 학습 때 질문을 봤는가에 따라 그 의존이 달라지는지를 본다는 데 있습니다. `To`로 시작을 강제하면 답이 크게 짧아진다는 보고([2507.03704](https://arxiv.org/abs/2507.03704))도 있어, 네 모델이 모인 현상이 `To`로 인한 바닥 효과일 수 있습니다. 이 점은 아래 절에서 다룹니다.
+
+## 추가 결과: 첫 토큰을 건드리지 않으면 순서가 뒤집혔습니다
+
+<!-- xp3 -->
+<figure class="xp"><p class="xp-t">실제 입력과 출력 예(같은 문항, SFT, 첫 토큰 고정 없음, 정답 3)</p><div class="xp-cols"><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">A triangle has sides measuring 1 unit and 3 units. The length of the t …</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class=""><b>Okay,</b> so I have this problem here: A triangle ha …</div></div><div class="xp-name">시스템 턴 있음: 1,068토큰, 긴 풀이</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">A triangle has sides measuring 1 unit and 3 units. The length of the t …</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class=""><b>Okay,</b> so I have this problem here about a triang …</div></div><div class="xp-name">시스템 턴 없음, Okay로 시작: 1,115토큰, 긴 풀이</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">A triangle has sides measuring 1 unit and 3 units. The length of the t …</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class=""><b>To</b> determine the length of the third side of a t …</div></div><div class="xp-name">시스템 턴 없음, 다른 단어로 시작: 384토큰, 긴 풀이 아님</div></div></div><div class="xp-legend"><span><i class="xp-sw" style="box-shadow:inset 0 0 0 2px var(--xp-ctx)"></i>입력으로 읽기만 함(채점 안 함)</span><span><i class="xp-sw" style="background:var(--xp-del)"></i>입력에서 지움</span></div><p class="xp-cap">굵은 글자가 모델이 스스로 고른 첫 단어이고, 그 뒤는 생성된 글의 앞부분입니다. 시스템 턴이 없을 때 두 번 생성한 답 중 하나는 Okay로, 하나는 다른 단어로 시작한 문항 30개에서, 두 답의 토큰 비가 중앙값인 문항을 골랐습니다. 답 하나의 길이는 표본마다 크게 흔들립니다.</p></figure>
+<figure class="xp"><p class="xp-t">긴 풀이 비율과 기하 평균 토큰(새 100문항, 첫 토큰을 건드린 경우와 건드리지 않은 경우)</p><div class="xp-bars"><span>SFT: 시스템 턴 있음, 자연 시작</span><span class="xp-track"><i class="xp-fill" style="width:90.25%"></i></span><span>90.2%, 3,282토큰</span><span>SFT: 시스템 턴 있음, To 고정</span><span class="xp-track"><i class="xp-fill" style="width:78.75%"></i></span><span>78.8%, 2,738토큰</span><span>SFT: 시스템 턴 없음, 자연 시작</span><span class="xp-track"><i class="xp-fill" style="width:62.00%"></i></span><span>62.0%, 2,053토큰</span><span>SFT: 시스템 턴 없음, To 고정</span><span class="xp-track"><i class="xp-fill bad" style="width:31.50%"></i></span><span>31.5%, 1,208토큰</span></div><div class="xp-bars"><span>A1: 시스템 턴 있음, 자연 시작</span><span class="xp-track"><i class="xp-fill" style="width:87.00%"></i></span><span>87.0%, 2,935토큰</span><span>A1: 시스템 턴 있음, To 고정</span><span class="xp-track"><i class="xp-fill" style="width:39.25%"></i></span><span>39.2%, 1,572토큰</span><span>A1: 시스템 턴 없음, 자연 시작</span><span class="xp-track"><i class="xp-fill" style="width:30.00%"></i></span><span>30.0%, 1,222토큰</span><span>A1: 시스템 턴 없음, To 고정</span><span class="xp-track"><i class="xp-fill bad" style="width:29.00%"></i></span><span>29.0%, 1,132토큰</span></div><div class="xp-bars"><span>SFT, 시스템 턴 없음, 자연 시작 중 Okay류로 시작</span><span class="xp-track"><i class="xp-fill" style="width:85.29%"></i></span><span>85.3%, 2,914토큰</span><span>SFT, 시스템 턴 없음, 자연 시작 중 다른 단어로 시작</span><span class="xp-track"><i class="xp-fill bad" style="width:37.76%"></i></span><span>37.8%, 1,425토큰</span></div><p class="xp-cap">자연 시작은 첫 토큰을 고정하지 않고 생성한 답, To 고정은 첫 토큰을 To로 넣고 이어 쓴 답입니다. 시스템 턴이 있는 칸은 같은 프롬프트로 시드만 바꿔 두 번 돌린 400행을 합쳤고, 없는 칸은 200행입니다. 맨 아래 두 줄은 답을 본 뒤 시작 단어로 나눈 값이라 선택 편향이 남아 있습니다.</p></figure>
+<!-- /xp3 -->
+
+앞 실험은 모든 답의 첫 토큰을 `To`로 고정했습니다. 그런데 SFT와 A1은 고정하지 않으면 대부분 `Okay`로 시작합니다. 그래서 같은 새 100문항에서 첫 토큰을 고정하지 않고 다시 생성했습니다. 조건마다 2번씩 모델당 600개를 만들었고, 판정 기준은 답을 보기 전에 일지에 적었습니다.
+
+| 미리 정한 판정 | 기준 | 결과 |
+|---|---|---|
+| 잡음 대조 | 시드 반복이 0.90–1.10 | 통과: SFT 0.98, A1 1.07 |
+| 시스템 턴을 없앨 때 길이 | SFT만 줄면 SFT 관문, 둘 다 줄면 공통 단축 | **공통 단축**: SFT 0.63 (0.55–0.71), A1 0.42 (0.36–0.47) |
+| 첫 토큰 이동 | `Okay`류 비율이 20%p 이상 달라짐 | 이동: SFT 100% → 51%, A1 89% → 1% |
+| 정답 유지 | 구간 아래쪽 −5%p 이상 | 둘 다 미충족: SFT −5.2%p (−10.5–+0.0), A1 −1.8%p (−6.8–+3.0) |
+
+첫 토큰을 `To`로 고정했을 때는 SFT(0.44배)가 A1(0.72배)보다 훨씬 많이 줄었는데, 자연스럽게 시작하게 하니 반대로 A1(0.42배)이 SFT(0.63배)보다 더 줄었습니다. 미리 정한 규칙대로 **"자연스럽게 생성할 때 시스템 턴에 묶이는 것은 SFT만의 일"이라는 주장은 접습니다.** `To` 고정 상태의 결과는 그대로 남습니다.
+
+**왜 뒤집혔나(사후 분석).** 표의 수는 기하 평균 토큰과 긴 풀이 비율입니다.
+
+| | 시스템 턴 있음 | 시스템 턴 없음 |
+|---|---|---|
+| SFT, 자연 시작 | 3,282토큰, 90.2% (`Okay`류 100%) | 2,053토큰, 62.0% (`Okay`류 51%) |
+| SFT, `To` 고정 | 2,738토큰, 78.8% | 1,208토큰, 31.5% |
+| A1, 자연 시작 | 2,935토큰, 87.0% (`Okay`류 89%) | 1,222토큰, 30.0% (`Okay`류 1%) |
+| A1, `To` 고정 | 1,572토큰, 39.2% | 1,132토큰, 29.0% |
+
+- 시스템 턴을 없애면 첫 단어가 바뀝니다. A1은 `Okay`류가 거의 사라지고, SFT는 절반이 남습니다.
+- SFT가 시스템 턴 없이 `Okay`로 시작한 답은, 같은 문항에서 시스템 턴이 있을 때의 `Okay` 답과 길이가 같았습니다(0.99배, 0.87–1.13, 66문항). 다른 단어로 시작한 답은 0.39배(0.32–0.48, 64문항)였습니다.
+- 같은 문항, 같은 프롬프트에서 2번 생성했을 때 한 번은 `Okay`로, 한 번은 다른 단어로 시작한 경우가 30문항 있었습니다. 이 안에서도 다른 단어 쪽이 0.32배(0.22–0.46)로 짧았습니다.
+- 시스템 턴이 없을 때 SFT가 자연스럽게 `To`로 시작한 답은 `To`를 강제한 답과 길이가 같았습니다(1.05배, 0.90–1.24, 55문항). 네 모델이 모였던 값은 `To` 강제의 부작용만은 아니고, `To`로 시작하고 시스템 턴이 없는 경로의 길이입니다. `Okay`로 시작하면 시스템 턴이 없어도 길게 풀므로, 학습 방식과 상관없는 바닥값이라고 볼 수는 없습니다.
+
+즉 SFT는 **`Okay`로 시작하거나 시스템 턴이 있거나, 둘 중 하나만 있어도 길게 풀고 둘 다 없을 때만 짧습니다.** A1은 시스템 턴이 있어도 `To`로 시작하면 39%에 그치므로, 거의 `Okay`로 시작할 때만 깁니다.
+
+**아직 말할 수 없는 것.** `Okay`로 시작할지는 모델이 고른 것이어서 선택 편향이 남아 있고, 이 분석은 답을 본 뒤에 한 것입니다. 또 시스템 턴 제거로 줄어든 만큼 정답률을 지켰다고 말할 수 없습니다. 그래서 겹치지 않는 문항에서 `Okay`를 강제해 다시 확인합니다.
 
 ## 다음
 
 순서대로 진행합니다. 판정 기준은 결과를 보기 전에 일지에 적습니다.
 
-1. 첫 토큰을 고정하지 않고 자연스럽게 생성했을 때도 같은 일이 일어나는지 봅니다. SFT와 A1은 자연스럽게는 거의 `Okay`로 시작하므로, `To`로 강제한 상태와 다를 수 있습니다.
-2. 학습할 때 질문을 넣고 빼는 것과 시스템 문장을 넣고 빼는 것을 교차해 작은 모델 네 종류를 학습 시드 두 개씩 학습하고, 이 의존이 학습 형식에서 생기는지, 질문을 봤을 때 더 커지는지 시험합니다.
-3. 같은 답의 앞부분을 서로 다른 모델이 이어 쓰게 해, 긴 풀이가 어디에서 결정되는지(이미 쓴 글인가, 모델인가)도 함께 봅니다.
+1. 학습할 때 질문을 넣고 빼는 것과 시스템 문장을 넣고 빼는 것을 교차해 작은 모델 네 종류를 학습 시드 두 개씩 학습하고, 이 의존이 학습 형식에서 생기는지, 질문을 봤을 때 더 커지는지 시험합니다.
+2. 같은 답의 앞부분을 서로 다른 모델이 이어 쓰게 해, 긴 풀이가 어디에서 결정되는지(이미 쓴 글인가, 모델인가)도 함께 봅니다.
+3. 겹치지 않는 100문항에서 첫 토큰을 `Okay`로 강제하고 시스템 턴을 없애, 위의 "둘 중 하나만 있어도 길다"가 재현되는지 봅니다.
