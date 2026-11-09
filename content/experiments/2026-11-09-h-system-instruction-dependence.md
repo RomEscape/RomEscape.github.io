@@ -3,13 +3,13 @@ title: 첫 토큰을 고정해도 시스템 지시문을 없애면 답이 짧아
 date: 2026-11-09
 project: QFFT
 status: 진행 중
-summary: 응답 글을 고정하고 프롬프트의 한 구역만 바꿔 다음 토큰 분포의 변화를 쟀고, 시스템 지시문을 없앴을 때 SFT가 A1보다 3.5–4.9배 크게 움직이는 것을 새 200문항에서 재현했다. 실제로 답을 생성한 100문항에서는 세 모델 모두 짧아졌고(SFT 0.52배, A1 0.66배, A2 0.79배) 미리 정한 판정은 보류다. 지시문 없이 학습한 QFFT 대조를 진행 중이다.
+summary: 응답 글을 고정하고 프롬프트의 한 구역만 바꿔 다음 토큰 분포의 변화를 쟀고, 시스템 지시문을 없앴을 때 SFT가 A1보다 3.5–4.9배 크게 움직이는 것을 새 200문항에서 재현했다. 첫 토큰을 고정하고 실제로 답을 생성한 겹치지 않는 새 100문항에서 SFT와 다른 세 모델의 긴 풀이 격차는 시스템 턴이 있을 때 35–41%p, 없을 때 1.5–4.5%p였다. 학습 방식마다 모델이 하나뿐이고 첫 토큰을 고정한 결과라 아직 발견이라고 부르지 않는다.
 published: true
 ---
 
 ## 한 줄 요약
 
-첫 토큰이 지나간 뒤(16–256번째 토큰)에도 학습 방식에 따른 차이가 남아 있었습니다. **질문 내용을 바꿨을 때의 반응은 네 모델이 같습니다. 시스템 지시문을 없앴을 때의 반응은 질문을 보고 학습한 SFT만 3.5–4.9배 큽니다.** 미리 정한 기준으로 새 200문항에서 재현됐습니다. 이어서 실제로 답을 생성해 보니 **세 모델 모두 답이 짧아졌지만(SFT 0.52배, A1 0.66배, A2 0.79배) SFT만의 현상은 아니었습니다.** 미리 정한 판정은 보류이고, 아직 발견이라고 부르지 않습니다.
+첫 토큰이 지나간 뒤(16–256번째 토큰)에도 학습 방식에 따른 차이가 남아 있었습니다. **질문 내용을 바꿨을 때의 반응은 네 모델이 같습니다. 시스템 지시문을 없앴을 때의 반응은 질문을 보고 학습한 SFT만 3.5–4.9배 큽니다.** 미리 정한 기준으로 새 200문항에서 재현됐습니다. 이어서 실제로 답을 생성해 보니 첫 100문항에서는 세 모델이 모두 짧아져(SFT 0.52배, A1 0.66배, A2 0.79배) 판정을 보류했습니다. **겹치지 않는 새 100문항에서는 미리 정한 규칙으로 모델 순서가 재현됐습니다. 첫 토큰을 `To`로 고정했을 때 긴 풀이 비율은 SFT 79%, 나머지 세 모델 38–44%였고, 시스템 턴을 없애면 넷 모두 27–31.5%로 모였습니다.** 학습 방식마다 모델이 하나뿐이고 첫 토큰을 고정한 결과라 아직 발견이라고 부르지 않습니다.
 
 ## 왜 궁금했나
 
@@ -98,11 +98,53 @@ SFT와 A1은 각각 따로 학습한 모델이라, 차이가 학습의 우연일
 - **예상과 달랐던 것:** KL에서 SFT가 A1의 3.5–4.9배였던 차이는 길이에서는 약 1.6배로 줄었습니다. 토큰 합계로 본 실제 비용에서는 SFT와 A1을 가를 수 없습니다(이중비 1.07, 구간 0.83–1.37).
 - **조심할 것:** SFT는 정답률 구간이 −9.5%p까지 내려가 정답률을 유지한다고 말할 수 없습니다. 모든 조건이 첫 토큰을 `To`로 고정했으므로, 그대로 생성했을 때의 비용과는 다릅니다. 프롬프트로 추론 길이를 조절할 수 있다는 일반론은 이미 알려져 있어, 여기서 후보로 남기는 것은 "학습 방식에 따라 그 의존 크기가 달라지는가"뿐입니다.
 
+## 추가 결과: 새 100문항에서 순서가 다시 나왔습니다
+
+<!-- xp2 -->
+<figure class="xp"><p class="xp-t">실제 입력과 출력 예(새 100문항 중 SFT의 길이 비가 중앙값인 문항, 정답 143)</p><div class="xp-cols"><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">The sum of the digits of a two-digit number is $13.$ The difference be …</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class=""><b>To</b> solve this problem, let's start by understandin …</div></div><div class="xp-name">기본: 1,176토큰, 긴 풀이 아님</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">The sum of the digits of a two-digit number is $13.$ The difference be …</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class=""><b>To</b> solve this problem, let's start by defining the …</div></div><div class="xp-name">step by step만: 666토큰, 긴 풀이 아님</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">The sum of the digits of a two-digit number is $13.$ The difference be …</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class=""><b>To</b> solve the problem, let's denote the two-digit n …</div></div><div class="xp-name">상자 지시만: 570토큰, 긴 풀이 아님</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">The sum of the digits of a two-digit number is $13.$ The difference be …</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class=""><b>To</b> solve the problem, let's denote the two-digit n …</div></div><div class="xp-name">시스템 턴 없앰: 428토큰, 긴 풀이 아님</div></div></div><div class="xp-legend"><span><i class="xp-sw" style="box-shadow:inset 0 0 0 2px var(--xp-ctx)"></i>입력으로 읽기만 함(채점 안 함)</span><span><i class="xp-sw" style="background:var(--xp-del)"></i>입력에서 지움</span></div><p class="xp-cap">첫 토큰 To는 굵게 표시했고, 그 뒤는 SFT가 생성한 글의 앞부분입니다. 칸 아래에 그 답의 토큰 수와 긴 풀이 여부를 적었습니다. 이 문항은 SFT의 토큰 비가 100문항의 중앙값이 되는 문항으로 골랐고, 답 하나의 길이는 표본마다 크게 흔들립니다.</p></figure>
+<figure class="xp"><p class="xp-t">긴 풀이 비율(새 100문항, 첫 토큰 To 고정, 네 모델)</p><div class="xp-bars"><span>기본: SFT</span><span class="xp-track"><i class="xp-fill bad" style="width:78.75%"></i></span><span>78.8%</span><span>기본: A1</span><span class="xp-track"><i class="xp-fill" style="width:39.25%"></i></span><span>39.2%</span><span>기본: A2</span><span class="xp-track"><i class="xp-fill" style="width:37.75%"></i></span><span>37.8%</span><span>기본: QFFT</span><span class="xp-track"><i class="xp-fill" style="width:44.00%"></i></span><span>44.0%</span></div><div class="xp-bars"><span>시스템 턴 없앰: SFT</span><span class="xp-track"><i class="xp-fill" style="width:31.50%"></i></span><span>31.5%</span><span>시스템 턴 없앰: A1</span><span class="xp-track"><i class="xp-fill" style="width:29.00%"></i></span><span>29.0%</span><span>시스템 턴 없앰: A2</span><span class="xp-track"><i class="xp-fill" style="width:27.00%"></i></span><span>27.0%</span><span>시스템 턴 없앰: QFFT</span><span class="xp-track"><i class="xp-fill" style="width:30.00%"></i></span><span>30.0%</span></div><p class="xp-cap">긴 풀이는 답 안에 wait가 네 번 이상이거나, wait와 alternatively가 함께 나온 답입니다. 기본 프롬프트에서는 SFT가 다른 셋보다 훨씬 높고, 시스템 턴을 없애면 네 모델이 거의 같아집니다.</p></figure>
+<!-- /xp2 -->
+
+앞 실험에 쓰지 않은 100문항으로 네 모델의 답을 모두 새로 생성했습니다. 첫 토큰은 `To`로 고정했고 조건마다 2번 생성했습니다. A1은 시스템 문장만 있고 질문은 없이 학습한 모델, A2는 거기에 첫 토큰 학습까지 뺀 모델, QFFT는 시스템 문장과 질문을 모두 빼고 학습한 모델입니다. 판정 기준은 답을 보기 전에 일지에 적었습니다.
+
+| 프롬프트 변경 | SFT | A1 | A2 | QFFT |
+|---|---|---|---|---|
+| 시드 반복 (잡음의 크기) | 1.01 (0.92–1.11) | 1.09 (0.99–1.21) | 1.02 (0.90–1.15) | 0.98 (0.88–1.09) |
+| 뜻이 같은 다른 문장 | 0.85 (0.78–0.93) | 0.89 (0.82–0.97) | 0.90 (0.83–0.98) | 0.98 (0.89–1.07) |
+| `step by step` 문구를 뺌 (상자 지시만 남김) | 0.60 (0.53–0.66) | 0.75 (0.68–0.83) | 0.80 (0.73–0.89) | 0.80 (0.73–0.88) |
+| 상자 지시를 뺌 (`step by step`만 남김) | 0.99 (0.90–1.09) | 1.05 (0.96–1.15) | 1.00 (0.92–1.08) | 1.14 (1.03–1.26) |
+| 시스템 턴을 없앰 | 0.44 (0.39–0.49) | 0.72 (0.64–0.81) | 0.76 (0.69–0.83) | 0.78 (0.71–0.85) |
+
+표의 수는 기본 프롬프트 대비 몇 배인지를 문항마다 구해 평균낸 값(기하 평균)이고, 괄호는 95% 구간입니다.
+
+| 시스템 턴을 없앴을 때 | SFT | A1 | A2 | QFFT |
+|---|---|---|---|---|
+| 정답률 변화 | −1.2%p (−5.2–+2.5) | +3.0%p (−1.2–+7.2) | +0.2%p (−4.5–+4.8) | −4.0%p (−9.0–+0.5) |
+| 긴 풀이 비율 (기본 → 시스템 턴 없음) | 78.8% → 31.5% | 39.3% → 29.0% | 37.8% → 27.0% | 44.0% → 30.0% |
+
+| 미리 정한 판정 | 기준 | 결과 |
+|---|---|---|
+| 잡음 대조 | 시드 반복 네 모델 모두 0.90–1.10 | 통과 |
+| 모델 순서 | SFT가 A2, A1보다 더 줄어듦(이중비 0.85·0.90 이하, 구간 위쪽 1 미만) | **재현**: A1 대비 0.61 (0.54–0.70), A2 대비 0.58 (0.51–0.66) |
+| SFT 격차 축소 | 시스템 턴을 없애면 A1, A2와의 긴 풀이 격차가 절반 이상 줄어듦 | **재현**: A1 +39.5%p → +2.5%p, A2 +41.0%p → +4.5%p |
+| QFFT 대조 | QFFT는 그대로이거나, 함께 줄면 일반 효과 | 보류: QFFT도 0.78배로 줄지만 SFT가 훨씬 더 줄어듭니다 |
+| 어느 문구인가 | `step by step`만 남기면 그대로, 상자 지시만 남기면 줄어드는가 | `step by step` 문구: 0.99배, 0.60배 |
+| 뜻과 글자 | 뜻이 같은 다른 문장에서 그대로이면 뜻, 줄면 글자 | 보류: 0.85배로 기준 경계에서 판정 불가 |
+| 정답 유지 | 구간 아래쪽 −5%p 이상 | SFT 미충족 (−5.2%p), A1·A2 충족, QFFT 미충족 |
+
+**이렇게 읽으면 됩니다.**
+
+- 시스템 턴을 없애면 SFT가 가장 크게 줄었습니다(0.44배). 다른 세 모델은 0.72–0.78배입니다.
+- 기본 프롬프트에서 SFT가 다른 세 모델보다 긴 풀이를 35–41%p 더 많이 내는데, 시스템 턴을 없애면 그 차이가 1.5–4.5%p로 줄어듭니다. 앞선 100문항에서도 같은 방향이었습니다(사후 관찰, 격차 축소율 0.62–0.74).
+- 시스템 턴이 없을 때 네 모델의 평균적인 답 길이(기하 평균 1,132–1,210토큰)와 긴 풀이 비율(27–31.5%)은 거의 같았습니다. 학습 방식이 달라도 이 조건에서는 거의 구별되지 않습니다. 사후에 발견한 값이어서 다음 실험으로 확인해야 합니다.
+- `step by step` 문구만 남겨도 SFT는 줄지 않았습니다.
+
+**아직 말할 수 없는 것.** 학습 방식마다 모델이 하나뿐이라 학습 우연일 수 있습니다. 첫 토큰을 `To`로 고정한 결과라 자연스럽게 생성했을 때와 다를 수 있습니다. SFT의 정답 유지는 구간 아래쪽이 −5.2%p로 기준을 넘지 못했고, 상자 지시가 없는 조건에는 형식 문제도 섞여 있습니다. 프롬프트로 답 길이를 조절한다는 일반론은 이미 알려져 있고, 여기서 후보로 남기는 것은 질문을 보고 학습한 쪽의 초과 장문화가 시스템 지시문에 묶여 있다는 진단입니다.
+
 ## 다음
 
-지금 새 100문항으로 다음을 실행 중입니다. 판정 기준은 결과를 보기 전에 일지에 적었습니다.
+순서대로 진행합니다. 판정 기준은 결과를 보기 전에 일지에 적습니다.
 
-1. 지시문 없이 학습한 QFFT도 짧아지는지 봅니다. QFFT도 비슷하게 줄면 학습 방식의 효과가 아니라 일반 효과이므로 주장을 줄입니다.
-2. 지시문을 `step by step` 문구와 상자 문구로 나눠, 어느 쪽이 길이를 좌우하는지 봅니다.
-3. 뜻은 같고 글자만 다른 문장으로 바꿔, 학습 문장의 글자 자체에 묶인 것인지 뜻에 반응하는 것인지 봅니다.
-4. SFT, A1, A2의 순서가 새 문항에서도 다시 나오는지 봅니다.
+1. 첫 토큰을 고정하지 않고 자연스럽게 생성했을 때도 같은 일이 일어나는지 봅니다. SFT와 A1은 자연스럽게는 거의 `Okay`로 시작하므로, `To`로 강제한 상태와 다를 수 있습니다.
+2. 학습할 때 질문과 시스템 문장을 각각 넣고 빼서 작은 모델을 학습해, 이 의존이 학습 형식에서 생기는지 원인을 시험합니다.
+3. 같은 답의 앞부분을 서로 다른 모델이 이어 쓰게 해, 긴 풀이가 어디에서 결정되는지(이미 쓴 글인가, 모델인가)도 함께 봅니다.
