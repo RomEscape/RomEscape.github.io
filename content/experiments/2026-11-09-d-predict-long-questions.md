@@ -47,6 +47,10 @@ published: true
 
 ## 실험 예시
 
+<!-- xp -->
+<figure class="xp"><p class="xp-t">답을 뽑기 전에 문제를 가려내는 과정 (문항 110)</p><div class="xp-flow"><div class="xp-step"><b>입력</b>문제 글(306글자, 42낱말, 숫자 16개)과 Base 답 1개. Base 답은 32,000토큰까지 이어지고도 답을 내지 못함</div><div class="xp-arrow">→</div><div class="xp-step"><b>판별기</b>단순한 통계 모델, 5분할 교차 적합. 정답은 보지 않음. 점수 0.99</div><div class="xp-arrow">→</div><div class="xp-step"><b>보낼 곳</b>문턱을 넘으면 Base로 보냄. 넘지 못하면 A2가 풀되 12,000토큰에서 끊고 Base로 대체</div></div><div class="xp-tbl"><table><tr><th>이 문제의 결과</th><th>A2로 풀 때</th><th>Base로 보낼 때</th></tr><tr><td>평균 토큰</td><td>23,772</td><td>3,236</td></tr><tr><td>16번 중 맞힌 수</td><td>0</td><td>0</td></tr></table></div><p class="xp-cap">A2의 답 16개는 13,855–32,000토큰으로 모두 8,000을 넘습니다. 이 문제는 보내도 잃는 것이 없는 경우입니다. 반대로 긴 답이 값을 내는 문제를 잘못 보내면 정답을 잃습니다.</p></figure>
+<!-- /xp -->
+
 **문제 입력.** 모델에게는 다음과 같은 프롬프트에 문제 글이 들어갑니다. 정답은 저장된 16번 답을 채점할 때만 썼고, 판별기는 보지 않습니다.
 
 ```text

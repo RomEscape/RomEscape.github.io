@@ -40,6 +40,10 @@ published: true
 
 ## 실험 예시
 
+<!-- xp -->
+<figure class="xp"><p class="xp-t">학습에서 보는 길이와 답을 만들 때 허용되는 길이</p><div class="xp-bars"><span>가운데 길이의 학습 문서</span><span class="xp-track"><i class="xp-fill" style="width:16.17%"></i><i class="xp-line" style="left:45.51%"></i></span><span>5,820 끝맺음 있음</span><span>95% 지점의 학습 문서</span><span class="xp-track"><i class="xp-fill bad" style="width:45.51%"></i><i class="xp-fill off" style="left:45.51%;width:0.11%"></i><i class="xp-line" style="left:45.51%"></i></span><span>16,423 잘림, 끝맺음 없음</span><span>가장 긴 학습 문서</span><span class="xp-track"><i class="xp-fill bad" style="width:45.51%"></i><i class="xp-fill off" style="left:45.51%;width:52.14%"></i><i class="xp-line" style="left:45.51%"></i></span><span>35,155 잘림, 끝맺음 없음</span><span>A2의 답(상한 도달)</span><span class="xp-track"><i class="xp-fill" style="width:88.89%"></i><i class="xp-line" style="left:45.51%"></i></span><span>32,000</span></div><p class="xp-cap">빨간 선이 학습 입력 상한 16,384토큰입니다. 연한 부분은 학습에서 읽지 않는 토큰입니다. 잘린 문서 44개에는 끝맺음 표시가 없고, 답을 만들 때는 이 선을 넘어 32,000토큰까지 갑니다. 16,384를 넘은 A2 답은 740개입니다.</p></figure>
+<!-- /xp -->
+
 A2 모델로 계산 과정을 그대로 보이면 다음과 같습니다.
 
 | 구간(토큰) | 시작까지 끝나지 않은 답 | 그 구간에서 끝난 답 | 1,000토큰당 끝맺을 확률 |

@@ -44,6 +44,16 @@ published: true
 
 ## 실험 예시
 
+<!-- xp -->
+<figure class="xp"><p class="xp-t">문제에 있던 말이 답 안에 다시 나오는지 셉니다 (문항 7, A2)</p><div class="xp-cols"><div><p class="xp-name">문제</p><pre class="xp-ex">The set of points $(x,y,z)$ that satisfy
+\[2x = 3y = -z\]is a line.
+
+The set of points $(x,y,z)$ that satisfy
+\[6x = -y = -4z\]is another line.
+
+<span class="xp-hit">Find the angle between these lines, in degrees.</span></pre></div><div><p class="xp-name">답 도중</p><pre class="xp-ex">Wait, but the problem says "<span class="xp-hit">Find the angle between these lines, in degrees.</span>" Since the angle between two lines is the angle between their direction vectors, …</pre></div></div><p class="xp-cap">답의 앞 128토큰은 문제를 다시 말하는 구간이라 빼고, 그 뒤에서 문제의 연속 6토큰과 똑같이 나오는 곳을 셉니다. 빨간 글자가 실제로 복사된 부분입니다.</p></figure>
+<!-- /xp -->
+
 **자연어 복사의 실제 예.** 문항 7(난도 4)의 A2 답입니다. 문제는 두 직선 사이의 각을 묻고, 문제 끝 문장은 `Find the angle between these lines, in degrees.`입니다. 답 도중 `Wait` 뒤에 그 문장이 그대로 다시 나옵니다.
 
 ```text
