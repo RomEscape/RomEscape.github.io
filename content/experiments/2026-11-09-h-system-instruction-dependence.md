@@ -1,15 +1,15 @@
 ---
-title: 첫 토큰이 지나간 뒤에도 남는 차이, SFT만 시스템 지시문에 매달린다
+title: 첫 토큰을 고정해도 시스템 지시문을 없애면 답이 짧아진다
 date: 2026-11-09
 project: QFFT
 status: 진행 중
-summary: 응답 글을 고정하고 프롬프트의 한 구역만 바꿔 모델의 다음 토큰 분포가 얼마나 달라지는지 쟀다. 질문 내용을 바꿨을 때는 네 모델이 똑같이 움직였지만, 시스템 지시문을 없앴을 때는 SFT만 3.5–4.9배 크게 움직였다. 새 200문항에서 재현됐다. 실제 답 길이로 이어지는지는 아직 모른다.
+summary: 응답 글을 고정하고 프롬프트의 한 구역만 바꿔 다음 토큰 분포의 변화를 쟀고, 시스템 지시문을 없앴을 때 SFT가 A1보다 3.5–4.9배 크게 움직이는 것을 새 200문항에서 재현했다. 실제로 답을 생성한 100문항에서는 세 모델 모두 짧아졌고(SFT 0.52배, A1 0.66배, A2 0.79배) 미리 정한 판정은 보류다. 지시문 없이 학습한 QFFT 대조를 진행 중이다.
 published: true
 ---
 
 ## 한 줄 요약
 
-첫 토큰이 지나간 뒤(16–256번째 토큰)에도 학습 방식에 따른 차이가 남아 있었습니다. **질문 내용을 바꿨을 때의 반응은 네 모델이 같습니다. 시스템 지시문을 없앴을 때의 반응은 질문을 보고 학습한 SFT만 3.5–4.9배 큽니다.** 미리 정한 기준으로 새 200문항에서 재현됐습니다. 다만 이것은 다음 토큰 분포의 변화이고, 실제 답 길이가 달라지는지는 아직 검증 중입니다.
+첫 토큰이 지나간 뒤(16–256번째 토큰)에도 학습 방식에 따른 차이가 남아 있었습니다. **질문 내용을 바꿨을 때의 반응은 네 모델이 같습니다. 시스템 지시문을 없앴을 때의 반응은 질문을 보고 학습한 SFT만 3.5–4.9배 큽니다.** 미리 정한 기준으로 새 200문항에서 재현됐습니다. 이어서 실제로 답을 생성해 보니 **세 모델 모두 답이 짧아졌지만(SFT 0.52배, A1 0.66배, A2 0.79배) SFT만의 현상은 아니었습니다.** 미리 정한 판정은 보류이고, 아직 발견이라고 부르지 않습니다.
 
 ## 왜 궁금했나
 
@@ -22,6 +22,7 @@ published: true
 <!-- xp -->
 <figure class="xp"><p class="xp-t">무엇을 바꿨나: 응답 글은 그대로 두고 프롬프트의 한 구역만 바꿈</p><div class="xp-cols"><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">Convert the point $(0,3)$ in rectangular coordinates to polar coordina …</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">To convert the point \((0, 3)\) from rectangular coordinates …</div></div><div class="xp-name">기준: 평가 프롬프트 그대로</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">Convert the point $(0,3)$ in rectangular coordinates to polar coordina …</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">To convert the point \((0, 3)\) from rectangular coordinates …</div></div><div class="xp-name">시스템 턴 없앰</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div></div><div class="xp-del"><div class="xp-role">user</div><div class="">Convert the point $(0,3)$ in rectangular coordinates to polar coordina …</div></div><div class="xp-ctx"><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">To convert the point \((0, 3)\) from rectangular coordinates …</div></div><div class="xp-name">질문을 비움</div></div></div><div class="xp-legend"><span><i class="xp-sw" style="box-shadow:inset 0 0 0 2px var(--xp-ctx)"></i>입력으로 읽기만 함(채점 안 함)</span><span><i class="xp-sw" style="background:var(--xp-del)"></i>입력에서 지움</span></div><p class="xp-cap">저장된 MATH500 응답을 앞 512토큰까지 그대로 입력합니다. 빨간 테두리 안은 모델이 읽는 문맥이고, 회색은 지운 구역입니다. 답을 새로 만들지 않고, 각 위치에서 다음 토큰 분포가 기준과 얼마나 다른지(KL)만 잽니다.</p></figure>
 <figure class="xp"><p class="xp-t">확인 실험(새 200문항, 응답 글 A2): 16–256번째 토큰의 평균 KL</p><div class="xp-bars"><span>시스템 턴 없앰: SFT</span><span class="xp-track"><i class="xp-fill bad" style="width:32.48%"></i></span><span>0.162</span><span>시스템 턴 없앰: A1</span><span class="xp-track"><i class="xp-fill" style="width:6.66%"></i></span><span>0.033</span><span>시스템 턴 없앰: A2</span><span class="xp-track"><i class="xp-fill" style="width:4.67%"></i></span><span>0.023</span><span>시스템 턴 없앰: QFFT</span><span class="xp-track"><i class="xp-fill" style="width:10.03%"></i></span><span>0.050</span></div><div class="xp-bars"><span>질문을 비움: SFT</span><span class="xp-track"><i class="xp-fill" style="width:84.45%"></i></span><span>0.422</span><span>질문을 비움: A1</span><span class="xp-track"><i class="xp-fill" style="width:83.21%"></i></span><span>0.416</span><span>질문을 비움: A2</span><span class="xp-track"><i class="xp-fill" style="width:82.70%"></i></span><span>0.413</span><span>질문을 비움: QFFT</span><span class="xp-track"><i class="xp-fill" style="width:81.84%"></i></span><span>0.409</span></div><p class="xp-cap">질문을 비웠을 때의 변화는 네 모델이 거의 같고, 시스템 턴을 없앴을 때의 변화는 SFT만 큽니다. 응답 글을 SFT나 QFFT가 쓴 답으로 바꿔도 방향이 같습니다.</p></figure>
+<figure class="xp"><p class="xp-t">실제로 답을 생성(100문항 × 2회, 첫 토큰 To 고정): 기본 프롬프트 대비 토큰 비</p><div class="xp-bars"><span>같은 설정 다시 실행: SFT</span><span class="xp-track"><i class="xp-fill" style="width:78.09%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.98 (0.89–1.08)</span><span>같은 설정 다시 실행: A1</span><span class="xp-track"><i class="xp-fill" style="width:83.85%"></i><i class="xp-line" style="left:80.00%"></i></span><span>1.05 (0.96–1.16)</span><span>같은 설정 다시 실행: A2</span><span class="xp-track"><i class="xp-fill" style="width:80.47%"></i><i class="xp-line" style="left:80.00%"></i></span><span>1.01 (0.91–1.11)</span><span>step by step 문구 뺌: SFT</span><span class="xp-track"><i class="xp-fill" style="width:51.66%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.65 (0.58–0.73)</span><span>step by step 문구 뺌: A1</span><span class="xp-track"><i class="xp-fill" style="width:63.47%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.79 (0.73–0.87)</span><span>step by step 문구 뺌: A2</span><span class="xp-track"><i class="xp-fill" style="width:72.52%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.91 (0.82–1.00)</span><span>시스템 턴 없앰: SFT</span><span class="xp-track"><i class="xp-fill bad" style="width:41.92%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.52 (0.47–0.59)</span><span>시스템 턴 없앰: A1</span><span class="xp-track"><i class="xp-fill bad" style="width:52.50%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.66 (0.59–0.73)</span><span>시스템 턴 없앰: A2</span><span class="xp-track"><i class="xp-fill bad" style="width:63.44%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.79 (0.71–0.88)</span></div><p class="xp-cap">세로선이 1.0(기본 프롬프트와 같음)입니다. 문항마다 몇 배 달라졌는지를 평균낸 기하 평균 비이고, 괄호는 문항을 다시 뽑아 구한 95% 구간입니다. 같은 프롬프트를 시드만 바꿔 다시 돌린 줄이 잡음의 크기를 보여 줍니다.</p></figure>
 <!-- /xp -->
 
 ## 미리 정한 기준과 결과
@@ -74,8 +75,34 @@ SFT와 A1은 각각 따로 학습한 모델이라, 차이가 학습의 우연일
 
 미리 정한 판정은 **보류**입니다(기준은 네 값 모두 2배 이상). 방향은 전체 학습과 같고 질문 내용 의존이 같다는 점도 재현됐지만, 크기는 절반 정도이고 첫 토큰을 뺀 쌍에서는 약합니다. 질문 유무가 원인이라고 아직 단정하지 않습니다.
 
+## 추가 결과: 실제로 답을 생성한 100문항
+
+위의 KL은 다음 토큰 분포의 변화이므로, 앞서 쓰지 않은 100문항에서 답을 실제로 만들어 길이를 쟀습니다. 모든 조건에서 첫 토큰은 `To`로 고정했고, 표의 시드 반복은 같은 프롬프트를 시드만 바꿔 다시 돌린 값입니다. 비는 문항마다 몇 배 달라졌는지를 평균낸 값(기하 평균)이고, 괄호는 95% 구간입니다.
+
+| 프롬프트 변경 | SFT | A1 | A2 |
+|---|---|---|---|
+| 시드 반복 (잡음의 크기) | 0.98 (0.89–1.08) | 1.05 (0.96–1.16) | 1.01 (0.91–1.11) |
+| `step by step` 문구를 뺌 | 0.65 (0.58–0.73) | 0.79 (0.73–0.87) | 0.91 (0.82–1.00) |
+| 무관한 지시문으로 교체 | 0.68 (0.61–0.77) | 0.82 (0.75–0.90) | 0.85 (0.78–0.92) |
+| 시스템 턴을 없앰 | 0.52 (0.47–0.59) | 0.66 (0.59–0.73) | 0.79 (0.71–0.88) |
+
+| 시스템 턴을 없앴을 때 | SFT | A1 | A2 |
+|---|---|---|---|
+| 정답률 변화 | −4.2%p (−9.5–+0.5) | +1.2%p (−3.0–+5.8) | −0.2%p (−4.2–+3.8) |
+| 긴 풀이 비율 변화 | −37.5%p | −18.0%p | −10.0%p |
+| 토큰 합계로 본 비용 비 | 0.71 (0.60–0.81) | 0.66 (0.53–0.80) | 0.85 (0.71–1.02) |
+
+미리 정한 판정은 **보류**입니다. 기준은 "SFT는 뚜렷이 줄고 A2는 그대로(0.90–1.10)"였는데, A2의 시스템 턴 제거가 0.79배로 그 범위를 벗어났습니다. 기준을 결과에 맞춰 바꾸지 않았습니다.
+
+- **확인된 것:** 첫 토큰을 고정해도 시스템 지시문을 바꾸면 세 모델 모두 답이 짧아집니다. 잡음의 크기(0.98–1.05)를 뚜렷이 넘습니다.
+- **예상과 달랐던 것:** KL에서 SFT가 A1의 3.5–4.9배였던 차이는 길이에서는 약 1.6배로 줄었습니다. 토큰 합계로 본 실제 비용에서는 SFT와 A1을 가를 수 없습니다(이중비 1.07, 구간 0.83–1.37).
+- **조심할 것:** SFT는 정답률 구간이 −9.5%p까지 내려가 정답률을 유지한다고 말할 수 없습니다. 모든 조건이 첫 토큰을 `To`로 고정했으므로, 그대로 생성했을 때의 비용과는 다릅니다. 프롬프트로 추론 길이를 조절할 수 있다는 일반론은 이미 알려져 있어, 여기서 후보로 남기는 것은 "학습 방식에 따라 그 의존 크기가 달라지는가"뿐입니다.
+
 ## 다음
 
-남은 검증입니다.
+지금 새 100문항으로 다음을 실행 중입니다. 판정 기준은 결과를 보기 전에 일지에 적었습니다.
 
-1. 100문항에서 지시문을 없애거나 바꾼 뒤 실제로 답을 생성해, 같은 조건 반복의 변동을 넘어 길이가 달라지는지 확인합니다.
+1. 지시문 없이 학습한 QFFT도 짧아지는지 봅니다. QFFT도 비슷하게 줄면 학습 방식의 효과가 아니라 일반 효과이므로 주장을 줄입니다.
+2. 지시문을 `step by step` 문구와 상자 문구로 나눠, 어느 쪽이 길이를 좌우하는지 봅니다.
+3. 뜻은 같고 글자만 다른 문장으로 바꿔, 학습 문장의 글자 자체에 묶인 것인지 뜻에 반응하는 것인지 봅니다.
+4. SFT, A1, A2의 순서가 새 문항에서도 다시 나오는지 봅니다.
