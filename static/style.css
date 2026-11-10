@@ -7,6 +7,7 @@
   --s2:#1d7440; --s2-bg:#e2f3e8;   /* 완료 */
   --s3:#b23a2e; --s3-bg:#f9e6e3;   /* 실패 */
   --s4:#5d6876; --s4-bg:#eceff3;   /* 보류 */
+  --idea:#6b3fa0; --idea-bg:#efe7f8; /* 아이디어 후보 */
   --font:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
   --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
 }
@@ -14,7 +15,7 @@
   --bg:#0f141b; --sheet:#151c25; --ink:#e5eaf0; --muted:#9aa6b4; --rule:#29323e;
   --accent:#93b4ea; --accent-soft:#1b2638;
   --s0:#93b4ea; --s0-bg:#1b2638; --s1:#e6bb62; --s1-bg:#33280f; --s2:#68cc92; --s2-bg:#15301f;
-  --s3:#f08f83; --s3-bg:#3a1d1a; --s4:#a8b3c0; --s4-bg:#222a35; color-scheme:dark}}
+  --s3:#f08f83; --s3-bg:#3a1d1a; --s4:#a8b3c0; --s4-bg:#222a35; --idea:#c6a6ee; --idea-bg:#2a2038; color-scheme:dark}}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.75;word-break:keep-all;overflow-wrap:anywhere}
@@ -64,6 +65,7 @@ footer.inner{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;p
 .pill.s0{color:var(--s0);background:var(--s0-bg)} .pill.s1{color:var(--s1);background:var(--s1-bg)}
 .pill.s2{color:var(--s2);background:var(--s2-bg)} .pill.s3{color:var(--s3);background:var(--s3-bg)}
 .pill.s4,.pill.s-1{color:var(--s4);background:var(--s4-bg)}
+.pill.idea{color:var(--idea);background:var(--idea-bg)}
 .month{display:flex;flex-direction:column;gap:8px}
 .month h2{font-size:16px;color:var(--muted);font-weight:600}
 .filters{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
