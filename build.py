@@ -20,6 +20,7 @@ import markdown
 import yaml
 
 ROOT = Path(__file__).resolve().parent
+CSS_V = ''
 STATUSES = ['계획', '진행 중', '완료', '실패', '보류']
 IDEA, NOIDEA = '아이디어 후보', '아이디어 후보 제외'
 NAV = [('home', 'index.html', '홈'), ('research', 'research/index.html', '연구'), ('experiments', 'experiments/index.html', '실험 기록'),
@@ -92,7 +93,7 @@ def page(site, title, body, depth, active):
 <title>{full}</title>
 <meta name="description" content="{esc(site.get('tagline'))}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-<link rel="stylesheet" href="{r}static/style.css">
+<link rel="stylesheet" href="{r}static/style.css?v={CSS_V}">
 </head>
 <body>
 <header class="top"><div class="inner"><a class="brand" href="{r}index.html">{name}</a><nav>{''.join(links)}</nav></div></header>
@@ -149,6 +150,8 @@ def build(root=ROOT, out=None):
     (out / 'experiments').mkdir(parents=True)
     (out / 'talks').mkdir()
     (out / 'research').mkdir()
+    global CSS_V  # 스타일이 바뀌면 주소가 바뀌어 브라우저 캐시(GitHub Pages 10분)를 건너뛴다
+    CSS_V = hashlib.md5((root / 'static' / 'style.css').read_bytes()).hexdigest()[:8]
     shutil.copytree(root / 'static', out / 'static')
     if (root / 'uploads').exists():
         shutil.copytree(root / 'uploads', out / 'uploads', ignore=shutil.ignore_patterns('.gitkeep'))
@@ -335,6 +338,7 @@ def selftest():
         rp = (out / 'research/topic.html').read_text(encoding='utf-8')
         assert 'href="../experiments/2026-11-08-a.html"' in rp and '숨긴 기록' not in rp and '실험 기록 1개' in (out / 'research/index.html').read_text(encoding='utf-8')
         assert 'href="research/index.html"' in (out / 'index.html').read_text(encoding='utf-8')
+        assert 'static/style.css?v=' + hashlib.md5(b'body{}').hexdigest()[:8] in (out / 'index.html').read_text(encoding='utf-8')
         j = t / 'j.md'
         j.write_text('# 일지\n\n## 2026-11-08 — B01 사전등록 [Claude 세션]\n\n**배경.** 서버 10.0.0.1 에 ssh 로 접속.\n\n'
                      '## 2026-11-08 — B01 결과: 사전 기준 통과\n\n결과 문단.\n\n## 정정 이력\n\n| 표 |\n', encoding='utf-8')
