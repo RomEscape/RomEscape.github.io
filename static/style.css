@@ -140,7 +140,7 @@ footer.inner{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;p
 .prose .xp-tbl table{display:table;font-size:12.5px;font-family:var(--mono);margin:0;white-space:nowrap}
 .prose .xp-tbl th,.prose .xp-tbl td{padding:3px 7px;text-align:center}
 .prose .xp-tbl th:first-child,.prose .xp-tbl td:first-child{text-align:left;font-family:var(--font);position:sticky;left:0;background:var(--sheet)}
-.prose .xp-tbl td.m{background:var(--xp-mask);color:var(--xp-mask-ink);font-weight:700}
+.prose .xp-tbl td.m{box-shadow:inset 0 0 0 2px var(--xp-ctx);color:var(--ink);font-weight:700}
 .prose .xp-tbl .gap{color:var(--muted);border:0}
 .xp-ex{font-family:var(--mono);font-size:12.5px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;border:1px solid var(--rule);border-radius:8px;padding:9px 11px;margin:0}
 .xp-bars{display:grid;grid-template-columns:auto 1fr auto;gap:3px 8px;align-items:center;font-size:12.5px;font-family:var(--mono);position:relative}
