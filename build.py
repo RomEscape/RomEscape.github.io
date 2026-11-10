@@ -21,7 +21,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent
 STATUSES = ['계획', '진행 중', '완료', '실패', '보류']
-IDEA = '아이디어 후보'
+IDEA, NOIDEA = '아이디어 후보', '아이디어 후보 제외'
 NAV = [('home', 'index.html', '홈'), ('research', 'research/index.html', '연구'), ('experiments', 'experiments/index.html', '실험 기록'),
        ('talks', 'talks/index.html', '발표자료'), ('about', 'about.html', '소개')]
 FRONT = re.compile(r'^---[ \t]*\n(.*?)\n---[ \t]*(?:\n|$)', re.S)
@@ -65,8 +65,14 @@ def pill(status):
     return f'<span class="pill s{i}">{esc(status)}</span>' if status else ''
 
 
-def idea_pill(d):  # 새 방법론 쪽으로 가치가 있던 실험 표시(머리말 idea: true)
-    return f'<span class="pill idea">{IDEA}</span>' if d.get('idea') else ''
+def idea_mark(d):  # 머리말 idea: 후보(또는 true) → '1', idea: 제외 → 'x', 없으면 '0'
+    v = d.get('idea')
+    return '1' if v is True or v == '후보' else 'x' if v == '제외' else '0'
+
+
+def idea_pill(d):  # 논문화 가능한 아이디어 후보와 가망 없어 뺀 것 표시
+    m = idea_mark(d)
+    return f'<span class="pill idea">{IDEA}</span>' if m == '1' else f'<span class="pill noidea">{NOIDEA}</span>' if m == 'x' else ''
 
 
 def page(site, title, body, depth, active):
@@ -102,7 +108,7 @@ def page(site, title, body, depth, active):
 def exp_row(d, r):
     proj = f'<span class="proj">{esc(d.get("project"))}</span>' if d.get('project') else ''
     summ = f'<p>{esc(d.get("summary"))}</p>' if d.get('summary') else ''
-    return (f'<li class="row" data-status="{esc(d.get("status"))}" data-project="{esc(d.get("project"))}" data-idea="{1 if d.get("idea") else 0}">'
+    return (f'<li class="row" data-status="{esc(d.get("status"))}" data-project="{esc(d.get("project"))}" data-idea="{idea_mark(d)}">'
             f'<time>{d["date"].isoformat()}</time>{pill(d.get("status"))}{idea_pill(d)}'
             f'<a class="title" href="{r}experiments/{quote(d["slug"])}.html">{esc(d.get("title") or d["slug"])}</a>{proj}{summ}</li>')
 
@@ -190,7 +196,7 @@ def build(root=ROOT, out=None):
             groups.append((ym, []))
             cur = ym
         groups[-1][1].append(exp_row(d, '../'))
-    chips = ''.join(f'<button type="button" data-status="{esc(s)}">{esc(s)}</button>' for s in STATUSES) + f'<button type="button" data-status="__idea">{IDEA}</button>'
+    chips = ''.join(f'<button type="button" data-status="{esc(s)}">{esc(s)}</button>' for s in STATUSES) + f'<button type="button" data-status="__idea">{IDEA}</button><button type="button" data-status="__noidea">{NOIDEA}</button>'
     opts = ''.join(f'<option value="{esc(p)}">{esc(p)}</option>' for p in projects)
     body = f'''<h1>실험 기록</h1>
 <div class="filters" role="group" aria-label="거르기"><button type="button" data-status="" aria-pressed="true">전체</button>{chips}
@@ -199,7 +205,7 @@ def build(root=ROOT, out=None):
 <script>
 (function(){{var st='',pj=document.getElementById('proj');
 function apply(){{var n=0;document.querySelectorAll('.month').forEach(function(m){{var v=0;
-m.querySelectorAll('.row').forEach(function(r){{var ok=(!st||(st==='__idea'?r.dataset.idea==='1':r.dataset.status===st))&&(!pj.value||r.dataset.project===pj.value);r.hidden=!ok;if(ok)v++;}});
+m.querySelectorAll('.row').forEach(function(r){{var ok=(!st||(st==='__idea'?r.dataset.idea==='1':st==='__noidea'?r.dataset.idea==='x':r.dataset.status===st))&&(!pj.value||r.dataset.project===pj.value);r.hidden=!ok;if(ok)v++;}});
 m.hidden=!v;n+=v;}});document.getElementById('count').textContent=n+'개';}}
 document.querySelectorAll('.filters button').forEach(function(b){{b.addEventListener('click',function(){{st=b.dataset.status;
 document.querySelectorAll('.filters button').forEach(function(x){{x.setAttribute('aria-pressed',x===b);}});apply();}});}});
@@ -308,6 +314,7 @@ def selftest():
             (t / 'content' / kind).mkdir(parents=True)
         (t / 'content/research/topic.md').write_text('---\ntitle: 연구 주제\nproject: QFFT\nstatus: 진행 중\nsummary: 요약\n---\n\n본문\n', encoding='utf-8')
         (t / 'content/experiments/2026-11-08-a.md').write_text('---\ntitle: 공개 기록\ndate: 2026-11-08\nstatus: 완료\nproject: QFFT\nidea: true\n---\n\n| a | b |\n|---|---|\n| 1 | 2 |\n\n![그림](/uploads/x.png)\n', encoding='utf-8')
+        (t / 'content/experiments/2026-11-06-d.md').write_text('---\ntitle: 뺀 기록\ndate: 2026-11-06\nidea: 제외\n---\n본문\n', encoding='utf-8')
         (t / 'content/experiments/2026-11-07-b.md').write_text('---\ntitle: 숨긴 기록\ndate: 2026-11-07\npublished: false\n---\n본문\n', encoding='utf-8')
         (t / 'content/talks/2026-11-03-c.md').write_text('---\ntitle: 회의 발표\ndate: 2026-11-03\nfile: /uploads/meeting.pptx\n---\n', encoding='utf-8')
         (t / 'uploads').mkdir()
@@ -315,12 +322,13 @@ def selftest():
         (t / '_converted').mkdir()
         (t / '_converted/meeting.pdf').write_bytes(b'%PDF')
         out, ne, nt = build(t, t / '_site')
-        assert (ne, nt) == (1, 1)
+        assert (ne, nt) == (2, 1)
         assert not (out / 'experiments/2026-11-07-b.html').exists()
         e = (out / 'experiments/2026-11-08-a.html').read_text(encoding='utf-8')
         assert '<table>' in e and 'src="../uploads/x.png"' in e and 'class="pill s2"' in e and 'class="pill idea"' in e
         ix = (out / 'experiments/index.html').read_text(encoding='utf-8')
-        assert 'data-idea="1"' in ix and 'data-status="__idea"' in ix
+        assert 'data-idea="1"' in ix and 'data-status="__idea"' in ix and 'data-idea="x"' in ix and 'data-status="__noidea"' in ix
+        assert 'class="pill noidea"' in (out / 'experiments/2026-11-06-d.html').read_text(encoding='utf-8')
         k = (out / 'talks/2026-11-03-c.html').read_text(encoding='utf-8')
         assert 'data="../uploads/pdf/meeting.pdf"' in k and 'href="../uploads/meeting.pptx" download' in k
         assert (out / 'uploads/pdf/meeting.pdf').exists() and '<strong>소개</strong>' in (out / 'index.html').read_text(encoding='utf-8')

@@ -66,6 +66,7 @@ footer.inner{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;p
 .pill.s2{color:var(--s2);background:var(--s2-bg)} .pill.s3{color:var(--s3);background:var(--s3-bg)}
 .pill.s4,.pill.s-1{color:var(--s4);background:var(--s4-bg)}
 .pill.idea{color:var(--idea);background:var(--idea-bg)}
+.pill.noidea{color:var(--muted);background:transparent;border:1px solid var(--rule);text-decoration:line-through;text-decoration-thickness:1px}
 .month{display:flex;flex-direction:column;gap:8px}
 .month h2{font-size:16px;color:var(--muted);font-weight:600}
 .filters{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
