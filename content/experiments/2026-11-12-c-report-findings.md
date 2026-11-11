@@ -118,6 +118,25 @@ QFFT를 포함해 학습 형식을 하나씩 바꾼 모델들은 틀린 풀이�
 
 같은 문구를 빼는데 그 문구를 보고 학습한 표준 SFT만 0.60배로 줄어듭니다.
 
+### 추론 지시만 빼면 조금만 짧아진다
+
+<!-- xp4 -->
+<figure class="xp"><p class="xp-t">세 가지 추론 조건의 실제 입력과 답의 앞부분(표준 SFT, 같은 문항, 정답 2)</p><div class="xp-cols"><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">What integer $x$ satisfies $\frac{1}{4}&lt;\frac{x}{7}&lt;\frac{1}{3}$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">Okay, so I need to find an integer x that satisfies the ineq …</div></div><div class="xp-name">표준 프롬프트: 2,630토큰</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">What integer $x$ satisfies $\frac{1}{4}&lt;\frac{x}{7}&lt;\frac{1}{3}$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">Okay, so I need to find an integer x that fits between 1/4 a …</div></div><div class="xp-name">추론 지시만 제거: 860토큰. 여전히 Okay로 시작</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">What integer $x$ satisfies $\frac{1}{4}&lt;\frac{x}{7}&lt;\frac{1}{3}$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">To determine the integer \( x \) that satisfies the inequali …</div></div><div class="xp-name">시스템 프롬프트 제거: 750토큰. To로 시작</div></div></div><div class="xp-legend"><span><i class="xp-sw" style="box-shadow:inset 0 0 0 2px var(--xp-ctx)"></i>모델이 읽는 프롬프트</span><span><i class="xp-sw" style="background:var(--sheet);border-color:var(--ink)"></i>모델이 쓴 답의 앞부분</span></div></figure>
+<figure class="xp"><p class="xp-t">표준 프롬프트 대비 토큰 비(표준 SFT, MATH500 500문항 × 4회, 같은 문항끼리 견준 값)</p><div class="xp-bars"><span>표준 프롬프트</span><span class="xp-track"><i class="xp-fill bad" style="width:80.00%"></i><i class="xp-line" style="left:80.00%"></i></span><span>기준, 평균 6,507토큰, Okay류로 시작 100%</span><span>추론 지시만 제거</span><span class="xp-track"><i class="xp-fill bad" style="width:68.80%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.86배 (0.83–0.90), 5,992토큰, Okay류 100%</span><span>시스템 프롬프트 제거</span><span class="xp-track"><i class="xp-fill" style="width:48.00%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.60배 (0.57–0.64), 4,899토큰, Okay류 49%</span></div><p class="xp-cap">시스템 프롬프트 칸이 남아 있으면 답 형식 지시만 있어도 답은 Okay류로 시작하고 길이도 거의 그대로입니다. 칸을 통째로 없애야 첫 낱말이 바뀌고 크게 짧아집니다.</p></figure>
+<!-- /xp4 -->
+
+시스템 프롬프트에서 "단계별로 추론하라"만 빼고 답 형식 지시는 남기면("Put your final answer within `\boxed{}`.") 어떻게 되는지도 돌렸습니다.
+
+| 추론 조건(표준 SFT) | 평균 토큰 | 표준 프롬프트 대비(문항 기준) | 정답률(표준 채점) | Okay류로 시작한 답 |
+|---|---|---|---|---|
+| 표준 프롬프트 | 6,507 | 기준 | 78.9% | 2,000개 중 2,000 |
+| 추론 지시만 제거 | 5,992 | 0.86배 [0.83, 0.90] | 79.1% | 1,999 |
+| 시스템 프롬프트 제거 | 4,899 | 0.60배 [0.57, 0.64] | 76.8%(읽어 넣으면 80.2%) | 974 |
+
+- 추론 지시 문구만 빼면 14%쯤 짧아지는 데 그치고, 첫 낱말은 그대로 "Okay"입니다.
+- 긴 풀이로 들어가는 문은 "단계별로 추론하라"라는 말이 아니라 시스템 프롬프트 칸이 있다는 것 자체에 묶여 있습니다. 칸을 통째로 없애야 첫 낱말이 바뀌고 0.60배가 됩니다.
+- 세 조건의 정답률은 같습니다(79–80%).
+
 ### QFFT와 견주면
 
 | 비교 | 토큰 비(문항 기준) | 토큰 비(전체) |
@@ -226,7 +245,7 @@ QFFT를 포함해 학습 형식을 하나씩 바꾼 모델들은 틀린 풀이�
 
 | 할 일 | 무엇을 위해 | 자원 | 필요한 결정 |
 |---|---|---|---|
-| 추론 지시만 빼기, 학습 형식별 프롬프트 빼기, GSM8K | 발견 2의 근거 넓히기 | 평가만, 11월 12일 오전까지 | 없음 |
+| 답 형식 지시를 질문 뒤에 붙이기, 학습 형식별 프롬프트 빼기, GSM8K | 발견 2의 근거 넓히기 | 평가만, 11월 12일 오전까지 | 없음 |
 | 표준 SFT 시드 반복 | 발견 1, 2가 학습 한 번의 우연이 아님을 확인 | 전체 파인튜닝 약 5.9시간과 평가 약 4시간 | 승인 |
 | 균형 상태 짝 학습 | 발견 4의 통제 실험 | 자료 만들기, 전체 파인튜닝 약 6.7시간, 평가 | 승인 |
 | 넘길 때를 정하는 신호 개선 | 발견 3의 남은 여지 약 4%포인트 | 추가 학습 없음 | 없음. 선행 연구가 많아 겹침 확인을 먼저 함 |
