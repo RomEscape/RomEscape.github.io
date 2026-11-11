@@ -4,7 +4,7 @@ date: 2026-11-12
 project: QFFT
 status: 판정 완료, 후속 진행 중
 idea: 후보
-summary: 표준 SFT 모델은 추론 때 학습에 쓴 시스템 프롬프트만 빼도 답 길이가 문항 기준 0.60배로 줄고 정답률은 그대로다(MATH500, 500문항 × 4회). 그 프롬프트 없이 학습한 모델은 1.04배, 미세조정 전 기반 모델은 0.95배로 거의 변하지 않는다. 미리 정한 판정은 "재현"이다. QFFT와의 길이 차이는 1.98배에서 1.20배로 줄어든다.
+summary: 표준 SFT 모델은 추론 때 학습에 쓴 시스템 프롬프트만 빼도 답 길이가 문항 기준 0.60배로 줄고 정답률은 그대로다(MATH500, 500문항 × 4회). 그 프롬프트 없이 학습한 모델은 1.04배, 미세조정 전 기반 모델은 0.95배로 거의 변하지 않는다. 미리 정한 판정은 "재현"이다. QFFT와의 길이 차이는 1.98배에서 1.20배로 줄어든다. 긴 풀이가 묶인 곳은 시스템 프롬프트라는 칸이 아니라 그 안의 지시 문장이다(답 형식 지시 한 문장만 질문 뒤에 붙여도 다시 길어진다).
 published: true
 ---
 
@@ -16,6 +16,7 @@ published: true
 - **대조:** 그 프롬프트 없이 학습한 모델은 1.04배, 미세조정 전 기반 모델은 0.95배입니다. 같은 문구를 빼는데 그 문구를 보고 학습한 모델만 줄어듭니다. 두 번째 모델(질문 비움 SFT)에서는 0.39배였습니다.
 - **정답률:** 답 틀이 없는 답을 읽어 넣으면 80.2% 대 79.6%로 내려가지 않습니다.
 - **판정:** 실험 전에 정한 두 예측이 모두 맞아 "재현"입니다.
+- **무엇에 묶였나(11월 12일 아침 추가):** 시스템 프롬프트라는 칸이 아니라 그 안의 지시 문장입니다. 칸을 없애고 답 형식 지시 한 문장만 질문 뒤에 붙여도 답 2,000개 가운데 1,997개가 다시 "Okay"로 시작하고 길이는 0.81배로 돌아옵니다.
 
 모델과 조건의 이름은 [실험 이름표](2026-11-12-a-status-names-and-plan.html)를 따릅니다.
 
@@ -43,6 +44,9 @@ QFFT 논문은 질문을 지우고 학습하면 모델이 쉬운 문제는 짧�
 | 토큰 비 | 두 조건의 답 길이를 나눈 값. 1배면 변화 없음 | 0.60배면 40% 짧아짐 |
 | 95% 구간 | 문항을 다시 뽑아도 값이 있을 범위. 대괄호로 적습니다 | 0.60배 [0.57, 0.64] |
 | 답 틀 | 최종 답을 넣는 `\boxed{}`. 원본 채점은 이 안의 답만 봅니다 | `\boxed{2}` |
+| 추론 지시 | 시스템 프롬프트의 앞부분. 단계별로 풀라는 말 | "Please reason step by step, and" |
+| 답 형식 지시 | 시스템 프롬프트의 뒷부분. 최종 답을 답 틀에 넣으라는 말 | "put your final answer within `\boxed{}`." |
+| Okay류로 시작 | 답이 "Okay"나 "Alright"로 시작함. 혼잣말하듯 길게 푸는 방식의 표시입니다 | 표준 프롬프트에서는 답 2,000개가 모두 그렇습니다 |
 | %p(퍼센트포인트) | 퍼센트끼리의 차이 | 79.6%와 80.2%의 차이는 0.6%p |
 
 ## 실험 예시
@@ -170,7 +174,7 @@ To determine the integer \( x \) that satisfies the inequality \( \frac{1}{4} < 
 - **128개 중 117개가 맞은 답이었습니다.** 표준 SFT에서 시스템 프롬프트를 뺀 조건은 73개 중 67개, 표준 프롬프트 조건은 17개 중 14개가 맞았습니다.
 - **읽어 넣으면 정답률은 내려가지 않습니다.** 표준 SFT는 80.2% 대 79.6%입니다.
 
-답 형식 지시는 남기고 추론 지시만 빼는 조건도 돌렸습니다. 답 틀 문제는 없어졌지만 길이가 거의 줄지 않았습니다(아래 "추가 결과"). 표준 채점만으로 견주려면 시스템 프롬프트 칸은 없애고 답 형식 지시를 질문 뒤에 붙이는 조건이 필요해, 이어서 돌립니다.
+답 형식 지시를 다시 넣는 조건 두 가지도 돌렸습니다. 하나는 시스템 프롬프트에 답 형식 지시만 남긴 조건이고, 다른 하나는 시스템 프롬프트 칸은 없애고 답 형식 지시를 질문 뒤에 붙인 조건입니다. 두 조건 모두 답 틀 문제는 없어졌지만(틀 없는 답 6개, 3개) 답이 다시 길어졌습니다(아래 "추가 결과" 두 절). 그래서 짧은 방식의 정답률은 위의 직접 읽기와, 지시 없이도 답을 틀에 넣는 질문 비움 SFT의 표준 채점으로 확인합니다.
 
 ## QFFT와 견주면
 
@@ -193,27 +197,66 @@ To determine the integer \( x \) that satisfies the inequality \( \frac{1}{4} < 
 ## 추가 결과: 추론 지시만 빼면 조금만 짧아진다
 
 <!-- xp3 -->
-<figure class="xp"><p class="xp-t">세 가지 추론 조건의 실제 입력과 답의 앞부분(표준 SFT, 같은 문항, 정답 2)</p><div class="xp-cols"><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">What integer $x$ satisfies $\frac{1}{4}&lt;\frac{x}{7}&lt;\frac{1}{3}$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">Okay, so I need to find an integer x that satisfies the ineq …</div></div><div class="xp-name">표준 프롬프트: 1,809토큰</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">What integer $x$ satisfies $\frac{1}{4}&lt;\frac{x}{7}&lt;\frac{1}{3}$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">Okay, so I need to find an integer x that fits between 1/4 a …</div></div><div class="xp-name">추론 지시만 제거: 1,444토큰. 여전히 Okay로 시작</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">What integer $x$ satisfies $\frac{1}{4}&lt;\frac{x}{7}&lt;\frac{1}{3}$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">To determine the integer \( x \) that satisfies the inequali …</div></div><div class="xp-name">시스템 프롬프트 제거: 750토큰. To로 시작</div></div></div><div class="xp-legend"><span><i class="xp-sw" style="box-shadow:inset 0 0 0 2px var(--xp-ctx)"></i>모델이 읽는 프롬프트</span><span><i class="xp-sw" style="background:var(--sheet);border-color:var(--ink)"></i>모델이 쓴 답의 앞부분</span></div><p class="xp-cap">이 문항을 4번씩 푼 평균 토큰은 표준 프롬프트 1,682, 추론 지시만 제거 1,314, 시스템 프롬프트 제거 1,013입니다. 카드의 답은 4번 가운데 길이가 가운데쯤인 것입니다(시스템 프롬프트 제거는 To로 시작한 답).</p></figure>
-<figure class="xp"><p class="xp-t">표준 프롬프트 대비 토큰 비(표준 SFT, MATH500 500문항 × 4회, 같은 문항끼리 견준 값)</p><div class="xp-bars"><span>표준 프롬프트</span><span class="xp-track"><i class="xp-fill bad" style="width:80.00%"></i><i class="xp-line" style="left:80.00%"></i></span><span>기준, 평균 6,507토큰, Okay류로 시작 100%</span><span>추론 지시만 제거</span><span class="xp-track"><i class="xp-fill bad" style="width:68.80%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.86배 (0.83–0.90), 5,992토큰, Okay류 100%</span><span>시스템 프롬프트 제거</span><span class="xp-track"><i class="xp-fill" style="width:48.00%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.60배 (0.57–0.64), 4,899토큰, Okay류 49%</span></div><p class="xp-cap">시스템 프롬프트 칸이 남아 있으면 답 형식 지시만 있어도 답은 Okay류로 시작하고 길이도 거의 그대로입니다. 칸을 통째로 없애야 첫 낱말이 바뀌고 크게 짧아집니다.</p></figure>
+<figure class="xp"><p class="xp-t">네 가지 추론 조건의 실제 입력과 답의 앞부분(표준 SFT, 같은 문항, 정답 2)</p><div class="xp-cols"><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">What integer $x$ satisfies $\frac{1}{4}&lt;\frac{x}{7}&lt;\frac{1}{3}$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">Okay, so I need to find an integer x that satisfies the ineq …</div></div><div class="xp-name">표준 프롬프트: 1,809토큰</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">What integer $x$ satisfies $\frac{1}{4}&lt;\frac{x}{7}&lt;\frac{1}{3}$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">Okay, so I need to find an integer x that fits between 1/4 a …</div></div><div class="xp-name">추론 지시만 제거: 1,444토큰. 여전히 Okay로 시작</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">What integer $x$ satisfies $\frac{1}{4}&lt;\frac{x}{7}&lt;\frac{1}{3}$?<br><br>Put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">Okay, so I need to find an integer x that satisfies the ineq …</div></div><div class="xp-name">답 형식 지시를 질문 뒤에: 932토큰. 시스템 프롬프트 칸이 없어도 Okay로 시작</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">What integer $x$ satisfies $\frac{1}{4}&lt;\frac{x}{7}&lt;\frac{1}{3}$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">To determine the integer \( x \) that satisfies the inequali …</div></div><div class="xp-name">시스템 프롬프트 제거: 750토큰. To로 시작</div></div></div><div class="xp-legend"><span><i class="xp-sw" style="box-shadow:inset 0 0 0 2px var(--xp-ctx)"></i>모델이 읽는 프롬프트</span><span><i class="xp-sw" style="background:var(--sheet);border-color:var(--ink)"></i>모델이 쓴 답의 앞부분</span></div><p class="xp-cap">이 문항을 4번씩 푼 평균 토큰은 표준 프롬프트 1,682, 추론 지시만 제거 1,314, 답 형식 지시를 질문 뒤에 940, 시스템 프롬프트 제거 1,013입니다. 한 문항의 값은 문항마다 달라서, 전체 경향은 아래 막대(500문항)로 봅니다. 카드의 답은 4번 가운데 길이가 가운데쯤인 것입니다(시스템 프롬프트 제거는 To로 시작한 답).</p></figure>
+<figure class="xp"><p class="xp-t">표준 프롬프트 대비 토큰 비(표준 SFT, MATH500 500문항 × 4회, 같은 문항끼리 견준 값)</p><div class="xp-bars"><span>표준 프롬프트</span><span class="xp-track"><i class="xp-fill bad" style="width:80.00%"></i><i class="xp-line" style="left:80.00%"></i></span><span>기준, 평균 6,507토큰, Okay류로 시작 2,000개 중 2,000</span><span>추론 지시만 제거</span><span class="xp-track"><i class="xp-fill bad" style="width:68.80%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.86배 (0.83–0.90), 5,992토큰, Okay류 1,999</span><span>답 형식 지시를 질문 뒤에</span><span class="xp-track"><i class="xp-fill bad" style="width:64.80%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.81배 (0.78–0.84), 5,870토큰, Okay류 1,997</span><span>시스템 프롬프트 제거</span><span class="xp-track"><i class="xp-fill" style="width:48.00%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.60배 (0.57–0.64), 4,899토큰, Okay류 974</span></div><p class="xp-cap">답 형식 지시 문장이 입력 어디에든 있으면(시스템 프롬프트 칸이든 질문 뒤든) 답은 Okay류로 시작하고 길이도 긴 쪽에 머뭅니다. 그 문장이 어디에도 없을 때만 첫 낱말이 바뀌고 크게 짧아집니다.</p></figure>
 <!-- /xp3 -->
 
 시스템 프롬프트에는 두 가지 지시가 한 문장에 들어 있습니다. "단계별로 추론하라"와 "답을 `\boxed{}`에 넣으라"입니다. 어느 쪽이 길이를 정하는지 보려고, 추론 지시만 빼고 답 형식 지시는 남긴 조건을 돌렸습니다. 시스템 프롬프트는 "Put your final answer within `\boxed{}`." 한 문장입니다.
 
-**표 읽는 법.** 세 줄 모두 표준 SFT이고 추론 조건만 다릅니다. "Okay류로 시작"은 답 2,000개 가운데 "Okay"나 "Alright"로 시작한 답의 수입니다.
+**표 읽는 법.** 네 줄 모두 표준 SFT이고 추론 조건만 다릅니다. "답 형식 지시를 질문 뒤에" 줄은 다음 절에서 설명합니다. "Okay류로 시작"은 답 2,000개 가운데 "Okay"나 "Alright"로 시작한 답의 수입니다.
 
 | 추론 조건 | 평균 토큰 | 표준 프롬프트 대비(문항 기준) | 정답률(표준 채점) | Okay류로 시작 | 답 틀 없는 답 |
 |---|---|---|---|---|---|
 | 표준 프롬프트 | 6,507 | 기준 | 78.9% | 2,000 | 17 |
 | 추론 지시만 제거 | 5,992 | 0.86배 [0.83, 0.90] | 79.1% | 1,999 | 6 |
+| 답 형식 지시를 질문 뒤에(시스템 프롬프트 칸 없음) | 5,870 | 0.81배 [0.78, 0.84] | 80.0% | 1,997 | 3 |
 | 시스템 프롬프트 제거 | 4,899 | 0.60배 [0.57, 0.64] | 76.8%(읽어 넣으면 80.2%) | 974 | 73 |
 
 - **추론 지시만 빼면 14%쯤 짧아지는 데 그칩니다.** 전체 토큰으로는 0.92배입니다. 정답률은 그대로입니다(차 +0.2%포인트 [−1.6, +1.9]).
-- **첫 낱말이 바뀌지 않습니다.** 답 형식 지시 한 문장만 있어도 답은 여전히 "Okay"로 시작합니다. 긴 풀이로 들어가는 문은 "단계별로 추론하라"라는 말이 아니라, 시스템 프롬프트 칸이 있다는 것 자체에 묶여 있습니다.
-- **크게 짧아지려면 칸을 통째로 없애야 합니다.** 그때 답의 절반이 "To"로 시작하면서 0.60배가 됩니다. 그 조건에서 "Okay"로 시작한 답은 0.84배였는데, 이번의 0.86배와 같은 크기입니다. 즉 추론 지시 문구의 몫이 약 15%, 첫 낱말이 바뀌는 몫이 나머지입니다.
+- **첫 낱말이 바뀌지 않습니다.** 답 형식 지시 한 문장만 있어도 답은 여전히 "Okay"로 시작합니다. 긴 풀이로 들어가는 문은 "단계별로 추론하라"라는 말에 달려 있지 않습니다.
+- **크게 짧아지는 것은 지시 문장이 아예 없을 때입니다.** 시스템 프롬프트를 통째로 빼면 답의 절반이 "To" 같은 말로 시작하면서(답 2,000개 가운데 "To" 851개, "Given", "Let's", "First" 등 175개) 0.60배가 됩니다. 그 조건에서 "Okay"로 시작한 답은 0.84배였는데, 이번의 0.86배와 같은 크기입니다. 즉 추론 지시 문구의 몫이 약 15%, 첫 낱말이 바뀌는 몫이 나머지입니다.
 - 미세조정 전 기반 모델에서 같은 문구를 빼면 0.91배였습니다. 문구 자체의 효과는 어느 모델에서나 작습니다.
 - 11월 10일에 첫 낱말을 "To"로 고정하고 잰 같은 조건은 0.60배였습니다. 그 값은 첫 낱말을 묶어 둔 값이라 이번 값과 다릅니다.
 
-**아직 남은 것.** 답 형식 지시를 남기면 답 틀 문제는 없어지지만(6개) 길이가 QFFT 수준으로 내려가지 않습니다. 그래서 "짧은 방식의 정답률을 사람이 읽지 않고 표준 채점만으로 확인한다"는 목적은 이 조건으로 이루지 못했습니다. 시스템 프롬프트 칸은 없애고 답 형식 지시만 질문 뒤에 붙이는 조건을 이어서 돌립니다.
+**아직 남은 것.** 답 형식 지시를 남기면 답 틀 문제는 없어지지만(6개) 길이가 QFFT 수준으로 내려가지 않습니다. 그래서 "짧은 방식의 정답률을 사람이 읽지 않고 표준 채점만으로 확인한다"는 목적은 이 조건으로 이루지 못했습니다. 그래서 시스템 프롬프트 칸은 없애고 답 형식 지시만 질문 뒤에 붙이는 조건을 돌렸습니다. 결과는 다음 절입니다.
+
+## 추가 결과: 답 형식 지시를 질문 뒤에 붙이면 다시 길어진다
+
+**왜 돌렸나.** 위 조건에서 답이 "Okay"로 시작한 이유는 두 가지일 수 있었습니다. 시스템 프롬프트라는 칸이 남아 있어서일 수도 있고, 답 형식 지시 문장이 남아 있어서일 수도 있습니다. 그래서 칸은 없애고 문장만 질문 뒤로 옮겼습니다. 칸이 원인이라면 답은 짧아져야 하고, 문장이 원인이라면 길게 남아야 합니다.
+
+**실제 입력.** 시스템 프롬프트 칸이 없고, 질문 뒤에 빈 줄을 두고 답 형식 지시 한 문장을 붙였습니다(위 그림의 세 번째 카드).
+
+```
+<|im_start|>user
+What integer $x$ satisfies $\frac{1}{4}<\frac{x}{7}<\frac{1}{3}$?
+
+Put your final answer within \boxed{}.<|im_end|>
+<|im_start|>assistant
+```
+
+**이 문항에서 일어난 일.** 4번 모두 "Okay"로 시작했습니다. 토큰은 782, 932, 1,182, 864였습니다. 이 문항 하나만 보면 짧게 나왔지만 한 문항의 길이는 실행마다 크게 달라서, 길이는 아래 500문항 값으로 봅니다.
+
+**표 읽는 법.** 위 절의 표에 있는 "답 형식 지시를 질문 뒤에" 줄이 이 조건입니다. 아래 표는 이 조건을 다른 세 조건과 하나씩 견준 값입니다. 1배보다 크면 이 조건이 더 깁니다.
+
+| 견주는 조건 | 토큰 비(문항 기준) | 토큰 비(전체) | 정답률 차(표준 채점) |
+|---|---|---|---|
+| 표준 프롬프트 | 0.81배 [0.78, 0.84] | 0.90배 [0.86, 0.94] | +1.1%p [−0.8, +2.8] |
+| 추론 지시만 제거(같은 문장을 시스템 프롬프트 칸에 둠) | 0.94배 [0.91, 0.98] | 0.98배 [0.93, 1.02] | +0.9%p [−0.7, +2.5] |
+| 시스템 프롬프트 제거(문장이 없음) | 1.34배 [1.27, 1.41] | 1.20배 [1.13, 1.27] | +3.1%p [+1.1, +5.4] |
+
+- **칸이 없어도 다시 "Okay"로 시작합니다.** 답 2,000개 가운데 1,997개입니다. 길이도 긴 쪽으로 돌아와 0.81배입니다.
+- **문장을 어디에 두든 거의 같습니다.** 같은 문장을 시스템 프롬프트 칸에 둔 조건과 견주면 0.94배입니다.
+- **미리 정한 판정.** 길이는 "중간"입니다(짧은 방식의 기준인 0.75배 아래도, 긴 방식의 기준인 0.80배 위도 아님). 답 틀은 "문제 없음"(틀 없는 답 3개), 정답률은 "유지"입니다. 세 가지가 모두 통과해야 하는 종합 판정은 "확인 못 함"입니다. 짧은 방식이 유지되지 않아, 이 조건으로는 짧은 방식의 정답률을 표준 채점만으로 확인할 수 없습니다.
+- **마지막 줄의 +3.1%포인트는 그대로 읽으면 안 됩니다.** 시스템 프롬프트 제거 쪽은 답 틀이 없는 맞은 답이 오답으로 채점된 값입니다.
+
+**해석을 하나 거둡니다.** 이 글의 앞선 판에는 "긴 풀이로 들어가는 문은 시스템 프롬프트 칸이 있다는 것 자체에 묶여 있다"고 적었습니다. 칸이 없어도 같은 일이 일어났으므로 이 해석은 틀렸습니다. 네 조건으로 말할 수 있는 것은 다음 두 가지입니다.
+
+- 학습 때 본 지시 문장의 일부(답 형식 지시)가 입력에 있으면, 시스템 프롬프트 칸에 있든 질문 뒤에 있든 답은 긴 방식으로 들어갑니다.
+- 그 문장이 입력 어디에도 없을 때만 절반이 짧은 방식으로 시작합니다.
+
+**실용 쪽에서의 뜻.** 표준 SFT에서는 답 형식을 지키게 하려고 이 문장을 다시 넣으면 답이 다시 길어집니다. "짧게 풀면서 답 형식도 지키는" 간단한 조건은 표준 SFT에서 아직 찾지 못했습니다. 질문 비움 SFT는 지시가 없어도 답을 틀에 넣으므로 이 문제가 없습니다(다음 절).
+
+**아직 모르는 것.** 추론 지시만 있을 때, 같은 뜻의 다른 문구일 때, 아무 상관 없는 문장일 때, 빈 시스템 프롬프트 칸만 있을 때는 재지 않았습니다. 답의 첫 낱말만 뽑아 보는 가벼운 측정으로 이어서 잽니다.
 
 ## 추가 결과: 다른 학습 형식에서도 같은가
 
@@ -253,6 +296,7 @@ To determine the integer \( x \) that satisfies the inequality \( \frac{1}{4} < 
 **말할 수 있는 것.**
 
 - 표준 SFT의 긴 풀이 습관은 학습 때 본 시스템 프롬프트에 붙어 있습니다. 그 프롬프트를 본 적이 없는 두 모델은 같은 프롬프트를 넣고 빼도 길이가 변하지 않았습니다.
+- 붙어 있는 곳은 시스템 프롬프트라는 칸이 아니라 그 안의 지시 문장입니다. 답 형식 지시 한 문장만 질문 뒤에 붙여도 긴 방식으로 돌아옵니다.
 - QFFT가 주는 "짧아짐"의 대부분은 다시 학습하지 않아도, 표준 SFT 모델의 추론 프롬프트를 바꾸는 것으로 얻을 수 있습니다(MATH500 기준).
 
 **말할 수 없는 것.**
@@ -260,6 +304,7 @@ To determine the integer \( x \) that satisfies the inequality \( \frac{1}{4} < 
 - 다른 벤치마크와 다른 학습 자료에서도 같다고는 아직 말할 수 없습니다.
 - 시스템 프롬프트를 뺀 표준 SFT가 QFFT만큼 "문제에 맞춰" 길이를 조절하는지는 따로 재야 합니다. 여기서 잰 것은 평균 길이와 정답률입니다.
 - 학습을 다른 시드로 다시 했을 때도 같은지는 확인하지 못했습니다.
+- 지시 문장의 어느 부분, 어느 문구가 긴 방식을 부르는지는 아직 다 나누지 못했습니다. 추론 지시만 있을 때와 다른 문구일 때를 재고 있습니다.
 
 ## 선행 연구와의 자리
 
@@ -276,8 +321,8 @@ To determine the integer \( x \) that satisfies the inequality \( \frac{1}{4} < 
 
 ## 다음
 
-- 답 형식 지시를 질문 뒤에 붙이기(시스템 프롬프트 칸은 없앰). 표준 채점만으로 정답률을 확인합니다.
+- 첫 낱말만 뽑기: 추론 지시만 있을 때, 같은 뜻의 다른 문구, 무관한 문장, 빈 시스템 프롬프트 칸에서 답이 어떤 낱말로 시작하는지 잽니다.
 - 남은 학습 형식의 모델(QFFT, 질문 비움 첫 토큰 미학습 SFT)에서 시스템 프롬프트 제거.
-- GSM8K에서 같은 실험.
+- GSM8K에서 같은 실험(표준 SFT, 질문 비움 SFT).
 
-*일지에서의 이름: 같은 조건 MATH500 평가(11월 11일), 학습 프롬프트 빼기(11월 12일)*
+*일지에서의 이름: 같은 조건 MATH500 평가(11월 11일), 학습 프롬프트 빼기와 답 형식 지시를 질문 뒤에 붙이는 조건(11월 12일)*
