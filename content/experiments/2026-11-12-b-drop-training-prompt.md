@@ -30,6 +30,21 @@ QFFT 논문은 질문을 지우고 학습하면 모델이 쉬운 문제는 짧�
 
 그렇다면 물어볼 것은 이것입니다. **표준 SFT의 긴 풀이는 질문이 아니라 학습 때 본 시스템 프롬프트에 붙어 있는 것 아닌가.** 맞다면 QFFT처럼 다시 학습하지 않고, 추론 때 그 프롬프트만 빼도 답이 짧아져야 합니다. 이것을 표준 벤치마크에서 직접 확인했습니다.
 
+## 용어 풀이
+
+| 용어 | 뜻 | 이 실험에서의 예 |
+|---|---|---|
+| 토큰 | 모델이 글을 읽고 쓰는 최소 단위. 영어 단어 하나나 그 일부 정도 | 표준 SFT는 MATH500 한 문항에 평균 6,507토큰을 씁니다 |
+| 미세조정(SFT) | 이미 만들어진 모델에 자료를 더 보여 주어 습관을 바꾸는 학습 | 어려운 수학 문제 817개와 긴 풀이를 보여 줌 |
+| 표준 SFT | 질문, 시스템 프롬프트, 풀이를 모두 넣고 학습한 모델 | 예전 글의 "SFT" |
+| 기반 모델 | 미세조정 전의 원래 모델 | Qwen2.5-7B-Instruct, 한 문항에 평균 635토큰 |
+| 시스템 프롬프트 | 질문 앞에 붙는 지시문. 학습 때도 평가 때도 같은 문장을 씁니다 | "Please reason step by step, and put your final answer within `\boxed{}`." |
+| 추론 조건 | 답을 쓰게 할 때 프롬프트를 어떻게 주는가 | 표준 프롬프트, 시스템 프롬프트 제거 |
+| 토큰 비 | 두 조건의 답 길이를 나눈 값. 1배면 변화 없음 | 0.60배면 40% 짧아짐 |
+| 95% 구간 | 문항을 다시 뽑아도 값이 있을 범위. 대괄호로 적습니다 | 0.60배 [0.57, 0.64] |
+| 답 틀 | 최종 답을 넣는 `\boxed{}`. 원본 채점은 이 안의 답만 봅니다 | `\boxed{2}` |
+| %p(퍼센트포인트) | 퍼센트끼리의 차이 | 79.6%와 80.2%의 차이는 0.6%p |
+
 ## 실험 예시
 
 <!-- xp -->
@@ -37,6 +52,61 @@ QFFT 논문은 질문을 지우고 학습하면 모델이 쉬운 문제는 짧�
 <figure class="xp"><p class="xp-t">시스템 프롬프트를 뺐을 때의 토큰 비(MATH500, 같은 문항끼리 견준 값). 세로 선이 1배(변화 없음)입니다</p><div class="xp-bars"><span>표준 SFT</span><span class="xp-track"><i class="xp-fill bad" style="width:48.00%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.60배 (0.57–0.64)</span><span>시스템 프롬프트 없이 학습한 SFT</span><span class="xp-track"><i class="xp-fill" style="width:83.20%"></i><i class="xp-line" style="left:80.00%"></i></span><span>1.04배 (1.00–1.07)</span><span>기반 모델(미세조정 전)</span><span class="xp-track"><i class="xp-fill" style="width:76.00%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.95배 (0.93–0.97)</span></div><p class="xp-cap">같은 문구를 빼는데, 그 문구를 보고 학습한 표준 SFT만 짧아집니다. 괄호는 95% 구간입니다.</p></figure>
 <figure class="xp"><p class="xp-t">평균 토큰과 정답률(MATH500)</p><div class="xp-bars"><span>표준 SFT, 표준 프롬프트</span><span class="xp-track"><i class="xp-fill bad" style="width:92.96%"></i></span><span>6,507토큰, 79.6%</span><span>표준 SFT, 시스템 프롬프트 제거</span><span class="xp-track"><i class="xp-fill" style="width:69.99%"></i></span><span>4,899토큰, 80.2%</span><span>QFFT, 표준 프롬프트</span><span class="xp-track"><i class="xp-fill" style="width:66.14%"></i></span><span>4,630토큰, 80.3%</span><span>기반 모델, 표준 프롬프트</span><span class="xp-track"><i class="xp-fill" style="width:9.07%"></i></span><span>635토큰, 75.4%</span></div><p class="xp-cap">표준 SFT의 두 줄은 답 틀이 없는 답을 읽어 넣은 정답률이고, QFFT와 기반 모델은 표준 채점 값입니다.</p></figure>
 <!-- /xp -->
+
+### 문항 하나로 따라가 보기
+
+<!-- xp1 -->
+**어느 문항인가.** MATH500의 342번 문항입니다. 500문항 가운데 토큰 비가 전체 값(0.60배)에 가장 가깝고, 8개 답이 모두 맞은 문항을 규칙으로 골랐습니다. 정답은 2입니다.
+
+**실제 입력: 표준 프롬프트.** 모델이 받는 글 전체입니다.
+
+```
+<|im_start|>system
+Please reason step by step, and put your final answer within \boxed{}.<|im_end|>
+<|im_start|>user
+What integer $x$ satisfies $\frac{1}{4}<\frac{x}{7}<\frac{1}{3}$?<|im_end|>
+<|im_start|>assistant
+```
+
+**실제 입력: 시스템 프롬프트 제거.** 위에서 system 칸 두 줄만 뺐습니다. 질문과 나머지는 글자까지 같습니다.
+
+```
+<|im_start|>user
+What integer $x$ satisfies $\frac{1}{4}<\frac{x}{7}<\frac{1}{3}$?<|im_end|>
+<|im_start|>assistant
+```
+
+**조건별로 한 일.** 같은 문항을 조건마다 4번 풀게 했습니다. 모델은 매번 조금씩 다른 답을 씁니다.
+
+| 추론 조건 | 1번째 | 2번째 | 3번째 | 4번째 | 평균 토큰 |
+|---|---|---|---|---|---|
+| 표준 프롬프트 | 2,630토큰, Okay로 시작, 정답 | 1,164토큰, Okay로 시작, 정답 | 1,809토큰, Okay로 시작, 정답 | 1,124토큰, Okay로 시작, 정답 | 1,682 |
+| 시스템 프롬프트 제거 | 750토큰, To로 시작, 정답 | 671토큰, To로 시작, 정답 | 1,245토큰, Okay로 시작, 정답 | 1,385토큰, Okay로 시작, 정답 | 1,013 |
+
+- 이 문항의 토큰 비는 1,013 ÷ 1,682 = 0.60배입니다.
+- 표준 프롬프트에서는 4번 모두 "Okay"나 "Alright"로 시작합니다. 시스템 프롬프트를 빼면 같은 문항에서도 "To"로 시작하는 답과 "Okay"로 시작하는 답이 섞여 나옵니다.
+
+**500문항을 합치는 법.**
+
+1. 문항마다 위와 같은 토큰 비를 구합니다.
+2. **문항 기준 토큰 비**는 그 비들의 곱셈 평균입니다. 예를 들어 세 문항의 비가 0.5배, 0.6배, 1.0배라면 0.5 × 0.6 × 1.0 = 0.3의 세제곱근인 0.67배입니다. 500문항 전체로는 0.60배입니다.
+3. **전체 토큰 비**는 500문항의 토큰을 모두 더해 나눈 값입니다. 4,899 ÷ 6,507 = 0.75배입니다.
+4. 두 값이 다른 이유는 어려운 문항 때문입니다. 어려운 문항은 답이 길어 전체 토큰의 큰 몫을 차지하는데, 덜 줄어듭니다. 가장 어려운 수준 5의 134문항은 0.70배입니다.
+
+**실제 출력 일부.** 표준 프롬프트의 1번째 답(2,630토큰) 앞부분입니다.
+
+```
+Okay, so I need to find an integer x that satisfies the inequality $\frac{1}{4} < \frac{x}{7} < \frac{1}{3}$. Let me try to figure this out step by step. First, I should probably handle each part of the inequality separately. So, breaking it down, I have two inequalities here: 1. $\frac{1}{4} < \frac{x}{7}$ 2. $\frac{x}{7} < \fr …
+```
+
+시스템 프롬프트를 뺐을 때 "To"로 시작한 답(750토큰) 앞부분입니다.
+
+```
+To determine the integer \( x \) that satisfies the inequality \( \frac{1}{4} < \frac{x}{7} < \frac{1}{3} \), we need to solve the compound inequality step by step. First, let's break down the inequality into two parts: 1. \( \frac{1}{4} < \frac{x}{7} \) 2. \( \frac{x}{7} < \frac{1}{3} \) We will solve each part separately and t …
+```
+
+**채점.** 답에서 마지막 `\boxed{}` 안의 글을 꺼내 정답과 수학적으로 같은지 봅니다. 위 두 답에서 꺼낸 값은 "2"와 "2"이고 정답 2와 같아 둘 다 정답입니다. `\boxed{}`가 없으면 꺼낼 값이 없어 오답이 됩니다.
+<!-- /xp1 -->
 
 ## 무엇을 했나
 
@@ -150,3 +220,5 @@ QFFT 논문은 질문을 지우고 학습하면 모델이 쉬운 문제는 짧�
 - 추론 지시만 빼기(답 형식 지시는 남김).
 - 다른 학습 형식의 모델(질문 비움 SFT, QFFT)에서 시스템 프롬프트 제거. 프롬프트를 보고 학습한 모델만 짧아지는지를 다른 모델로 반복합니다.
 - GSM8K에서 같은 실험.
+
+*일지에서의 이름: 같은 조건 MATH500 평가(11월 11일), 학습 프롬프트 빼기(11월 12일)*
