@@ -14,7 +14,7 @@ published: true
 | 발견 | 핵심 수치 | 근거의 굳기 |
 |---|---|---|
 | 1. 학습 형식을 바꿔도 가려내는 정도는 같고 되짚는 문턱만 다르다 | 여섯 모델의 가려내는 정도 1.13–1.21. 문턱은 표준 SFT 0.80, 나머지 1.04–1.11 | 측정 끝. 재는 척도에 따라 표현이 조금 달라짐 |
-| 2. 표준 SFT에서 학습 프롬프트만 빼면 QFFT 수준이 된다 | MATH500에서 토큰 0.60배 [0.57, 0.64], 정답률 80.2% 대 79.6%. 그 프롬프트 없이 학습한 모델은 1.04배, 기반 모델은 0.95배 | 미리 정한 판정 "재현". 학습은 모델마다 한 번 |
+| 2. 표준 SFT에서 학습 프롬프트만 빼면 QFFT 수준이 된다 | MATH500에서 토큰 0.60배 [0.57, 0.64], 정답률 80.2% 대 79.6%. 같은 프롬프트로 학습한 다른 모델은 0.39배. 그 프롬프트 없이 학습한 모델은 1.04배, 기반 모델은 0.95배 | 미리 정한 판정 "재현". 학습은 모델마다 한 번 |
 | 3. QFFT 한 번보다 "싼 풀이 먼저, 갈리면 긴 추론"이 낫다 | QFFT 한 번 대비 MATH500 +1.6%p(토큰 0.87배), GSM8K +6.6%p(0.97배), AIME25는 같음 | 저장된 답으로 고른 방식을 새 표본과 미리 정한 규칙으로 확인함(MATH500 +2.0%p, 토큰 0.89배) |
 | 4. 틀린 지점만 가르치면 "틀렸을 때"가 아니라 "어려운 문제에서" 켜는 것을 배운다 | 가려내는 정도 0.74(일곱 모델 중 최저), 헛경보가 자료 난도를 따라 6.3%에서 20.1%로 | 미확정. 통제 실험 필요 |
 
@@ -81,7 +81,7 @@ QFFT를 포함해 학습 형식을 하나씩 바꾼 모델들은 틀린 풀이�
 
 <!-- xp -->
 <figure class="xp"><p class="xp-t">실제 입력과 출력 예(표준 SFT, MATH500의 한 문항, 정답 2). 같은 문항에서 시스템 프롬프트만 뺐습니다</p><div class="xp-cols"><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">What integer $x$ satisfies $\frac{1}{4}&lt;\frac{x}{7}&lt;\frac{1}{3}$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">Okay, so I need to find an integer x that satisfies the inequality $\f …</div></div><div class="xp-name">표준 프롬프트: 2,630토큰, 정답</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">What integer $x$ satisfies $\frac{1}{4}&lt;\frac{x}{7}&lt;\frac{1}{3}$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">To determine the integer \( x \) that satisfies the inequality \( \fra …</div></div><div class="xp-name">시스템 프롬프트 제거, To로 시작한 답: 750토큰, 정답</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">What integer $x$ satisfies $\frac{1}{4}&lt;\frac{x}{7}&lt;\frac{1}{3}$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">Okay, so I need to find an integer x that fits between 1/4 and 1/3 whe …</div></div><div class="xp-name">시스템 프롬프트 제거, Okay로 시작한 답: 1,245토큰, 정답</div></div></div><div class="xp-legend"><span><i class="xp-sw" style="box-shadow:inset 0 0 0 2px var(--xp-ctx)"></i>모델이 읽는 프롬프트</span><span><i class="xp-sw" style="background:var(--xp-del)"></i>입력에서 뺀 부분</span><span><i class="xp-sw" style="background:var(--sheet);border-color:var(--ink)"></i>모델이 쓴 답의 앞부분</span></div><p class="xp-cap">이 문항의 평균 토큰은 표준 프롬프트 1,682, 시스템 프롬프트 제거 1,013로 0.60배입니다. 시스템 프롬프트를 빼면 같은 문항에서도 답이 "To"로 시작하기도 하고 "Okay"로 시작하기도 합니다.</p></figure>
-<figure class="xp"><p class="xp-t">시스템 프롬프트를 뺐을 때의 토큰 비(MATH500, 같은 문항끼리 견준 값). 세로 선이 1배(변화 없음)입니다</p><div class="xp-bars"><span>표준 SFT</span><span class="xp-track"><i class="xp-fill bad" style="width:48.00%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.60배 (0.57–0.64)</span><span>시스템 프롬프트 없이 학습한 SFT</span><span class="xp-track"><i class="xp-fill" style="width:83.20%"></i><i class="xp-line" style="left:80.00%"></i></span><span>1.04배 (1.00–1.07)</span><span>기반 모델(미세조정 전)</span><span class="xp-track"><i class="xp-fill" style="width:76.00%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.95배 (0.93–0.97)</span></div><p class="xp-cap">같은 문구를 빼는데, 그 문구를 보고 학습한 표준 SFT만 짧아집니다. 괄호는 95% 구간입니다.</p></figure>
+<figure class="xp"><p class="xp-t">시스템 프롬프트를 뺐을 때의 토큰 비(MATH500, 같은 문항끼리 견준 값). 세로 선이 1배(변화 없음)입니다</p><div class="xp-bars"><span>표준 SFT (학습 때 시스템 프롬프트를 봄)</span><span class="xp-track"><i class="xp-fill bad" style="width:48.00%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.60배 (0.57–0.64)</span><span>질문 비움 SFT (봄)</span><span class="xp-track"><i class="xp-fill bad" style="width:31.20%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.39배 (0.37–0.42)</span><span>시스템 프롬프트 없이 학습한 SFT (안 봄)</span><span class="xp-track"><i class="xp-fill" style="width:83.20%"></i><i class="xp-line" style="left:80.00%"></i></span><span>1.04배 (1.00–1.07)</span><span>기반 모델 (미세조정 전)</span><span class="xp-track"><i class="xp-fill" style="width:76.00%"></i><i class="xp-line" style="left:80.00%"></i></span><span>0.95배 (0.93–0.97)</span></div><p class="xp-cap">같은 문구를 빼는데, 그 문구를 보고 학습한 두 모델만 짧아집니다. 괄호는 95% 구간입니다.</p></figure>
 <!-- /xp -->
 
 **무엇을 했나.** MATH500 500문항을 문항당 4회 풀게 했습니다. 추론 조건은 표준 프롬프트와 시스템 프롬프트 제거 두 가지입니다. 결과를 보기 전에 예측 두 가지를 적어 두었습니다. ① 표준 SFT는 프롬프트를 빼면 0.90배 아래로 줄어든다. ② 시스템 프롬프트 없이 학습한 SFT보다 더 많이 줄어든다.
@@ -137,12 +137,29 @@ QFFT를 포함해 학습 형식을 하나씩 바꾼 모델들은 틀린 풀이�
 - 긴 풀이로 들어가는 문은 "단계별로 추론하라"라는 말이 아니라 시스템 프롬프트 칸이 있다는 것 자체에 묶여 있습니다. 칸을 통째로 없애야 첫 낱말이 바뀌고 0.60배가 됩니다.
 - 세 조건의 정답률은 같습니다(79–80%).
 
+### 다른 학습 형식에서도 같다
+
+시스템 프롬프트를 보고 학습한 두 번째 모델(질문 비움 SFT)에서도 같은 일이 일어났습니다.
+
+| 모델 | 학습 때 시스템 프롬프트 | 뺐을 때 토큰 비(문항 기준) | 정답률 차(표준 채점) |
+|---|---|---|---|
+| 표준 SFT | 봄 | 0.60배 [0.57, 0.64] | 읽어 넣으면 +0.5%p [−1.3, +2.5] |
+| 질문 비움 SFT | 봄 | 0.39배 [0.37, 0.42] | +0.2%p [−1.2, +1.6] |
+| 시스템 프롬프트 없이 학습한 SFT | 안 봄 | 1.04배 [1.00, 1.07] | 읽어 넣으면 −0.7%p [−2.2, +0.9] |
+| 기반 모델 | 미세조정 없음 | 0.95배 [0.93, 0.97] | +0.6%p [−0.6, +1.8] |
+
+- 질문 비움 SFT는 시스템 프롬프트가 없어도 답을 틀에 넣습니다. 그래서 사람이 읽어 넣지 않은 표준 채점만으로 정답률이 그대로입니다(79.7% 대 79.8%).
+- 시스템 프롬프트를 뺀 질문 비움 SFT는 평균 3,778토큰, 79.8%로 QFFT(4,630토큰, 80.3%)보다 전체 토큰이 0.82배 [0.77, 0.86]이고 정답률 차는 −0.4%포인트 [−1.8, +0.9]입니다.
+- 질문만 지우고 학습한 이 모델은 표준 프롬프트에서는 표준 SFT만큼 깁니다(6,149토큰). 길이를 가르는 것은 질문을 보고 학습했는지보다, 학습 때 본 시스템 프롬프트가 평가 때 있는지에 가깝습니다.
+- QFFT와 질문 비움 첫 토큰 미학습 SFT의 같은 조건은 아침에 채웁니다.
+
 ### QFFT와 견주면
 
 | 비교 | 토큰 비(문항 기준) | 토큰 비(전체) |
 |---|---|---|
 | 표준 SFT, 표준 프롬프트 ÷ QFFT | 1.98배 [1.89, 2.08] | 1.41배 [1.34, 1.48] |
 | 표준 SFT, 시스템 프롬프트 제거 ÷ QFFT | 1.20배 [1.14, 1.26] | 1.06배 [1.01, 1.11] |
+| 질문 비움 SFT, 시스템 프롬프트 제거 ÷ QFFT | 0.73배 [0.70, 0.76] | 0.82배 [0.77, 0.86] |
 
 길이 차이의 대부분이 추론 프롬프트 하나로 사라집니다. 효과의 대부분은 첫 낱말을 거칩니다. 프롬프트가 없으면 답의 51%가 "Okay" 대신 "To"로 시작하고 이 답은 0.41배입니다. 자세한 기록은 [학습 프롬프트 빼기](2026-11-12-b-drop-training-prompt.html)에 있습니다.
 
