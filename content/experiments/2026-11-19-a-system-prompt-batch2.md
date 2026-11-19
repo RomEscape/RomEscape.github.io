@@ -3,7 +3,7 @@ title: 시스템 프롬프트 묶음 2, 학습 방식별 간결 문장과 글자
 date: 2026-11-19
 project: QFFT
 status: 끝, 미리 정한 기준으로 간결 문장의 난도 배분은 SFT, A1, QFFT 모두 적응, 시스템 프롬프트 없이 학습한 모델은 중간
-summary: "answer concisely" 한 문장으로 쉬운 문제는 짧게, 어려운 문제는 길게 푸는 현상이 질문 제거 SFT(A1)와 QFFT에서도 나왔다(MATH500 Level 1 0.41, 0.47배, AIME25 0.88, 0.93배). 시스템 프롬프트 없이 학습한 모델은 덜 반응했다(0.79배). 학습 문장의 낱말 순서를 섞거나("answer step step, …") 부정해도("Do not reason step by step, …") SFT는 길게 풀었고, 겹치는 낱말이 없는 한국어 번역으로도 길게 풀었다. 응답 시작 위치에 더하는 방향은 7층에서는 효과가 없고 14층과 21층에서 작동했다. SFT 전 Instruct 모델에서는 아무것도 바꾸지 못했다.
+summary: 간결 문장("answer concisely") 하나로 쉬운 문제는 짧게, 어려운 문제는 길게 푸는 현상이 질문 제거 SFT(A1)와 QFFT에서도 나왔다(MATH500 Level 1 0.41, 0.47배, AIME25 0.88, 0.93배). 시스템 프롬프트 없이 학습한 모델은 덜 반응했다(0.79배). 학습 문장의 낱말 순서를 섞거나("answer step step, …") 부정해도("Do not reason step by step, …") SFT는 길게 풀었고, 겹치는 낱말이 없는 한국어 번역으로도 길게 풀었다. 응답 시작 위치에 더하는 방향은 7층에서는 효과가 없고 14층과 21층에서 작동했다. SFT 전 Instruct 모델에서는 아무것도 바꾸지 못했다.
 published: true
 ---
 
