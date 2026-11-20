@@ -35,7 +35,9 @@ published: true
 
 **11월 12일 확인한 GSM8K 정답 오류가 후속 평가에 얼마나 남았나** 공식 정답과 달랐던 16문항을 원 채점기로 바로잡자 같은 21,104개 생성에서 LIMO A2와 저자 QFFT가 각각 225개를 더 맞혔다. 정정한 GSM8K 전체에서 조기 종료가 같은 비용의 강한 대조보다 정확도 0.5%p 이상 높았던 경우는 없었다. [실험 설계와 문항 예시](../experiments/2026-11-20-gsm8k-restored-answer-audit.html)
 
-<!-- qfft-public-hub-49d604f81aa7f3f1c1 -->
+**같은 숫자를 64자리 쓴 뒤 멈추면 수학 풀이를 얼마나 줄일 수 있나** 정답에 가까운 값을 내고 0을 30,599번 반복한 사례가 있었지만, 그 문제를 뺀 MATH500 499문항에서는 경보 뒤 출력이 전체의 0.1063%였다. 단순 숫자 반복이나 정밀도 지시를 사용한 별도 GPU 실험은 보류했다. [실험 설계와 문항 예시](../experiments/2026-11-20-rounding-and-digit-repetition.html)
+
+<!-- qfft-public-hub-733ee5e3f43f1188c8 -->
 
 <!-- END 20261120 shared-premise and equivalent-policy -->
 
