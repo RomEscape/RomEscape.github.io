@@ -27,7 +27,9 @@ published: true
 
 **간결한 풀이에서 토큰은 마지막 계산의 앞과 뒤 중 어디에서 줄었나** 같은 참조 계산식이 양쪽 풀이에서 확인된 LIMO SFT 371문항에서 간결 지시는 평균 432토큰을 줄였다. 식을 쓰기 전이 340토큰, 식을 쓴 뒤가 91토큰이었다. 마지막 계산 뒤의 반복이 주로 줄었다는 가설은 사전 기준에 미달했다. [실험 설계와 문항 예시](../experiments/2026-11-20-reference-equation-length.html)
 
-<!-- qfft-public-hub-a1b39a5e096e622483 -->
+**최저 비용이 같은데 최적 배정이 여러 개면 풀이도 달라질까** 등록·대기. 사전등록과 실행 승인을 마쳤고, 예약된 앞선 GPU 작업 순서를 기다리고 있다. 최솟값과 그 증명은 같게 두고 최적 배정의 개수만 달라질 때, 값만 묻는 문제에서 출력 토큰이 달라지는지 시험한다. [실험 설계와 문항 예시](../experiments/2026-11-20-optimal-assignment-multiplicity.html)
+
+<!-- qfft-public-hub-9d59eb00e65f2e0c23 -->
 
 <!-- END 20261120 shared-premise and equivalent-policy -->
 
