@@ -23,7 +23,7 @@ published: true
 
 **네 풀이 중 먼저 끝난 두 답이 같을 때 멈추면 얼마나 절약할까** MATH와 GSM8K에서 네 표 완주보다 토큰을 17.7~27.0% 절약했지만, 먼저 끝난 세 표를 활용하는 정책까지 포함한 같은 비용의 대조 대비 정확도 차이는 −0.21~+0.16%p였다. 0.5%p 개선을 확인한 조합은 없었다. [실험 설계와 문항 예시](../experiments/2026-11-20-first-two-finished.html)
 
-<!-- qfft-public-hub-7c9b44cec02ed9c66b -->
+<!-- qfft-public-hub-25b7a05c36ca0d03ba -->
 
 <!-- END 20261120 shared-premise and equivalent-policy -->
 
