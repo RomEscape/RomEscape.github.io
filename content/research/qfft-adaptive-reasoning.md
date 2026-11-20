@@ -31,7 +31,9 @@ published: true
 
 **최저 비용이 같은데 최적 배정이 여러 개면 풀이도 달라질까** 등록·대기. 사전등록과 실행 승인을 마쳤고, 예약된 앞선 GPU 작업 순서를 기다리고 있다. 최솟값과 그 증명은 같게 두고 최적 배정의 개수만 달라질 때, 값만 묻는 문제에서 출력 토큰이 달라지는지 시험한다. [실험 설계와 문항 예시](../experiments/2026-11-20-optimal-assignment-multiplicity.html)
 
-<!-- qfft-public-hub-12f915cac19fbfb6b2 -->
+**11월 12일 확인한 GSM8K 정답 오류가 후속 평가에 얼마나 남았나** 공식 정답과 달랐던 16문항을 원 채점기로 바로잡자 같은 21,104개 생성에서 LIMO A2와 저자 QFFT가 각각 225개를 더 맞혔다. 정정한 GSM8K 전체에서 조기 종료가 같은 비용의 강한 대조보다 정확도 0.5%p 이상 높았던 경우는 없었다. [실험 설계와 문항 예시](../experiments/2026-11-20-gsm8k-restored-answer-audit.html)
+
+<!-- qfft-public-hub-b3e7a89f8b08b81a35 -->
 
 <!-- END 20261120 shared-premise and equivalent-policy -->
 
