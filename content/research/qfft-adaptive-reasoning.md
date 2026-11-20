@@ -31,7 +31,7 @@ published: true
 
 **최저 비용이 같은데 최적 배정이 여러 개면 풀이도 달라질까** 등록·대기. 사전등록과 실행 승인을 마쳤고, 예약된 앞선 GPU 작업 순서를 기다리고 있다. 최솟값과 그 증명은 같게 두고 최적 배정의 개수만 달라질 때, 값만 묻는 문제에서 출력 토큰이 달라지는지 시험한다. [실험 설계와 문항 예시](../experiments/2026-11-20-optimal-assignment-multiplicity.html)
 
-<!-- qfft-public-hub-b46e120c8ac161edfc -->
+<!-- qfft-public-hub-dc9faa6606c2b69f20 -->
 
 <!-- END 20261120 shared-premise and equivalent-policy -->
 
