@@ -35,7 +35,7 @@ published: true
 
 **11월 12일 확인한 GSM8K 정답 오류가 후속 평가에 얼마나 남았나** 공식 정답과 달랐던 16문항을 원 채점기로 바로잡자 같은 21,104개 생성에서 LIMO A2와 저자 QFFT가 각각 225개를 더 맞혔다. 정정한 GSM8K 전체에서 조기 종료가 같은 비용의 강한 대조보다 정확도 0.5%p 이상 높았던 경우는 없었다. [실험 설계와 문항 예시](../experiments/2026-11-20-gsm8k-restored-answer-audit.html)
 
-<!-- qfft-public-hub-b4004e299ff8e69ae3 -->
+<!-- qfft-public-hub-49d604f81aa7f3f1c1 -->
 
 <!-- END 20261120 shared-premise and equivalent-policy -->
 
