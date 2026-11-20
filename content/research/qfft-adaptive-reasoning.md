@@ -19,9 +19,9 @@ published: true
 
 <!-- BEGIN 20261120 shared-premise and equivalent-policy -->
 
-**두 풀이가 같은 답을 내면 어디를 검산해야 할까** 두 풀이가 같은 잘못된 답을 제시했을 때 검산할 위치에 따라 정답 회복과 비용이 달라지는지 시험한다. 스모크 결과를 기다리고 있다. [실험 설계와 문항 예시](../experiments/2026-11-20-shared-premise-repair.html)
+**두 풀이가 같은 답을 내면 어디를 검산해야 할까** 스모크에서 공통 줄을 지목해 공통 오류를 고친 수는 LIMO A2 2/2개, 저자 QFFT 1/2개였다. 사전 기준에 미달했다. [실험 설계와 문항 예시](../experiments/2026-11-20-shared-premise-repair.html)
 
-<!-- qfft-public-hub-ec500694bd7e7335ef -->
+<!-- qfft-public-hub-2e0bd4919f0c309863 -->
 
 <!-- END 20261120 shared-premise and equivalent-policy -->
 
