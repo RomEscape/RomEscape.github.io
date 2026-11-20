@@ -21,7 +21,9 @@ published: true
 
 **두 풀이가 같은 답을 내면 어디를 검산해야 할까** 스모크에서 공통 줄을 지목해 공통 오류를 고친 수는 LIMO A2 2/2개, 저자 QFFT 1/2개였다. 사전 기준에 미달했다. [실험 설계와 문항 예시](../experiments/2026-11-20-shared-premise-repair.html)
 
-<!-- qfft-public-hub-2e65f0088d979e7646 -->
+**네 풀이 중 먼저 끝난 두 답이 같을 때 멈추면 얼마나 절약할까** MATH 정수 문항과 GSM8K의 저장된 풀이에서 일찍 끝난 두 답의 합의로 멈추면 모든 네 표까지 기다릴 때보다 계산한 토큰이 17.7~27.0% 줄고 기대 정답률 차이는 +0.04~+0.09%p였다. [실험 설계와 문항 예시](../experiments/2026-11-20-first-two-finished.html)
+
+<!-- qfft-public-hub-7db5a9d6ecb95a326d -->
 
 <!-- END 20261120 shared-premise and equivalent-policy -->
 
