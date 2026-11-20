@@ -37,7 +37,7 @@ published: true
 
 **같은 숫자를 64자리 쓴 뒤 멈추면 수학 풀이를 얼마나 줄일 수 있나** 정답에 가까운 값을 내고 0을 30,599번 반복한 사례가 있었지만, 그 문제를 뺀 MATH500 499문항에서는 경보 뒤 출력이 전체의 0.1063%였다. 단순 숫자 반복이나 정밀도 지시를 사용한 별도 GPU 실험은 보류했다. [실험 설계와 문항 예시](../experiments/2026-11-20-rounding-and-digit-repetition.html)
 
-<!-- qfft-public-hub-bf88abe9fb7ace85e8 -->
+<!-- qfft-public-hub-cd9f803f8e530828bf -->
 
 <!-- END 20261120 shared-premise and equivalent-policy -->
 
