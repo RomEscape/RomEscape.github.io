@@ -21,7 +21,7 @@ published: true
 
 **두 풀이가 같은 답을 내면 어디를 검산해야 할까** 스모크에서 공통 줄을 지목해 공통 오류를 고친 수는 LIMO A2 2/2개, 저자 QFFT 1/2개였다. 사전 기준에 미달했다. [실험 설계와 문항 예시](../experiments/2026-11-20-shared-premise-repair.html)
 
-<!-- qfft-public-hub-2e0bd4919f0c309863 -->
+<!-- qfft-public-hub-2e65f0088d979e7646 -->
 
 <!-- END 20261120 shared-premise and equivalent-policy -->
 
