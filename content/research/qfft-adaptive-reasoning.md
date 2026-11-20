@@ -27,7 +27,7 @@ published: true
 
 **간결한 풀이에서 토큰은 마지막 계산의 앞과 뒤 중 어디에서 줄었나** 같은 참조 계산식이 양쪽 풀이에서 확인된 LIMO SFT 371문항에서 간결 지시는 평균 432토큰을 줄였다. 식을 쓰기 전이 340토큰, 식을 쓴 뒤가 91토큰이었다. 마지막 계산 뒤의 반복이 주로 줄었다는 가설은 사전 기준에 미달했다. [실험 설계와 문항 예시](../experiments/2026-11-20-reference-equation-length.html)
 
-<!-- qfft-public-hub-913e9b823b1cbb4e22 -->
+<!-- qfft-public-hub-a1b39a5e096e622483 -->
 
 <!-- END 20261120 shared-premise and equivalent-policy -->
 
