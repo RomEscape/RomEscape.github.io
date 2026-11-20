@@ -23,7 +23,7 @@ published: true
 
 **네 풀이 중 먼저 끝난 두 답이 같을 때 멈추면 얼마나 절약할까** MATH 정수 문항과 GSM8K의 저장된 풀이에서 일찍 끝난 두 답의 합의로 멈추면 모든 네 표까지 기다릴 때보다 계산한 토큰이 17.7~27.0% 줄고 기대 정답률 차이는 +0.04~+0.09%p였다. [실험 설계와 문항 예시](../experiments/2026-11-20-first-two-finished.html)
 
-<!-- qfft-public-hub-7db5a9d6ecb95a326d -->
+<!-- qfft-public-hub-b98bdcbc52b8942ed1 -->
 
 <!-- END 20261120 shared-premise and equivalent-policy -->
 
