@@ -32,7 +32,7 @@ published: true
 
 <!-- qfft-current-overview-end -->
 
-[11월 12일 연구 회의록과 발표 그림 5개 — 추론 시작 상태, 짧은 풀이에서 긴 풀이로 넘어가는 기준, 오류 뒤 재검토](../talks/2026-11-12-qfft-research-meeting.html)
+[11월 12일 연구 회의록과 발표 그림 5개 — 추론 시작 상태, 짧은 풀이에서 긴 풀이로 넘어가는 기준, 오류 뒤 재검토](../meetings/2026-11-12-qfft-research-meeting.html)
 
 ## 한 줄 요약
 

@@ -7,7 +7,7 @@ summary: QFFT가 바꾸는 것은 어디서 되짚어야 하는지 아는 능력
 published: true
 ---
 
-[11월 12일 회의록과 원본 그림 5개에서 발표 수치, 실제 문항, 세 가지 후속 연구 질문을 함께 볼 수 있습니다.](../talks/2026-11-12-qfft-research-meeting.html)
+[11월 12일 회의록과 원본 그림 5개에서 발표 수치, 실제 문항, 세 가지 후속 연구 질문을 함께 볼 수 있습니다.](../meetings/2026-11-12-qfft-research-meeting.html)
 
 ## 한 줄 요약
 

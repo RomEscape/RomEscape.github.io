@@ -24,7 +24,7 @@ CSS_V = ''
 STATUSES = ['계획', '진행 중', '완료', '실패', '보류']
 IDEA, NOIDEA = '아이디어 후보', '아이디어 후보 제외'
 NAV = [('home', 'index.html', '홈'), ('research', 'research/index.html', '연구'), ('experiments', 'experiments/index.html', '실험 기록'),
-       ('talks', 'talks/index.html', '발표자료'), ('about', 'about.html', '소개')]
+       ('meetings', 'meetings/index.html', '회의기록'), ('talks', 'talks/index.html', '발표자료'), ('about', 'about.html', '소개')]
 FRONT = re.compile(r'^---[ \t]*\n(.*?)\n---[ \t]*(?:\n|$)', re.S)
 
 
@@ -136,11 +136,11 @@ def exp_row(d, r, *, show_rank=False):
             f'{method_examples(d) if show_rank else ""}</li>')
 
 
-def talk_row(d, r):
+def event_row(d, r, section):
     ev = f'<span class="proj">{esc(d.get("event"))}</span>' if d.get('event') else ''
     summ = f'<p>{esc(d.get("summary"))}</p>' if d.get('summary') else ''
     return (f'<li class="row"><time>{d["date"].isoformat()}</time>'
-            f'<a class="title" href="{r}talks/{quote(d["slug"])}.html">{esc(d.get("title") or d["slug"])}</a>{ev}{summ}</li>')
+            f'<a class="title" href="{r}{section}/{quote(d["slug"])}.html">{esc(d.get("title") or d["slug"])}</a>{ev}{summ}</li>')
 
 
 def research_card(d, exps, r):
@@ -162,15 +162,32 @@ def talk_files(d, root):
     return f, (f'uploads/pdf/{Path(f).stem}.pdf' if pdf.exists() else None)
 
 
+def talk_attachment(d, root):
+    orig, pdf = talk_files(d, root)
+    orig, pdf = (quote(x, safe='/') if x else x for x in (orig, pdf))
+    if pdf:
+        viewer = (f'<div class="viewer"><object data="../{esc(pdf)}" type="application/pdf" aria-label="발표 슬라이드">'
+                  f'<p>이 브라우저에서는 PDF를 바로 보여 줄 수 없습니다. <a href="../{esc(pdf)}">PDF 열기</a></p></object></div>')
+        acts = f'<a class="btn" href="../{esc(pdf)}" target="_blank" rel="noopener">새 창에서 보기</a>'
+    else:
+        viewer = '<p class="empty">PDF 변환본이 아직 없습니다. 방금 올렸다면 몇 분 뒤 새로 고쳐 보세요.</p>' if orig else ''
+        acts = ''
+    if orig:
+        acts += f'<a class="btn" href="../{esc(orig)}" download>원본 내려받기</a>'
+    return viewer + (f'<div class="actions">{acts}</div>' if acts else '')
+
+
 def build(root=ROOT, out=None):
     out = Path(out or root / '_site')
     site = yaml.safe_load((root / 'site.yml').read_text(encoding='utf-8')) or {}
     exps, talks = load(root, 'experiments'), load(root, 'talks')
+    meetings = load(root, 'meetings')
     research = sorted(load(root, 'research'), key=lambda d: (d.get('order') or 99, d['slug']))
     if out.exists():
         shutil.rmtree(out)
     (out / 'experiments').mkdir(parents=True)
     (out / 'talks').mkdir()
+    (out / 'meetings').mkdir()
     (out / 'research').mkdir()
     global CSS_V  # 스타일이 바뀌면 주소가 바뀌어 브라우저 캐시(GitHub Pages 10분)를 건너뛴다
     CSS_V = hashlib.md5((root / 'static' / 'style.css').read_bytes()).hexdigest()[:8]
@@ -186,6 +203,7 @@ def build(root=ROOT, out=None):
 
     # 홈
     empty_e = '<p class="empty">아직 공개한 실험 기록이 없습니다.</p>'
+    empty_m = '<p class="empty">아직 공개한 회의기록이 없습니다.</p>'
     empty_t = '<p class="empty">아직 올린 발표자료가 없습니다. 관리 화면의 "발표자료"에서 PPT를 올리면 여기에 나타납니다.</p>'
     links = ''.join(f'<li><a href="{esc(l.get("url"))}">{esc(l.get("label"))}</a></li>' for l in site.get('links') or [] if l.get('url'))
     home = f'''<section class="hero"><h1>{esc(site.get('name') or '연구 기록')}</h1>
@@ -194,8 +212,10 @@ def build(root=ROOT, out=None):
 <div class="cols">
 <section><div class="sec-head"><h2>최근 실험 기록</h2><a href="experiments/index.html">전체 보기</a></div>
 {'<ul class="list">' + ''.join(exp_row(d, '') for d in exps[:6]) + '</ul>' if exps else empty_e}</section>
+<section><div class="sec-head"><h2>최근 회의기록</h2><a href="meetings/index.html">전체 보기</a></div>
+{'<ul class="list">' + ''.join(event_row(d, '', 'meetings') for d in meetings[:6]) + '</ul>' if meetings else empty_m}</section>
 <section><div class="sec-head"><h2>최근 발표자료</h2><a href="talks/index.html">전체 보기</a></div>
-{'<ul class="list">' + ''.join(talk_row(d, '') for d in talks[:6]) + '</ul>' if talks else empty_t}</section>
+{'<ul class="list">' + ''.join(event_row(d, '', 'talks') for d in talks[:6]) + '</ul>' if talks else empty_t}</section>
 </div>'''
     write('index.html', page(site, '홈', home, 0, 'home'))
 
@@ -253,26 +273,29 @@ pj.addEventListener('change',apply);apply();}})();
 <p class="meta">{meta}</p>{f'<p class="lead">{esc(d.get("summary"))}</p>' if d.get('summary') else ''}{examples}<div class="prose">{md(d['body'])}</div>{src}'''
         write(f'experiments/{d["slug"]}.html', page(site, d.get('title') or d['slug'], body, 1, 'experiments'))
 
-    # 발표자료
-    body = '<h1>발표자료</h1>' + ('<ul class="list">' + ''.join(talk_row(d, '../') for d in talks) + '</ul>' if talks else empty_t)
-    write('talks/index.html', page(site, '발표자료', body, 1, 'talks'))
-    for d in talks:
-        orig, pdf = talk_files(d, root)
-        orig, pdf = (quote(x, safe='/') if x else x for x in (orig, pdf))
-        if pdf:
-            viewer = (f'<div class="viewer"><object data="../{esc(pdf)}" type="application/pdf" aria-label="발표 슬라이드">'
-                      f'<p>이 브라우저에서는 PDF를 바로 보여 줄 수 없습니다. <a href="../{esc(pdf)}">PDF 열기</a></p></object></div>')
-            acts = f'<a class="btn" href="../{esc(pdf)}" target="_blank" rel="noopener">새 창에서 보기</a>'
-        else:
-            viewer = '<p class="empty">PDF 변환본이 아직 없습니다. 방금 올렸다면 몇 분 뒤 새로 고쳐 보세요.</p>' if orig else ''
-            acts = ''
-        if orig:
-            acts += f'<a class="btn" href="../{esc(orig)}" download>원본 내려받기</a>'
-        meta = ' · '.join(x for x in [d['date'].isoformat(), esc(d.get('event'))] if x)
-        body = f'''<p class="back"><a href="index.html">← 발표자료</a></p><h1>{esc(d.get('title') or d['slug'])}</h1>
-<p class="meta">{meta}</p>{f'<p class="lead">{esc(d.get("summary"))}</p>' if d.get('summary') else ''}{viewer}
-{f'<div class="actions">{acts}</div>' if acts else ''}<div class="prose">{md(d['body'])}</div>'''
-        write(f'talks/{d["slug"]}.html', page(site, d.get('title') or d['slug'], body, 1, 'talks'))
+    for section, label, records, empty in [('meetings', '회의기록', meetings, empty_m), ('talks', '발표자료', talks, empty_t)]:
+        rows = ''.join(event_row(d, '../', section) for d in records)
+        listing = f'<ul class="list">{rows}</ul>' if rows else empty
+        write(f'{section}/index.html', page(site, label, f'<h1>{label}</h1>{listing}', 1, section))
+        for d in records:
+            title = d.get('title') or d['slug']
+            meta = ' · '.join(x for x in [d['date'].isoformat(), esc(d.get('event'))] if x)
+            summary = f'<p class="lead">{esc(d["summary"])}</p>' if d.get('summary') else ''
+            attachment = talk_attachment(d, root) if section == 'talks' else ''
+            body = (f'<p class="back"><a href="index.html">← {label}</a></p><h1>{esc(title)}</h1>'
+                    f'<p class="meta">{meta}</p>{summary}{attachment}<div class="prose">{md(d["body"])}</div>')
+            write(f'{section}/{d["slug"]}.html', page(site, title, body, 1, section))
+
+    # 이미 공유된 발표자료 주소와 절 링크를 새 회의록으로 연결한다.
+    moved_meeting = '2026-11-12-qfft-research-meeting.html'
+    if (out / 'meetings' / moved_meeting).is_file():
+        target = '../meetings/' + moved_meeting
+        write('talks/' + moved_meeting, f'''<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>회의기록으로 이동</title>
+<link rel="canonical" href="{target}">
+<script>location.replace("{target}" + location.search + location.hash);</script>
+<meta http-equiv="refresh" content="0;url={target}"></head>
+<body><a href="{target}">11월 12일 QFFT 연구 회의록 열기</a></body></html>''')
 
     # 소개
     body = f'<h1>소개</h1><div class="prose">{md(site.get("about") or site.get("intro"))}</div>' + (f'<ul class="links">{links}</ul>' if links else '')
@@ -344,8 +367,9 @@ def selftest():
         (t / 'static').mkdir()
         (t / 'static' / 'style.css').write_text('body{}')
         (t / 'site.yml').write_text('name: 시험\nintro: "**소개**"\nlinks:\n  - label: GitHub\n    url: https://github.com/\n', encoding='utf-8')
-        for kind in ('experiments', 'talks', 'research'):
+        for kind in ('experiments', 'talks', 'meetings', 'research'):
             (t / 'content' / kind).mkdir(parents=True)
+        (t / 'content/meetings/minutes.md').write_text('---\ntitle: 주간 회의록\n---\n\n결정 사항\n', encoding='utf-8')
         (t / 'content/research/topic.md').write_text('---\ntitle: 연구 주제\nproject: QFFT\nstatus: 진행 중\nsummary: 요약\n---\n\n본문\n', encoding='utf-8')
         (t / 'content/experiments/2026-11-08-a.md').write_text('---\ntitle: 공개 기록\ndate: 2026-11-08\nstatus: 완료\nproject: QFFT\nidea: true\n---\n\n| a | b |\n|---|---|\n| 1 | 2 |\n\n![그림](/uploads/x.png)\n', encoding='utf-8')
         (t / 'content/experiments/2026-11-06-d.md').write_text('---\ntitle: 뺀 기록\ndate: 2026-11-06\nidea: 제외\n---\n본문\n', encoding='utf-8')
@@ -368,6 +392,10 @@ def selftest():
         e = (out / 'experiments/2026-11-08-a.html').read_text(encoding='utf-8')
         assert '<table>' in e and 'src="../uploads/x.png"' in e and 'class="pill s2"' in e and 'class="pill idea"' in e
         ix = (out / 'experiments/index.html').read_text(encoding='utf-8')
+        meeting = (out / 'meetings/minutes.html').read_text(encoding='utf-8')
+        assert '← 회의기록' in meeting and '결정 사항' in meeting
+        assert 'meetings/minutes.html' in (out / 'meetings/index.html').read_text(encoding='utf-8')
+        assert 'minutes.html' not in (out / 'talks/index.html').read_text(encoding='utf-8')
         top = (out / 'experiments/2026-10-01-top.html').read_text(encoding='utf-8')
         assert '<details class="method-example">' in ix and '<details class="method-example" open>' in top
         assert all('<dd>1 &lt; x &lt; 3</dd>' in page_text for page_text in (ix, top))

@@ -79,6 +79,20 @@ content:
       - { name: summary, label: 한 줄 요약, type: text }
       - { name: published, label: 공개, type: boolean, default: true }
       - { name: body, label: 메모, type: rich-text }
+  - name: meetings
+    label: 회의기록
+    type: collection
+    path: content/meetings
+    filename: "{year}-{month}-{day}-{hour}{minute}{second}.md"
+    view:
+      fields: [title, date, event, published]
+    fields:
+      - { name: title, label: 제목, type: string, required: true }
+      - { name: date, label: 회의 날짜, type: date }
+      - { name: event, label: 회의명, type: string }
+      - { name: summary, label: 한 줄 요약, type: text }
+      - { name: published, label: 공개, type: boolean, default: true }
+      - { name: body, label: 회의 내용, type: rich-text }
   - name: site
     label: 사이트 설정
     type: file
