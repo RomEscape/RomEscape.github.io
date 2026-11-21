@@ -33,6 +33,12 @@ content:
       - { name: title, label: 제목, type: string, required: true }
       - { name: date, label: 날짜, type: date }
       - { name: project, label: 프로젝트, type: string }
+      - name: idea
+        label: 아이디어 분류
+        type: select
+        options:
+          values: [후보, 제외]
+      - { name: idea_rank, label: 아이디어 후보 우선순위(1부터), type: number }
       - name: status
         label: 상태
         type: select

@@ -4,6 +4,7 @@ date: 2026-11-19
 project: QFFT
 status: 계획
 idea: 후보
+idea_rank: 7
 summary: 같은 풀이에서 전략의 전제를 가려내는 계산 한 번이 오답을 고치고 정답은 보존하는지 묻습니다. A2와 QFFT에서 끝낸 종료 선호 진단, 관련 원 논문, 새 문제에서 효과를 판단할 실험을 정리했습니다.
 published: true
 ---

@@ -71,6 +71,11 @@ def idea_mark(d):  # 머리말 idea: 후보(또는 true) → '1', idea: 제외 �
     return '1' if v is True or v == '후보' else 'x' if v == '제외' else '0'
 
 
+def idea_rank(d):
+    rank = d.get('idea_rank')
+    return rank if type(rank) is int and rank > 0 else None
+
+
 def idea_pill(d):  # 논문화 가능한 아이디어 후보와 가망 없어 뺀 것 표시
     m = idea_mark(d)
     return f'<span class="pill idea">{IDEA}</span>' if m == '1' else f'<span class="pill noidea">{NOIDEA}</span>' if m == 'x' else ''
@@ -106,11 +111,16 @@ def page(site, title, body, depth, active):
 '''
 
 
-def exp_row(d, r):
+def exp_row(d, r, *, show_rank=False):
     proj = f'<span class="proj">{esc(d.get("project"))}</span>' if d.get('project') else ''
     summ = f'<p>{esc(d.get("summary"))}</p>' if d.get('summary') else ''
+    date = f'<time>{d["date"].isoformat()}</time>'
+    if show_rank:
+        rank = idea_rank(d)
+        label = f'{rank}순위' if rank else '순위 검토 중'
+        date = f'<span><strong>{label}</strong><br>{date}</span>'
     return (f'<li class="row" data-status="{esc(d.get("status"))}" data-project="{esc(d.get("project"))}" data-idea="{idea_mark(d)}">'
-            f'<time>{d["date"].isoformat()}</time>{pill(d.get("status"))}{idea_pill(d)}'
+            f'{date}{pill(d.get("status"))}{idea_pill(d)}'
             f'<a class="title" href="{r}experiments/{quote(d["slug"])}.html">{esc(d.get("title") or d["slug"])}</a>{proj}{summ}</li>')
 
 
@@ -195,13 +205,22 @@ def build(root=ROOT, out=None):
     groups = {IDEA: []}
     for d in exps:
         heading = IDEA if idea_mark(d) == '1' else d['date'].strftime('%Y년 %m월')
-        groups.setdefault(heading, []).append(exp_row(d, '../'))
+        groups.setdefault(heading, []).append(d)
+    groups[IDEA].sort(key=lambda d: idea_rank(d) or float('inf'))
+    sections = []
+    for heading, docs in groups.items():
+        if not docs:
+            continue
+        candidates = heading == IDEA
+        note = '<p class="small">논문으로 발전시킬 연구 우선순위입니다. 정확도와 토큰 비용을 함께 평가한 결과, 다른 문항에서의 재현 여부, 후속 실험에서 확인할 수 있는 차이를 기준으로 정했습니다.</p>' if candidates else ''
+        rows = ''.join(exp_row(d, '../', show_rank=candidates) for d in docs)
+        sections.append(f'<section class="month"><h2>{heading}</h2>{note}<ul class="list">{rows}</ul></section>')
     chips = ''.join(f'<button type="button" data-status="{esc(s)}">{esc(s)}</button>' for s in STATUSES) + f'<button type="button" data-status="__idea">{IDEA}</button><button type="button" data-status="__noidea">{NOIDEA}</button>'
     opts = ''.join(f'<option value="{esc(p)}">{esc(p)}</option>' for p in projects)
     body = f'''<h1>실험 기록</h1>
 <div class="filters" role="group" aria-label="거르기"><button type="button" data-status="" aria-pressed="true">전체</button>{chips}
 <label>프로젝트 <select id="proj"><option value="">전체</option>{opts}</select></label><span id="count" class="small"></span></div>
-{''.join(f'<section class="month"><h2>{heading}</h2><ul class="list">{"".join(rows)}</ul></section>' for heading, rows in groups.items() if rows) or empty_e}
+{''.join(sections) or empty_e}
 <script>
 (function(){{var st='',pj=document.getElementById('proj');
 function apply(){{var n=0;document.querySelectorAll('.month').forEach(function(m){{var v=0;
@@ -317,16 +336,20 @@ def selftest():
         (t / 'content/experiments/2026-11-06-d.md').write_text('---\ntitle: 뺀 기록\ndate: 2026-11-06\nidea: 제외\n---\n본문\n', encoding='utf-8')
         (t / 'content/experiments/2026-11-07-b.md').write_text('---\ntitle: 숨긴 기록\ndate: 2026-11-07\npublished: false\n---\n본문\n', encoding='utf-8')
         (t / 'content/talks/2026-11-03-c.md').write_text('---\ntitle: 회의 발표\ndate: 2026-11-03\nfile: /uploads/meeting.pptx\n---\n', encoding='utf-8')
+        for slug, rank in [('2026-10-01-top', 1), ('2026-11-10-second', 2)]:
+            path = t / 'content/experiments' / f'{slug}.md'
+            path.write_text(f'---\nidea: 후보\nidea_rank: {rank}\n---\n', encoding='utf-8')
         (t / 'uploads').mkdir()
         (t / 'uploads/meeting.pptx').write_bytes(b'x')
         (t / '_converted').mkdir()
         (t / '_converted/meeting.pdf').write_bytes(b'%PDF')
         out, ne, nt = build(t, t / '_site')
-        assert (ne, nt) == (2, 1)
+        assert (ne, nt) == (4, 1)
         assert not (out / 'experiments/2026-11-07-b.html').exists()
         e = (out / 'experiments/2026-11-08-a.html').read_text(encoding='utf-8')
         assert '<table>' in e and 'src="../uploads/x.png"' in e and 'class="pill s2"' in e and 'class="pill idea"' in e
         ix = (out / 'experiments/index.html').read_text(encoding='utf-8')
+        assert ix.index('>1순위<') < ix.index('>2026-10-01-top</a>') < ix.index('>2순위<') < ix.index('>2026-11-10-second</a>') < ix.index('>순위 검토 중<') < ix.index('>공개 기록</a>')
         assert ix.index(f'<h2>{IDEA}</h2>') < ix.index('>공개 기록</a>') < ix.index('<h2>2026년 11월</h2>') < ix.index('>뺀 기록</a>')
         assert ix.count('>공개 기록</a>') == 1
         assert 'data-idea="1"' in ix and 'data-status="__idea"' in ix and 'data-idea="x"' in ix and 'data-status="__noidea"' in ix

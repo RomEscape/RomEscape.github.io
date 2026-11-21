@@ -4,6 +4,7 @@ date: 2026-11-19
 project: QFFT
 status: 계획
 idea: 후보
+idea_rank: 8
 summary: 해의 개선과 증명 사이의 선택, 정정 뒤 재계산 범위, 목표에 따른 변수 검산을 예시로 비교합니다. 선행 연구가 이미 한 일과 각 후보를 계속하거나 접을 조건을 정리했습니다.
 published: true
 ---

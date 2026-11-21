@@ -4,6 +4,7 @@ date: 2026-11-20
 project: QFFT
 status: 완료
 idea: 후보
+idea_rank: 5
 summary: 기본 지시와 간결 지시에서 마지막 두 계산식을 같은 순서로 쓴 GSM8K 풀이를 비교했습니다. 두 식 사이가 LIMO SFT에서 평균 106.1토큰, A1에서 71.3토큰 짧았습니다. 절감량 대부분이 마지막 계산 뒤에 몰린다는 최초 가설은 기준에 미달했습니다.
 published: true
 ---
