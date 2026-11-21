@@ -111,6 +111,17 @@ def page(site, title, body, depth, active):
 '''
 
 
+def method_examples(d, *, expanded=False):
+    blocks = []
+    fields = [('problem', '문제와 입력'), ('comparison', '비교 방법'), ('assessment', '판정')]
+    for e in d.get('method_examples') or []:
+        terms = ''.join(f'<dt>{label}</dt><dd>{esc(e[key])}</dd>' for key, label in fields)
+        blocks.append(f'<details class="method-example"{" open" if expanded else ""}>'
+                      f'<summary><span class="small">{esc(e["kind"])}</span> {esc(e["title"])}</summary>'
+                      f'<dl>{terms}</dl></details>')
+    return ''.join(blocks)
+
+
 def exp_row(d, r, *, show_rank=False):
     proj = f'<span class="proj">{esc(d.get("project"))}</span>' if d.get('project') else ''
     summ = f'<p>{esc(d.get("summary"))}</p>' if d.get('summary') else ''
@@ -121,7 +132,8 @@ def exp_row(d, r, *, show_rank=False):
         date = f'<span><strong>{label}</strong><br>{date}</span>'
     return (f'<li class="row" data-status="{esc(d.get("status"))}" data-project="{esc(d.get("project"))}" data-idea="{idea_mark(d)}">'
             f'{date}{pill(d.get("status"))}{idea_pill(d)}'
-            f'<a class="title" href="{r}experiments/{quote(d["slug"])}.html">{esc(d.get("title") or d["slug"])}</a>{proj}{summ}</li>')
+            f'<a class="title" href="{r}experiments/{quote(d["slug"])}.html">{esc(d.get("title") or d["slug"])}</a>{proj}{summ}'
+            f'{method_examples(d) if show_rank else ""}</li>')
 
 
 def talk_row(d, r):
@@ -233,9 +245,12 @@ pj.addEventListener('change',apply);apply();}})();
     write('experiments/index.html', page(site, '실험 기록', body, 1, 'experiments'))
     for d in exps:
         meta = ' · '.join(x for x in [d['date'].isoformat(), esc(d.get('project')) if d.get('project') else '', pill(d.get('status')), idea_pill(d)] if x)
+        examples = method_examples(d, expanded=True)
+        if examples:
+            examples = f'<section class="prose" id="method-examples"><h2>방법론 예시</h2>{examples}</section>'
         src = f'<p class="small">원본: {esc(d.get("source"))}</p>' if d.get('source') else ''
         body = f'''<p class="back"><a href="index.html">← 실험 기록</a></p><h1>{esc(d.get('title') or d['slug'])}</h1>
-<p class="meta">{meta}</p>{f'<p class="lead">{esc(d.get("summary"))}</p>' if d.get('summary') else ''}<div class="prose">{md(d['body'])}</div>{src}'''
+<p class="meta">{meta}</p>{f'<p class="lead">{esc(d.get("summary"))}</p>' if d.get('summary') else ''}{examples}<div class="prose">{md(d['body'])}</div>{src}'''
         write(f'experiments/{d["slug"]}.html', page(site, d.get('title') or d['slug'], body, 1, 'experiments'))
 
     # 발표자료
@@ -338,7 +353,11 @@ def selftest():
         (t / 'content/talks/2026-11-03-c.md').write_text('---\ntitle: 회의 발표\ndate: 2026-11-03\nfile: /uploads/meeting.pptx\n---\n', encoding='utf-8')
         for slug, rank in [('2026-10-01-top', 1), ('2026-11-10-second', 2)]:
             path = t / 'content/experiments' / f'{slug}.md'
-            path.write_text(f'---\nidea: 후보\nidea_rank: {rank}\n---\n', encoding='utf-8')
+            meta = dict(idea='후보', idea_rank=rank)
+            if rank == 1:
+                meta['method_examples'] = [dict(kind='실험 설계 예시', title='부등식 풀기',
+                                               problem='1 < x < 3', comparison='두 조건', assessment='정답 2')]
+            path.write_text('---\n' + yaml.safe_dump(meta, allow_unicode=True) + '---\n', encoding='utf-8')
         (t / 'uploads').mkdir()
         (t / 'uploads/meeting.pptx').write_bytes(b'x')
         (t / '_converted').mkdir()
@@ -349,6 +368,9 @@ def selftest():
         e = (out / 'experiments/2026-11-08-a.html').read_text(encoding='utf-8')
         assert '<table>' in e and 'src="../uploads/x.png"' in e and 'class="pill s2"' in e and 'class="pill idea"' in e
         ix = (out / 'experiments/index.html').read_text(encoding='utf-8')
+        top = (out / 'experiments/2026-10-01-top.html').read_text(encoding='utf-8')
+        assert '<details class="method-example">' in ix and '<details class="method-example" open>' in top
+        assert all('<dd>1 &lt; x &lt; 3</dd>' in page_text for page_text in (ix, top))
         assert ix.index('>1순위<') < ix.index('>2026-10-01-top</a>') < ix.index('>2순위<') < ix.index('>2026-11-10-second</a>') < ix.index('>순위 검토 중<') < ix.index('>공개 기록</a>')
         assert ix.index(f'<h2>{IDEA}</h2>') < ix.index('>공개 기록</a>') < ix.index('<h2>2026년 11월</h2>') < ix.index('>뺀 기록</a>')
         assert ix.count('>공개 기록</a>') == 1
