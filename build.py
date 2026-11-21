@@ -190,21 +190,18 @@ def build(root=ROOT, out=None):
 <p class="meta">{meta}</p>{f'<p class="lead">{esc(d.get("summary"))}</p>' if d.get('summary') else ''}<div class="prose">{md(d['body'])}</div>{rel_html}'''
         write(f'research/{d["slug"]}.html', page(site, d.get('title') or d['slug'], body, 1, 'research'))
 
-    # 실험 기록 목록(월별 묶음 + 상태·프로젝트 거르기)
+    # 실험 기록 목록: 아이디어 후보를 먼저 모으고 나머지는 월별로 표시한다.
     projects = sorted({d.get('project') for d in exps if d.get('project')})
-    groups, cur = [], None
+    groups = {IDEA: []}
     for d in exps:
-        ym = d['date'].strftime('%Y년 %m월')
-        if ym != cur:
-            groups.append((ym, []))
-            cur = ym
-        groups[-1][1].append(exp_row(d, '../'))
+        heading = IDEA if idea_mark(d) == '1' else d['date'].strftime('%Y년 %m월')
+        groups.setdefault(heading, []).append(exp_row(d, '../'))
     chips = ''.join(f'<button type="button" data-status="{esc(s)}">{esc(s)}</button>' for s in STATUSES) + f'<button type="button" data-status="__idea">{IDEA}</button><button type="button" data-status="__noidea">{NOIDEA}</button>'
     opts = ''.join(f'<option value="{esc(p)}">{esc(p)}</option>' for p in projects)
     body = f'''<h1>실험 기록</h1>
 <div class="filters" role="group" aria-label="거르기"><button type="button" data-status="" aria-pressed="true">전체</button>{chips}
 <label>프로젝트 <select id="proj"><option value="">전체</option>{opts}</select></label><span id="count" class="small"></span></div>
-{''.join(f'<section class="month"><h2>{ym}</h2><ul class="list">{"".join(rows)}</ul></section>' for ym, rows in groups) or empty_e}
+{''.join(f'<section class="month"><h2>{heading}</h2><ul class="list">{"".join(rows)}</ul></section>' for heading, rows in groups.items() if rows) or empty_e}
 <script>
 (function(){{var st='',pj=document.getElementById('proj');
 function apply(){{var n=0;document.querySelectorAll('.month').forEach(function(m){{var v=0;
@@ -330,6 +327,8 @@ def selftest():
         e = (out / 'experiments/2026-11-08-a.html').read_text(encoding='utf-8')
         assert '<table>' in e and 'src="../uploads/x.png"' in e and 'class="pill s2"' in e and 'class="pill idea"' in e
         ix = (out / 'experiments/index.html').read_text(encoding='utf-8')
+        assert ix.index(f'<h2>{IDEA}</h2>') < ix.index('>공개 기록</a>') < ix.index('<h2>2026년 11월</h2>') < ix.index('>뺀 기록</a>')
+        assert ix.count('>공개 기록</a>') == 1
         assert 'data-idea="1"' in ix and 'data-status="__idea"' in ix and 'data-idea="x"' in ix and 'data-status="__noidea"' in ix
         assert 'class="pill noidea"' in (out / 'experiments/2026-11-06-d.html').read_text(encoding='utf-8')
         k = (out / 'talks/2026-11-03-c.html').read_text(encoding='utf-8')
