@@ -142,6 +142,10 @@ MATH500 207번의 토핑을 8개 중 2개 고르면 포함 항목 2개를 세는
 | authorQFFT | matched | 4/4 | 2,681 | 0 |
 | authorQFFT | reverse | 4/4 | 2,204 | 0 |
 
+## 후속 실험 system_prompt_planning_1123
+
+**스모크 사전등록** · GPU 추론 실행 확인.
+
 ## 11월 22일 밤의 판단
 
 ## Base 두 응답이 같은 경우의 세 번째 확인 결과
