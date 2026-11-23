@@ -11,6 +11,8 @@ published: true
 
 ## 실험 현황과 다음 실험
 
+**11월 23일 16:40 KST.** LIMO A2의 수학 문제 32개, 실제 풀이 256개로 전략·예산 선택기의 중간 가중치를 학습하고 다시 불러와 검증했다. 별도 16문항의 개발 성능 판정은 당시 대기 중이었다. [선택기 학습과 후속 평가](../experiments/2026-11-23-strategy-budget-planning.html) · [계속 갱신되는 실행 상태](../experiments/2026-11-22-continuation-evidence.html)
+
 [시스템 프롬프트 연구 설계 · 문제를 읽고 풀이 전략과 토큰 예산을 함께 선택할 수 있을까?](../experiments/2026-11-23-strategy-budget-planning.html)
 
 **최적 배정 실험 최종 결과.** 최솟값만 물었을 때 복수형/고유형의 출력 토큰 비율은 LIMO A2 1.441, 저자 QFFT 1.928이었다. 두 모델이 함께 충족해야 하는 탐색 기준에 미달했다.
