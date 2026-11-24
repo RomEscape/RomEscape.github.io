@@ -85,6 +85,8 @@ L13→L0과 CODI의 차이는 네 벤치마크 모두 1점 안팎이었다(GSM8K
 
 **읽는 법.** latent를 비우면 L0에 넣은 두 모델만 15~26점 떨어졌다. L13→L0과 Middleflow는 같은 L13에서 뽑으므로, 이 차이를 가른 것은 뽑는 곳이 아니라 넣는 곳이다. 다른 문항의 latent를 넣으면 세 모델 모두 크게 떨어졌으므로, 셋 다 latent 내용을 읽어 답에 쓴다. 그래서 이 결과는 “Middleflow가 더 강건하다”가 아니라 **“L7에 넣으면 답이 latent에 덜 의존한다”**로 읽는 것이 정확하다. latent에 많이 기대는 모델(CODI, L13→L0)도 정확도는 latent 없이 학습한 모델보다 높지 않았다.
 
+**이후 확인(11-24).** 저장된 답 글을 다시 읽어 보니, latent를 비운 답의 일부는 답 앞에 학습 자료의 풀이 형식(`<<계산식>>`)으로 계산식을 글로 쓰고 답했다. 0 벡터를 넣었을 때 그런 답이 Middleflow는 45.9%, CODI는 11.3%였다. 글로 쓰지 않은 답만 보면 Middleflow 45.8%, CODI 23.0%였다. Middleflow가 덜 떨어진 데에는 글로 풀이를 쓰는 쪽으로 더 자주 넘어간 몫과, 글을 쓰지 않고도 덜 떨어진 몫이 함께 들어 있다. 자세한 표는 [추론 때 latent 바꾸기 기록](../experiments/2026-11-12-mf-g-inference-interventions.html)에 있다.
+
 <h2 id="no-latent">3. latent 없이 학습한 모델과 distillation</h2>
 
 **추가 실험 3의 Latent 없음은 학습이 끝난 CODI에서 latent를 뺀 것이 아니다.** 기본 Llama-3.2-1B-Instruct에서 출발해 학습할 때도 추론할 때도 latent 계산 없이 따로 학습한 모델이다. 답 토큰의 position 번호는 latent 6개가 있을 때와 같게 띄웠고, 손실 세 항도 같다.
