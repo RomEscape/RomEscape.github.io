@@ -63,6 +63,7 @@ GSM8K 80번 문항: "Two girls each got 1/6 of the 24 liters of water. Then a bo
 ## 그래서 무슨 뜻인가
 
 - latent를 마지막 layer에서 뽑을 필요는 없었습니다. L13에서 뽑아도 L0에 넣으면 CODI와 같습니다.
+- (11월 24일 추가) 이 "같다"는 위 네 벤치마크에서의 판정입니다. 이름과 숫자를 바꾸고 풀이 단계를 더한 GSM-Symbolic에서는 L13→L0이 CODI보다 main 2.50점 [−4.86, −0.26], P1 1.78점 [−3.62, −0.12] 낮았습니다([더 어려운 문제 기록](2026-11-24-mf-k-harder-benchmarks.html)).
 - 넣는 곳을 L4, L7로 옮기면 GSM8K가 2~3점 낮았습니다. L4와 L7 사이는 GSM-Hard만 차이가 있었습니다.
 - 넣는 곳은 정확도보다 "답이 latent에 기대는 정도"를 더 크게 바꿨습니다. 이것은 [추론 때 latent 바꾸기 기록](2026-11-12-mf-g-inference-interventions.html)에 있습니다. CODI, Coconut, PCCoT 논문에는 뽑는 layer나 넣는 layer를 바꾼 실험이 없어, 이 부분을 논문 기여 후보로 봅니다(다른 latent 분석 논문은 원문 확인 전).
 
