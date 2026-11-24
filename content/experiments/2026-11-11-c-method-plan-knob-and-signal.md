@@ -9,6 +9,11 @@ published: true
 
 ## 한 줄 요약
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-11-c-method-plan-knob-and-signal/concept-knob-and-signal-plan.png"><img src="../uploads/qfft/figures/2026-11-11-c-method-plan-knob-and-signal/concept-knob-and-signal-plan.png" alt="흐름도. 손잡이 줄은 표준 SFT의 추론 입력에서 학습에 쓴 시스템 프롬프트를 빼면 답 길이가 문항 기준 0.60배가 된다는 것과 0단계 판정 재현, 1단계 보류를 보인다. 신호 줄은 지금까지 찾은 조작들이 문턱만 옮기고 구분력은 그대로였다는 것과 2단계 보류, 3단계 승인 대기를 보인다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 방법을 길이를 바꾸는 손잡이와 언제 켤지 정하는 신호로 나눈 계획과, 11월 12일에 갱신한 단계별 상태입니다. 검증된 새 방법은 아직 없습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 지금까지의 실험을 한 문장으로 줄이면 이렇습니다. **긴 풀이를 켜는 손잡이는 여러 개 찾았지만, 언제 켜야 하는지를 더 잘 아는 모델은 아직 만들지 못했습니다.** 그래서 방법을 두 조각으로 나눠 계획합니다.
 
 - **손잡이(길이 조절):** 추가 학습 없이 이미 있습니다. 표준 SFT 모델은 추론 때 학습에 쓴 시스템 프롬프트만 빼도 답 길이가 문항 기준 0.60배가 됩니다(11월 11일 밤 중간 값).
@@ -17,6 +22,11 @@ published: true
 - **상태:** 계획입니다. 검증된 새 방법은 아직 없습니다. 11월 12일에 겹침 조사가 끝나 1, 2단계는 보류했습니다(바로 아래 갱신).
 
 ## 11월 12일 갱신: 겹침 조사 결과와 바뀐 계획
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-11-c-method-plan-knob-and-signal/example-stage0-three-models.png"><img src="../uploads/qfft/figures/2026-11-11-c-method-plan-knob-and-signal/example-stage0-three-models.png" alt="표. 추론 입력에서 시스템 프롬프트를 뺐을 때 답 길이는 표준 SFT 0.60배, 시스템 프롬프트 없이 학습한 모델 1.04배, 미세조정 전 기반 모델 0.95배다. 미리 정한 판정은 재현으로 나왔다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 0단계 대조 실험의 실제 값입니다. 같은 프롬프트를 뺐을 때 표준 SFT는 0.60배로 짧아졌고 나머지 두 모델은 1.04배와 0.95배였습니다. 미리 정한 판정은 재현이었습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 아래 계획을 세운 뒤 다른 연구와 겹치는지 조사했고, 0단계의 결과도 나왔습니다. 그에 따라 계획을 바꿨습니다.
 

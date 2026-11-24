@@ -40,6 +40,11 @@ published: true
 
 ## 설계 원리
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-10-a-training-data-design/concept-format-vs-state-data.png"><img src="../uploads/qfft/figures/2026-11-10-a-training-data-design/concept-format-vs-state-data.png" alt="흐름도. 지금 학습 데이터(LIMO 817개)는 모든 문서가 같은 시스템 프롬프트, Okay류 첫 낱말, 긴 풀이로 이어진다. 후보 A는 같은 형식 뒤에 쉬운 문제는 짧은 풀이, 나머지 문제는 긴 풀이를 두고, 후보 B는 짧게 풀다가 실제로 틀린 지점에서만 긴 추론으로 넘어가 고친다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 지금 학습 데이터와 두 후보를 학습 문서 하나의 모습으로 견줬습니다. 후보는 모두 실행 전인 계획이고, 새로움은 아직 확정하지 않았습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 **긴 추론을 켜는 것이 형식이 아니라 문제와 풀이의 상태가 되도록 데이터를 만든다.** 형식(시스템 프롬프트, 첫 낱말)만 보고는 짧게 쓸지 길게 쓸지 알 수 없게 하고, 실제로 어렵거나 풀이 중에 틀렸을 때만 긴 추론이 나오는 예를 보여 줍니다.
 
 ## 후보

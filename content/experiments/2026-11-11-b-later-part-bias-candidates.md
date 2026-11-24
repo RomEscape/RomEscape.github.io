@@ -113,6 +113,11 @@ Base는 이 표지를 거의 쓰지 않아 d′을 정할 수 없습니다. 앞�
 
 ## 여섯 모델로 넓힌 결과 (11월 11일 오후, 첫 GPU 실험)
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-11-b-later-part-bias-candidates/concept-training-format-and-marker.png"><img src="../uploads/qfft/figures/2026-11-11-b-later-part-bias-candidates/concept-training-format-and-marker.png" alt="표. 모델별로 학습할 때 본 입력과 측정값을 보인다. SFT는 오류 뒤 40.9%, 정상 뒤 8.5%, d′ 1.14, c 0.80이고, A1, A2, 시스템 프롬프트 없이 학습한 모델, QFFT는 오류 뒤 29.3~33.2%, 정상 뒤 4.6~5.4%, d′ 1.13~1.21, c 1.04~1.11이다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 같은 자료를 학습 형식만 바꿔 학습한 모델들에게 같은 풀이 앞부분을 주고, 오류 뒤와 정상 뒤에 wait가 나오는 비율을 쟀습니다. 반성 표지를 내는 성향은 SFT만 높고 나머지는 같은 수준입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 같은 371문항에서 모델마다 8회씩 새로 이어 쓰게 했습니다. 결과를 보기 전에 정한 규칙은 "c 차이가 0.13 이상이고 구간이 0을 빼며, 같은 조건 재학습끼리의 차이보다 크면 이동 있음"입니다.
 
 | 모델 | 학습에서 뺀 것 | 적중 | 오경보 | d′ [95%] | c [95%] | SFT 대비 c 차 |
@@ -129,6 +134,11 @@ Base는 이 표지를 거의 쓰지 않아 d′을 정할 수 없습니다. 앞�
 - 9월 저장 자료의 값과 새 실행의 값이 맞습니다(SFT 차이 0.02, QFFT 0.04).
 
 ## 평가에서 시스템 프롬프트를 빼면
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-11-b-later-part-bias-candidates/example-sft-eval-system-prompt.png"><img src="../uploads/qfft/figures/2026-11-11-b-later-part-bias-candidates/example-sft-eval-system-prompt.png" alt="두 열 비교. 평가 입력에 시스템 프롬프트가 있을 때 SFT는 오류 뒤 40.9%, 정상 뒤 8.5%에서 wait를 냈고 c는 0.80, d′은 1.14다. 시스템 프롬프트를 빼면 같은 앞부분에서 27.0%와 4.6%로 줄고 c는 1.15, d′은 1.08이 된다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. SFT에게 완전히 같은 풀이 앞부분을 주고 평가 입력의 시스템 프롬프트만 뺐습니다. 표지를 내는 문턱 c가 0.80에서 1.15로 올라 다른 모델 수준이 됩니다. 미리 정한 규칙으로는 부분 지지입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 위 평가 프롬프트(시스템 프롬프트 + 질문)는 SFT의 학습 형식과만 같습니다. 그래서 평가에서 시스템 프롬프트를 빼고 다시 쟀습니다. 이 가설은 위 결과를 본 뒤에 세운 것입니다.
 

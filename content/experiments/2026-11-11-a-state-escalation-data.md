@@ -17,6 +17,11 @@ published: true
 
 ## 자료 만드는 법
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-11-a-state-escalation-data/concept-escalation-data-and-verdict.png"><img src="../uploads/qfft/figures/2026-11-11-a-state-escalation-data/concept-escalation-data-and-verdict.png" alt="흐름도. 원래 모델이 8번 모두 맞힌 쉬운 문항은 짧은 풀이, 중간 문항은 틀린 풀이의 첫 오류 지점까지에 Wait와 긴 풀이 모델의 이어 쓰기를 붙인 풀이, 어려운 문항은 긴 풀이를 배우게 했다(1,608행 가운데 승급 예 287개). 평가에서 승급 모델 정답률은 43.2%로 SFT 55.7%보다 12.5%포인트 낮아 짝 기준선 학습을 보류했다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 승급 자료를 만드는 법과 평가 판정입니다. 승급 모델은 SFT보다 정답률이 12.5%포인트 낮아, 미리 정한 규칙에 따라 짝 기준선 학습을 보류했습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 원래 모델(Qwen2.5-7B-Instruct)이 문항마다 8번 풉니다. 8번 중 맞힌 비율을 p0라 부릅니다.
 
 | p0 | 분류 | 승급 모델이 배우는 풀이 | 짝 기준선이 배우는 풀이 |
@@ -45,7 +50,7 @@ published: true
 
 미리 정한 기준(직접 읽은 예의 80% 이상이 실제 오류 뒤 승급)에 4차 자료는 못 미쳤습니다.
 
-- **바꾼 것:** 첫 문단 바로 뒤에 잡힌 승급 예 46개는 승급하지 않은 것으로 돌렸습니다. 두 모델 모두 긴 풀이를 배웁니다.
+- **바꾼 것:** 첫 문단 바로 뒤에 잡힌 승급 예 46개는 승급하지 않은 것으로 돌렸습니다(342개 → 296개). 이 가운데 SFT 풀이가 없는 9개가 더 빠져, 학습에는 287개가 들어갔습니다. 두 모델 모두 긴 풀이를 배웁니다.
 - **확인:** 나머지에서 새로 무작위로 뽑은 12개는 10개가 통과했습니다. 앞서 읽은 것과 합치면 18개 중 15개(83%)입니다.
 - **주의:** 이 규칙은 결과를 본 뒤 정한 것입니다. 그래서 확인을 새 표본으로 했습니다.
 
@@ -80,6 +85,11 @@ published: true
 4. 그 밖은 변화 없음 또는 보류.
 
 ## 승급 모델 평가 결과 (11월 11일 오후)
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-11-a-state-escalation-data/example-taught-vs-produced-paths.png"><img src="../uploads/qfft/figures/2026-11-11-a-state-escalation-data/example-taught-vs-produced-paths.png" alt="띠 그림. 학습 자료의 승급 예는 원래 모델의 틀린 계산(486 − 378 − 36 + 6 − 26 = 72) 뒤에 Wait와 다시 더해 52를 얻는 이어 쓰기가 붙는다. 평가에서는 짧게 풀고 끝이 74개(정답 68.9%, 평균 498 tokens), 짧게 시작한 뒤 도중에 Wait가 46개(45.7%, 13,895 tokens), 처음부터 긴 풀이가 72개(15.3%, 21,729 tokens)였다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 위는 학습 자료에 넣은 실제 승급 예이고, 아래는 그 자료로 학습한 승급 모델이 평가에서 보인 세 가지 풀이 경로입니다. 의도한 승급 경로는 46개였고 전체 정답률은 SFT보다 낮았습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 승급 모델의 학습이 끝난 뒤, 짝 기준선을 학습하기 전에 승급 모델을 SFT와 먼저 비교했습니다. 짝 기준선 학습에 약 6.6시간이 들기 때문에, 결과를 보기 전에 "이런 경우에는 보류한다"는 규칙을 정해 두었습니다.
 
