@@ -172,9 +172,9 @@ CODI 저자가 공개한 GPT-2 체크포인트를 우리 평가 코드로 채점
 
 [![그림 9. GSM-Symbolic에서 각 모델과 Latent 없음의 짝차이](../uploads/middleflow/experiments/gsm-symbolic-diff.png)](../uploads/middleflow/experiments/gsm-symbolic-diff.png)
 
-*그림 9. 각 모델 − Latent 없음의 같은 문항 짝차이와 문제 틀 단위 95% 구간. 채운 점은 구간이 0을 포함하지 않는다. 11월 24일 15:14까지 끝난 모델만 그렸다.*
+*그림 9. 각 모델 − Latent 없음의 같은 문항 짝차이와 문제 틀 단위 95% 구간. 채운 점은 구간이 0을 포함하지 않는다. Latent 없음을 뺀 8개 모델을 모두 그렸다(11월 24일 밤).*
 
-GSM8K에서는 CODI와 Latent 없음의 차이가 확인되지 않았지만(+1.21 [−1.11, +3.53]), 이름과 숫자를 바꾼 main에서 CODI가 4.80점, 풀이 단계를 하나 더한 P1에서 CODI 2.98점, L13→L4 2.70점, Middleflow 2.02점 높았다. 회의에서 본 "latent 없이도 같다"는 GSM8K 문항 그대로에서의 결과였고, 바뀐 문항에서는 latent가 있는 모델이 앞섰다. AIME24, AIME25는 모든 모델이 0~1/30이라 비교할 수 없었다.
+GSM8K에서는 CODI와 Latent 없음의 차이가 확인되지 않았지만(+1.21 [−1.11, +3.53]), 이름과 숫자를 바꾼 main에서 CODI가 4.80점, 풀이 단계를 하나 더한 P1에서 CODI 2.98점, L13→L4 2.70점, Middleflow 2.02점 높았다. 회의에서 본 "latent 없이도 같다"는 GSM8K 문항 그대로에서의 결과였고, 바뀐 문항에서는 latent가 있는 모델이 앞섰다. AIME24, AIME25는 모든 모델이 0~1/30이라 비교할 수 없었다. 11월 24일 밤에 끝난 나머지 네 변형 중 입력 고정은 main, P1, P2 모두 Middleflow보다 낮았고(−2.98, −2.92, −1.68), Distillation을 빼고 학습한 모델은 main에서 Latent 없음보다 11.20점 낮았다.
 
 ### latent 경로 변형 (연구 질문 2, 3)
 
