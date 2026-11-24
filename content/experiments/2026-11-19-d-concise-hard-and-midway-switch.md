@@ -10,6 +10,11 @@ published: true
 
 ## 한 줄 요약
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-19-d-concise-hard-and-midway-switch/two-experiments-and-verdicts.png"><img src="../uploads/qfft/figures/2026-11-19-d-concise-hard-and-midway-switch/two-experiments-and-verdicts.png" alt="실험 두 개의 흐름도. 간결 문장은 Minerva에서 길이 0.50, 0.47배에 정답률 유지, 어려운 문제 묶음에서 0.89, 0.92배에 판정 불가였고, 풀이 도중 바꾸기는 ACC가 switch 55.0%, hint 56.9%, restart 59.4%로 switch가 후보 제외" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 실험 두 개가 무엇을 견줬는지와 미리 정한 기준의 판정입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 11월 18일, 19일 글에서 이어지는 실험 두 개입니다.
 
 1. **간결 문장의 어려운 문제 확인.** 시스템 프롬프트의 "reason step by step"을 "answer concisely"로 바꾼 간결 문장을 SFT와 QFFT에 넣고, 더 어려운 벤치마크 세 개(AIME24, AMC23, Minerva)를 새로 돌렸습니다. Minerva에서는 두 모델 모두 풀이 길이가 절반(0.50, 0.47배)이 됐고 정답률은 유지됐습니다. 가장 어려운 묶음(AIME24, AIME25, AMC23 100문항)에서는 길이가 10% 안팎만 줄었고, 정답률 차(−1.9, −1.4%p)는 범위가 넓어 판정하지 못했습니다.
@@ -54,6 +59,11 @@ published: true
 
 ### 1. 간결 문장, Minerva 한 문항
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-19-d-concise-hard-and-midway-switch/minerva-one-question.png"><img src="../uploads/qfft/figures/2026-11-19-d-concise-hard-and-midway-switch/minerva-one-question.png" alt="Minerva 한 문항에서 SFT의 기본 문장 답 16개와 간결 문장 답 두 개. 기본 문장은 평균 7,102 tokens에 16개 중 6개 정답, 간결 문장 답 1은 Okay로 시작해 6,273 tokens에 오답, 답 2는 To로 시작해 856 tokens에 오답" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 같은 Minerva 문항에서 기본 문장 답과 간결 문장 답 두 개의 첫머리, 길이, 채점입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 Minerva에서 SFT의 길이 비가 벤치마크 평균(0.50배)에 가장 가까운 문항을 골랐습니다.
 
 > Determine the frequency (in s^-1) of radiation capable of generating, in atomic hydrogen, free electrons which have a velocity of 1.3 × 10^6 m s^-1. Please format your answer as n × 10^x where n is to 2 decimal places.
@@ -79,6 +89,11 @@ Minerva에서 SFT의 길이 비가 벤치마크 평균(0.50배)에 가장 가까
 - 이 문항에서 정답으로 채점된 답은 모두 4.45 × 10^15였습니다(4.44 × 10^15는 오답 처리).
 
 ### 2. 풀이 도중 바꾸기, MATH500 한 문항
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-19-d-concise-hard-and-midway-switch/midway-switch-one-answer.png"><img src="../uploads/qfft/figures/2026-11-19-d-concise-hard-and-midway-switch/midway-switch-one-answer.png" alt="한 문항의 간결 문장 답을 4,096 tokens 지점에서 세 방식으로 이어 쓴 띠. 원래 답은 전체 5,592 tokens, switch는 4,659, hint는 4,573, restart는 비용 10,000 tokens이고 네 방식 모두 −50으로 정답" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 3. 예시 그림. 한 문항에서 간결 문장 그대로, switch, hint, restart가 4,096 tokens 지점 뒤에 쓴 글과 비용입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 바꾼 MATH500 답 가운데 문항 번호가 가장 작은 것을 골랐습니다.
 
@@ -143,6 +158,8 @@ MATH500 Level 1(가장 쉬운 등급) 문항이고, 정답은 −50입니다.
 |---|---|---|---|---|
 | SFT | 31.8% 대 33.7% | −1.9 [−5.3, +1.6]%p | 0.89 [0.84, 0.95] | **판정 불가** |
 | QFFT | 32.2% 대 33.7% | −1.4 [−5.8, +2.8]%p | 0.92 [0.85, 0.99] | **판정 불가** |
+
+정답률 차는 반올림하기 전 값으로 계산했습니다. 그래서 표에 적힌 두 값을 빼면 0.1%포인트 다를 수 있습니다(위 줄의 32.2% 대 33.7%는 −1.4%포인트, 벤치마크 표의 AMC23 53.1% 대 59.1%는 −5.9%포인트).
 
 Minerva(272문항)는 같은 규칙으로 SFT, QFFT 모두 **정답률 유지**입니다(위 표의 +0.9, +1.0%p).
 

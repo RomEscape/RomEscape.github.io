@@ -7,6 +7,11 @@ summary: 최솟값만 물었을 때 복수형/고유형의 출력 토큰 비율�
 published: true
 ---
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-optimal-assignment-multiplicity/three-cost-tables-same-minimum.png"><img src="../uploads/qfft/figures/2026-11-20-optimal-assignment-multiplicity/three-cost-tables-same-minimum.png" alt="세 비용표를 나란히 놓은 그림. 세 표 모두 최저 비용은 13이고 최적 배정 수만 1개, 2개, 1개로 다르다. 값 질문의 평균 출력은 LIMO A2와 저자 QFFT 순으로 11,759.9와 6,656.8, 16,760.1과 14,135.2, 14,045.0과 10,156.8 tokens이고, 사전 판정은 기준 미달이다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 최저 비용과 그 증명은 같게 두고 최적 배정의 수만 바꾼 세 비용표에서, 최저 비용을 묻는 질문의 출력량을 견줬습니다. 정확도와 대조 기준에 미달해 탐색 기준을 넘지 못했습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 **최솟값만 물었을 때 복수형/고유형의 출력 토큰 비율은 LIMO A2 1.441, 저자 QFFT 1.928이었다. 두 모델이 함께 충족해야 하는 탐색 기준에 미달했다.**
 
 ## 실제 결과
@@ -27,6 +32,11 @@ published: true
 
 
 ## 실제 최단거리 문제에서 옳은 경로를 쓰고도 답을 잃은 경우
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-optimal-assignment-multiplicity/problem-485-reversed-route.png"><img src="../uploads/qfft/figures/2026-11-20-optimal-assignment-multiplicity/problem-485-reversed-route.png" alt="MATH500 485번의 두 응답을 따라간 흐름도. 저자 QFFT의 한 응답은 A→C→D→B를 13으로 계산한 뒤 같은 길을 반대로 적어 3+4+5=12로 계산하고 12를 제출했다. 같은 모델의 다른 응답은 세 최적 경로를 각각 13으로 계산하고 정답을 제출했다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 최솟값 13을 내는 경로가 세 개인 실제 문항에서, 옳은 경로를 계산한 뒤 같은 길의 길이를 다르게 읽어 답을 잃은 응답과 정답을 낸 응답입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 MATH500 485번은 네 지점을 한 번씩 방문하는 **최단거리**만 묻는다. 역순을 같은 길로 세면 가능한 경로 12개 중 3개가 최솟값 13을 달성한다. 보관한 생성 32개를 다시 읽었을 때 두 모델은 각각 16번 중 13번 서로 다른 최적 경로를 적어도 두 개 검토했다. 최종 거리까지 맞힌 횟수는 LIMO A2 6번, 저자 QFFT 5번이었다. 표에서 최적 경로 여부는 문제에 표시된 원래 간선 길이로 검산했다.
 

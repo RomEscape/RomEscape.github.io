@@ -9,6 +9,11 @@ published: true
 
 ## 한 줄 요약
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-18-a-system-prompt-start-state/three-experiments-what-changed.png"><img src="../uploads/qfft/figures/2026-11-18-a-system-prompt-start-state/three-experiments-what-changed.png" alt="실험 세 개(문장 하나 바꾸기, 벡터로 프롬프트 대신, 풀이 도중 교체)가 입력의 어느 칸을 바꿨는지 열 세 개로 보인 그림. 판정은 차례로 난도가 이김(적응), 중간, 지속" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 실험 세 개가 입력의 어느 곳을 바꿨는지와 미리 정한 기준의 판정입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 11월 15일 글에서 "SFT가 길게 푸는 것은 시스템 프롬프트의 뜻에 반응한다"를 작게 확인했습니다. 이번에는 관련 논문을 다시 읽고, 지금 바로 돌릴 수 있는 실험 세 개를 끝까지(최대 32,000 tokens) 돌렸습니다.
 
 1. **문제 맞춤 프롬프트.** 기본 문장 "Please reason step by step, and put your final answer within \boxed{}."에서 "reason step by step"을 "answer concisely"로 바꾸기만 했습니다. 그러자 쉬운 문제는 크게 짧아지고(GSM8K 0.49배), 어려운 문제는 그대로 길게 풀었습니다(AIME25 0.97배). MATH500 정답률은 같았습니다. 반대로 은닉 상태나 난이도 같은 신호로 문제마다 문장을 골라 주는 방법은 무작위로 고르는 것보다 낫지 않았습니다. 문장 하나만 바꿔도 모델이 스스로 배분하기 때문입니다.
@@ -43,7 +48,7 @@ published: true
 | 95% CI | 문항을 다시 뽑아 2,000번 계산했을 때 값의 95%가 들어오는 범위 | 대괄호 안의 두 수. 0을 포함하면 차이가 있다고 말할 수 없음 |
 | Level 1–5 | MATH500 문항에 붙은 난이도 | 1이 가장 쉬움 |
 | 은닉 상태 | 모델이 글을 읽으며 층마다 만드는 수의 묶음(3,584개) | 28개 층 가운데 14번째 층 출력 |
-| 방향 v | 시스템 프롬프트가 있을 때와 없을 때, 응답 시작 직전 위치 은닉 상태의 평균 차이 | 11월 15일에 64문항으로 구함. 크기 37.6(은닉 상태 크기 63–77의 약 절반) |
+| 방향 v | 시스템 프롬프트가 있을 때와 없을 때, 응답 시작 직전 위치 은닉 상태의 평균 차이 | 11월 15일에 64문항으로 구함. 크기 37.6(은닉 상태 크기 63–77의 49–60%) |
 | α | v를 몇 배로 더했는지 | 0, 0.25, 0.5, 1, 2 |
 | 시작 위치에만 더하기 | 응답 시작 직전 위치 한 곳에만 α × v를 더함 | 그 뒤 생성되는 모든 위치는 그대로 |
 | 생성 내내 더하기 | 응답 시작 직전 위치와 그 뒤 생성되는 모든 위치에 더함 | 11월 15일 실험과 같은 방식 |
@@ -51,6 +56,11 @@ published: true
 | 상한 도달 | 32,000 tokens에 닿아 최종 답을 내지 못한 답변 | 대부분 같은 글을 반복하다 닿음 |
 
 ## 실험 예시
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-18-a-system-prompt-start-state/same-sentence-easy-and-hard.png"><img src="../uploads/qfft/figures/2026-11-18-a-system-prompt-start-state/same-sentence-easy-and-hard.png" alt="SFT의 응답 세 개를 나란히 보인 그림. 쉬운 문항에서 기본 문장은 Okay로 시작해 1,528 tokens, 간결 문장은 First로 시작해 111 tokens이고, 어려운 AIME25 18번에서는 간결 문장을 넣어도 Okay로 시작해 16,533 tokens를 썼다" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 쉬운 문항과 어려운 문항에서 SFT가 기본 문장과 간결 문장에 쓴 응답의 첫머리와 길이입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 ### 문항 하나로 따라가 보기 (문장 바꾸기와 방향 더하기)
 
@@ -156,6 +166,11 @@ MATH500 Level별 토큰 비(Level 1, 2, 3, 4, 5):
 - "답만 쓰라"는 문장의 초안은 신호로도 약했습니다. MATH500에서 초안 8개의 답 일치도는 평균 0.30이었고, 29% 문항에서는 답을 하나도 뽑지 못했습니다.
 
 ### 3. 벡터로 프롬프트 대신하기
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-18-a-system-prompt-start-state/where-direction-is-added.png"><img src="../uploads/qfft/figures/2026-11-18-a-system-prompt-start-state/where-direction-is-added.png" alt="방향 v를 더하는 위치를 띠로 보인 그림. 아무것도 안 더하면 607 tokens, 시작 위치에만 1배 더하면 959 tokens에 상자 답으로 끝나고, 생성 내내 0.5배와 1배 더하면 1,842와 2,020 tokens에 상자 없이 끝난다" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 3. 예시 그림. 같은 문항에서 방향 v를 시작 위치에만 더한 답과 생성 내내 더한 답의 길이와 끝입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 MATH500 100문항 × 2회입니다. 기준은 기본 시스템 프롬프트(ACC 82.5%, Okay/Alright 시작 100%, Long-CoT 90.5%)입니다.
 

@@ -9,6 +9,11 @@ published: true
 
 ## 한 줄 요약
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-19-a-system-prompt-batch2/three-follow-ups-what-changed.png"><img src="../uploads/qfft/figures/2026-11-19-a-system-prompt-batch2/three-follow-ups-what-changed.png" alt="실험 세 묶음(학습 방식별 간결 문장, 글자와 뜻, 시작 상태 확장)이 모델, 시스템 프롬프트 문장, 방향을 더하는 조건 가운데 무엇을 바꿨는지 열 세 개로 보인 그림. A1과 QFFT는 난도가 이김(적응), 낱말 섞기와 한국어는 켜짐, 21층은 14층과 같은 효과" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 실험 세 묶음이 무엇을 바꿨는지와 미리 정한 기준의 판정입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 11월 18일 글에서 이어지는 실험 세 묶음입니다.
 
 1. **학습 방식별 간결 문장.** 기본 시스템 프롬프트의 "reason step by step"을 "answer concisely"로 바꾸면, SFT는 쉬운 문제는 짧게, 어려운 문제는 길게 풀었습니다. 이번에는 같은 문장을 질문 제거 SFT(A1)와 QFFT에 넣었습니다. 두 모델 모두 같은 모습이었고(MATH500 Level 1 0.41, 0.47배, AIME25 0.88, 0.93배), MATH500과 AIME25 정답률은 유지됐습니다. 시스템 프롬프트 없이 학습한 SFT는 덜 반응했습니다(MATH500 0.79배).
@@ -47,6 +52,11 @@ published: true
 
 ### 문항 하나로 따라가 보기
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-19-a-system-prompt-batch2/concise-sentence-three-models.png"><img src="../uploads/qfft/figures/2026-11-19-a-system-prompt-batch2/concise-sentence-three-models.png" alt="64의 제곱근과 세제곱근의 차를 묻는 문항에 간결 문장을 넣었을 때 세 모델의 응답. A1은 136 tokens, QFFT는 93 tokens, 시스템 프롬프트 없이 학습한 SFT는 139 tokens이고 모두 First로 시작한다" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 같은 간결 문장과 같은 문항에서 학습 방식이 다른 세 모델의 응답 첫머리와 길이입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 MATH500 Level 1 문항입니다(11월 18일 글과 같은 문항).
 
 > What is the difference between the positive square root of 64 and the cube root of 64? (정답 4)
@@ -76,6 +86,8 @@ MATH500 Level 1 문항입니다(11월 18일 글과 같은 문항).
 
 - 영어로 쓴 답 126개: "Okay, so I need to …"로 시작하고 Long-CoT 89.7%, 토큰 비 0.84배였습니다. 기본 문장과 거의 같습니다.
 - 중국어로 쓴 답 74개: 모두 "好的，我需要计算 …"(우리말로 "좋아, 계산해야 할 것은 …")로 시작했습니다. "Okay"에 해당하는 말입니다. 다만 Long-CoT 판별 규칙이 영어 낱말로만 판별해서, 이 답들의 긴 풀이는 재지 못했습니다.
+- 아래 결과 표의 중국어 줄에서 Okay/Alright 시작과 Long-CoT가 둘 다 62.5%인 것은 우연히 같은 값입니다. Okay/Alright 시작은 영어 답 125개(200개 가운데)이고, Long-CoT는 영어 답 113개와 판별 규칙에 걸린 중국어 답 12개(74개의 16.2%)를 더한 125개입니다.
+- 같은 표의 "없음 (저장)" 줄 구간 [0.55, 0.69]는 [11월 15일 글](2026-11-15-a-system-prompt-smoke.html)의 [0.54, 0.68]과 끝자리가 다릅니다. 같은 저장 답으로 문항 재추출을 다시 했기 때문이고 값 0.61은 같습니다.
 
 ## 무엇을 했나
 
@@ -119,6 +131,11 @@ MATH500 Level 1 문항입니다(11월 18일 글과 같은 문항).
 - 엔진 대조: 같은 엔진으로 다시 만든 SFT 기본 문장의 GSM8K 정답률은 저장 결과와 0.2%p 차이였습니다. 같은 엔진 기준으로 보면 간결 문장의 GSM8K 정답률 차는 −1.7 [−3.5, +0.2]%p였습니다.
 
 ### 2. 글자와 뜻 (SFT, MATH500 100문항 × 2)
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-19-a-system-prompt-batch2/scrambled-negated-translated.png"><img src="../uploads/qfft/figures/2026-11-19-a-system-prompt-batch2/scrambled-negated-translated.png" alt="같은 문항에 낱말을 섞은 문장, 부정문, 한국어 문장을 시스템 프롬프트로 넣은 결과. 세 경우 모두 Okay로 시작했고 길이는 1,217, 983, 794 tokens" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 3. 예시 그림. 같은 SFT와 같은 문항에서 학습 문장의 낱말을 섞거나 부정하거나 한국어로 번역했을 때 응답의 첫머리와 길이입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 | 시스템 프롬프트 | 토큰 비 | Okay/Alright 시작 | Long-CoT (기본 90.5%) | ACC 차 | 상태 |
 |---|---|---|---|---|---|

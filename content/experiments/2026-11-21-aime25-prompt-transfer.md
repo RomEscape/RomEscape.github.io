@@ -11,6 +11,11 @@ published: true
 
 ## 파일럿 결과
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-21-aime25-prompt-transfer/remove-instruction-two-models.png"><img src="../uploads/qfft/figures/2026-11-21-aime25-prompt-transfer/remove-instruction-two-models.png" alt="AIME II 2번 문항에서 기본 지시와 지시 제거를 견준 그림. A2의 최종 답은 12, 1에서 49, 49로 바뀌고 저자 QFFT는 두 조건 모두 49, 12이며, 12개 응답의 평균 출력은 A2가 20,305에서 12,828 tokens로 줄고 저자 QFFT는 16,868에서 18,310 tokens로 늘었다" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림과 예시 그림. 같은 AIME25 문항에서 기본 지시와 지시 제거의 입력, 두 모델의 최종 답, 파일럿 12개 응답의 값입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 | 모델 | 정답 수, 기본 → 제거 | 응답당 평균 출력 토큰 | 32,000토큰 상한 도달 | 사전 판정 |
 |---|---:|---:|---:|---|
 | LIMO A2 | 0/12 → 2/12 | 20,305 → 12,828 (36.8% 감소) | 2/12 → 0/12 | 기본 조건에 정답이 없어 정답 보존 기준 미충족 |

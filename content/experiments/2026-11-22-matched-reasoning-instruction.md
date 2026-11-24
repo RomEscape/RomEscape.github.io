@@ -7,6 +7,11 @@ summary: A2의 기존 1,819문항을 독립 반복으로 다시 분석하고, �
 published: true
 ---
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-22-matched-reasoning-instruction/extra-tokens-vs-accuracy-gain.png"><img src="../uploads/qfft/figures/2026-11-22-matched-reasoning-instruction/extra-tokens-vs-accuracy-gain.png" alt="A2의 기존 기록을 다시 분석한 절차의 흐름도. 처음 두 생성에서 지시로 더 쓴 tokens로 문항을 정렬하고 다음 두 생성에서 상위와 하위 사분위의 정답 이득을 견준 차이는 GSM8K +1.37%p, MATH500 −2.53%p" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. A2의 기존 기록에서 지시로 더 길어진 문항과 덜 길어진 문항의 정답 이득을 견준 절차와 결과입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 **A2에서 단계별 풀이를 지시해 더 길어진 문제가, 별도로 다시 풀었을 때 더 많이 맞히는 문제라는 증거는 발견되지 않았다.** GSM8K 1,319문항과 MATH500 500문항에서 처음 두 생성의 추가 토큰으로 문항을 정렬했다. 다음 두 생성에서 상위와 하위 사분위의 정답 이득 차이는 GSM8K +1.37%p(95% 구간 −2.13~+5.03), MATH500 −2.53%p(−9.85~+4.86)였다. 이는 표준 지시와 시스템 지시 전체 제거를 비교한 과거 기록이다.
 
 | 같은 문항에 4회씩 생성한 기존 A2 | 표준 → 시스템 전체 제거 정답률 차이 | 평균 출력 토큰 |
@@ -26,6 +31,11 @@ published: true
 출력 예산은 최대 32,000토큰이며 모델의 입력 포함 전체 문맥은 32,768토큰이다. 세 핵심 벤치마크의 변화량을 균등 평균하고 세 보조 벤치마크를 따로 본다. 보존된 16회 표준 기록은 저자 QFFT 6종, A2 3종이다. 과거 16회 기준과 새 패널의 난수 및 실행 방식은 다르며, 직접 개입 비교는 이번 실행의 같은 문항과 시드로 한다.
 
 ## 스모크 실측
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-22-matched-reasoning-instruction/standard-box-and-full-removal.png"><img src="../uploads/qfft/figures/2026-11-22-matched-reasoning-instruction/standard-box-and-full-removal.png" alt="표준, 박스, 전체 제거 세 입력에 단계별 풀이 지시와 박스 문장이 있는지 나란히 보인 그림. 현재 시험(표준 대 박스)의 파일럿은 두 모델 동시 확대 기준 미충족" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 개념 그림. 과거 기록과 현재 시험이 각각 어떤 입력을 견줬는지입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 정답은 정상 종료한 응답의 최종 답으로 채점했다. 미제출·해석 불가·상한 종료는 0점이다. 회복은 표준 프롬프트의 오답 중 새로 맞힌 수이며, 손상은 표준 정답 중 새로 틀린 수다.
 
@@ -57,6 +67,11 @@ published: true
 
 
 ## 파일럿 실측
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-22-matched-reasoning-instruction/two-box-answers-then-standard.png"><img src="../uploads/qfft/figures/2026-11-22-matched-reasoning-instruction/two-box-answers-then-standard.png" alt="박스 조건의 답 두 개가 일치하면 첫 답을, 아니면 표준 지시의 세 번째 답을 채택하는 정책의 흐름도. 핵심 벤치마크에서 A2는 58.3%에 문항당 23,324.7 tokens, 저자 QFFT는 58.3%에 21,513.9 tokens로 두 모델 모두 미통과" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 3. 예시 그림. 파일럿 기록으로 재생한 정책의 절차와 핵심 벤치마크의 정확도, 문항당 총 tokens입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 정답은 정상 종료한 응답의 최종 답으로 채점했다. 미제출·해석 불가·상한 종료는 0점이다. 회복은 표준 프롬프트의 오답 중 새로 맞힌 수이며, 손상은 표준 정답 중 새로 틀린 수다.
 
