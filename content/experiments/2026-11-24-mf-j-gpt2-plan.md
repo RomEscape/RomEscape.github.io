@@ -26,6 +26,10 @@ Llama-1B에서는 [latent 없이 학습한 모델](2026-11-09-mf-c-no-latent.htm
 | 공개 체크포인트 | CODI 저자가 공개한 GPT-2 학습 결과 | 우리 평가 코드가 맞는지 확인하는 데만 씀 |
 | 추론 때 latent 바꾸기 | 학습을 마친 모델이 답을 쓰기 전에 latent를 지우거나 바꿔, 답이 latent에 얼마나 기대는지 봄 | 지우기 4가지, 틀린 내용 넣기 2가지(아래 표) |
 
+[![GPT-2 Small에서 학습하는 네 모델의 latent 계산 범위](../uploads/middleflow/experiments/gpt2-arms.png)](../uploads/middleflow/experiments/gpt2-arms.png)
+
+*GPT-2 Small은 layer가 12개(L0~L11)입니다. 가로는 position(질문, latent 6개, 답), 세로는 layer이고 파란 칸이 latent를 계산하는 layer입니다. 질문과 답 토큰은 네 모델 모두 12개 layer를 다 지나고, 답 토큰은 파란 layer에서만 latent를 볼 수 있습니다. CODI, Latent 없음, Middleflow는 11월 24일부터 학습 중이고 L9→L0은 사선 경로 다음에 학습합니다. 그림을 누르면 원본 크기로 열립니다.*
+
 ## 연구 질문
 
 1. latent 계산의 기여는 모델에 따라 달라지는가? (Llama-1B에서는 확인 안 됨, GPT-2 Small에서는?)

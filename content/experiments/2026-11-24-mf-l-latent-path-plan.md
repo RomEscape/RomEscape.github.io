@@ -41,6 +41,10 @@ latent가 지나는 layer를 step마다 다르게 정하는 세 가지 경로를
 | **사선** | step 1: 5→9, step 2: 4→8, …, step 6: 0→4 | 5 | Middleflow와 같은 계산량으로 마지막에 첫 layer까지 닿으면 latent를 더 쓰고 더 맞히는가 |
 | **후퇴 후 전진** | 5 → 9, 내려와 7 → 9 | 8 | 한 번 올라간 뒤 앞 단계를 다시 거치는 것이 도움이 되는가 |
 
+[![latent 경로 변형 세 가지와 기준 Middleflow의 step별 경로](../uploads/middleflow/experiments/latent-paths.png)](../uploads/middleflow/experiments/latent-paths.png)
+
+*가로는 position(질문, latent 6개, 답), 세로는 GPT-2 Small의 layer(L0~L11)입니다. 루프와 후퇴 후 전진은 한 latent position에서 layer를 두 번 지나므로 칸을 둘로 나눠 그렸습니다. 연한 파랑은 지나지만 KV를 남기지 않는 칸(같은 step에서 다시 지나기 전), 진한 파랑은 KV를 남기는 칸입니다. 사선은 step마다 범위가 한 칸씩 내려가 z6은 L0~L4를 지납니다. 그림을 누르면 원본 크기로 열립니다.*
+
 **표 읽는 법.** step당 block 계산이 같으면 latent에 드는 계산량이 같습니다. 그래서 루프는 L9→L0과(둘 다 10), 사선은 Middleflow와(둘 다 5) 짝지어 비교합니다. 후퇴 후 전진(8)은 Middleflow와 루프 사이입니다.
 
 - 한 step 안에서 같은 block을 두 번 지나면, 그 block의 KV 캐시에는 마지막으로 지날 때의 값만 남깁니다. 답을 쓸 때 각 block이 step마다 latent 하나만 보도록 하기 위해서입니다. 그래서 루프와 후퇴 후 전진은 Middleflow처럼 block 5~9의 KV 캐시에 latent가 6개씩 남습니다.

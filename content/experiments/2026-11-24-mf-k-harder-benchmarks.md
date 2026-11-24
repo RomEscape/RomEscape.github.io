@@ -33,6 +33,10 @@ latent가 "어려운 문제에 강한가"를 보려고 더 어려운 벤치마�
 
 GSM-Symbolic의 같은 문제 틀에서 나온 두 문항입니다.
 
+[![GSM-Symbolic 같은 틀의 main 문항과 P1 문항, 네 모델의 답](../uploads/middleflow/experiments/gsm-symbolic-example.png)](../uploads/middleflow/experiments/gsm-symbolic-example.png)
+
+*왼쪽은 이름과 숫자를 바꾼 main 문항, 오른쪽은 같은 틀에 풀이 단계를 하나 더한 P1 문항입니다. 가운데 상자는 정답 풀이의 단계이고, 아래는 Llama-1B 네 모델(10 epoch, 시드 11)이 실제로 쓴 답입니다. 빨간 네모가 틀린 답입니다.*
+
 **main (2단계, 정답 6).** A juggler can juggle 120 balls. A fifth of the balls are golf balls, and a quarter of the golf balls are black. How many black golf balls are there?
 
 **P1 (3단계, 정답 4).** A juggler can juggle 360 balls. 1/5 of the balls are tennis balls, and a third of the tennis balls are teal of which 1/6 are marked. How many marked teal tennis balls are there?
@@ -58,6 +62,7 @@ P1 문항은 360 ÷ 5 = 72, 72 ÷ 3 = 24, 24 ÷ 6 = 4로 세 번 차례로 계�
 | Middleflow (L13→L7) | 28.82 | 12.00 | 4.76 |
 | Latent 없음 | 29.02 | 9.98 | 3.52 |
 | L13→L0 | 31.32 | 11.18 | 3.88 |
+| L13→L4 | 31.42 | 12.68 | 4.72 |
 
 **같은 문항 짝차이(문제 틀 단위 95% 구간).**
 
@@ -68,6 +73,11 @@ P1 문항은 360 ÷ 5 = 72, 72 ÷ 3 = 24, 24 ÷ 6 = 4로 세 번 차례로 계�
 | CODI − Middleflow | **+5.00 [+2.34, +7.92]** | +0.96 [−0.62, +2.64] | −0.80 [−2.40, +0.64] |
 | L13→L0 − Latent 없음 | +2.30 [−0.40, +5.20] | +1.20 [−0.64, +3.34] | +0.36 [−1.04, +1.76] |
 | L13→L0 − CODI | **−2.50 [−4.86, −0.26]** | **−1.78 [−3.62, −0.12]** | −0.08 [−2.04, +1.68] |
+| L13→L4 − Latent 없음 | +2.40 [−0.04, +5.00] | **+2.70 [+0.32, +5.26]** | +1.20 [−0.56, +3.20] |
+
+[![GSM-Symbolic에서 각 모델과 Latent 없음의 짝차이](../uploads/middleflow/experiments/gsm-symbolic-diff.png)](../uploads/middleflow/experiments/gsm-symbolic-diff.png)
+
+*각 모델이 Latent 없음보다 몇 점 높은지와 문제 틀 단위 95% 구간입니다. 채운 점은 구간이 0을 포함하지 않는 칸(위 표의 굵은 칸)입니다. 11월 24일 15:14까지 평가가 끝난 모델만 그렸습니다.*
 
 **표 읽는 법.** 앞 모델이 맞히고 뒤 모델이 틀린 문항 비율에서 그 반대 비율을 뺀 값(점)입니다. 괄호는 문제 틀을 4,000번 다시 뽑아 구한 95% 구간(시드 0)이고, 굵은 칸은 구간이 0을 포함하지 않아 차이가 있다고 보는 칸입니다. GSM8K에서 CODI − Latent 없음은 +1.21 [−1.11, +3.53]로 확인되지 않았습니다. P2는 세 모델 모두 4% 안팎이라 차이를 가릴 수 없습니다.
 
@@ -81,6 +91,6 @@ P1 문항은 360 ÷ 5 = 72, 72 ÷ 3 = 24, 24 ÷ 6 = 4로 세 번 차례로 계�
 ## 한계와 남은 일
 
 - 시드 하나입니다. 같은 틀의 문항 50개가 비슷해 문항 수만큼 독립적이지 않으므로, 틀 단위로 묶어 구간을 냈습니다.
-- 나머지 변형(L13→L4, 띄엄 배치, CODI latent 3개, 입력 고정, Distillation 제거)은 평가 중입니다. 끝나면 이 글을 고칩니다.
+- 나머지 변형(띄엄 배치, CODI latent 3개, 입력 고정, Distillation 제거)은 평가 중입니다. 끝나면 이 글을 고칩니다.
 - latent가 실제로 필요하다고 보고된 GPT-2 Small에서 학습 중인 모델들도 끝나면 같은 묶음으로 평가합니다([GPT-2 Small 비교](2026-11-24-mf-j-gpt2-plan.html)).
 - GSM-Symbolic(apple, CC BY-NC-ND 4.0)은 평가에만 썼습니다.

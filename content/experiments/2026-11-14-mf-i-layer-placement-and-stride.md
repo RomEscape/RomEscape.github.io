@@ -31,6 +31,10 @@ latent가 지나는 7개 layer를 어디에 두든, 1 epoch 학습에서는 정�
 
 ## 실험 예시
 
+[![1 epoch 예비 비교의 다섯 배치에서 latent가 지나는 7개 layer](../uploads/middleflow/experiments/stride-placement.png)](../uploads/middleflow/experiments/stride-placement.png)
+
+*다섯 배치 모두 latent가 지나는 layer는 7개입니다. 이어진 두 latent position만 확대해 그렸고, 맨 위 파란 layer의 출력을 뽑아 MLP를 거쳐 다음 position의 맨 아래 파란 layer에 넣습니다. 질문과 답 토큰은 16개 layer를 모두 지납니다. 그림을 누르면 원본 크기로 열립니다.*
+
 block 1, 3, …, 13 배치에서 latent 하나는 block 1을 지난 뒤 block 2를 건너뛰고 block 3을 지나는 식으로 7개 block만 지나고, block 13의 출력에서 뽑혀 다음 position의 block 1에 들어갑니다. 질문과 답 토큰은 16개 block을 모두 지나며, latent는 그 7개 block에서만 볼 수 있습니다.
 
 ## 결과 (1 epoch)

@@ -142,6 +142,55 @@ CODI 같은 latent 추론은 세 가지 이유로 나왔다. 이 발표의 결�
 2. **여러 시드.** 1~3점 차이를 판정하려면 선행 연구처럼 시드 3개가 필요하다.
 3. **공식 CODI 코드 재현과 가까운 선행 연구 비교.** 같은 코드의 CODI 설정이 공식 코드와 같은 값을 내는지 확인하고, 가운데 layer를 되풀이하는 선행 연구(ETD, T²MLR)와 차이를 정리한다.
 
+## 회의 뒤 진행 중인 실험 (11월 24일 기준)
+
+회의에서 정한 다음 검증과 그 뒤에 더한 실험의 진행 상황이다. 시각은 한국 시각이다.
+
+| 실험 | 회의의 어느 질문에 답하나 | 상태 (11월 24일) | 기록 |
+|---|---|---|---|
+| GPT-2 Small에서 같은 비교 | 다음 검증 1, 연구 질문 3 | 세 모델 학습 중, 11월 25일 새벽 끝 예정 | [GPT-2 Small 비교](../experiments/2026-11-24-mf-j-gpt2-plan.html) |
+| 더 어려운 문제(GSM-Symbolic, AIME) | latent가 효과를 내는 조건 | Llama-1B 다섯 모델 끝, 나머지 평가 중 | [더 어려운 문제](../experiments/2026-11-24-mf-k-harder-benchmarks.html) |
+| latent 경로 변형(루프, 사선, 후퇴 후 전진) | 연구 질문 2, 3 | 코드와 시험 끝, 11월 25일 새벽 학습 시작 | [경로 변형](../experiments/2026-11-24-mf-l-latent-path-plan.html) |
+| 띄엄 배치 10 epoch | 연구 질문 2 | 셋 중 하나 끝, 둘 보류 | [띄엄 배치](../experiments/2026-11-14-mf-i-layer-placement-and-stride.html) |
+
+다음 검증 2(여러 시드)는 11월 24일에 시드 하나(11)로 비교 조건을 늘리는 쪽으로 바꿨다. 아래 결과도 모두 시드 하나다.
+
+### GPT-2 Small에서 같은 비교 (다음 검증 1)
+
+[![그림 7. GPT-2 Small에서 같은 설정으로 학습하는 네 모델의 latent 계산 범위](../uploads/middleflow/experiments/gpt2-arms.png)](../uploads/middleflow/experiments/gpt2-arms.png)
+
+*그림 7. GPT-2 Small(layer 12개)에서 같은 설정으로 학습하는 네 모델. 파란 칸이 latent를 계산하는 layer다. Middleflow는 Llama의 L13→L7을 layer 비율대로 옮긴 L9→L5(5개 layer)다.*
+
+CODI 저자가 공개한 GPT-2 체크포인트를 우리 평가 코드로 채점하니 GSM8K 42.46%(논문 43.7%)였고, 공식 평가 방식과 1,319문항의 답이 모두 같았다. 이 모델은 추론 때 latent를 비우면 22% 안팎, 다른 문항의 latent를 넣으면 6.37%로 떨어져 latent에 크게 기댄다. CODI(11월 24일 12:49 시작), Latent 없음(13:13), Middleflow(14:31)를 원본 CODI GPT-2 설정(40 epoch)으로 GPU 한 장씩 학습하고 있고, 11월 25일 03:30~05:45쯤 끝난다. L9→L0은 사선 경로 다음에 학습한다.
+
+### 더 어려운 문제에서 latent의 몫 (latent가 효과를 내는 조건)
+
+[![그림 8. GSM-Symbolic 같은 틀의 main 문항과 P1 문항, 네 모델의 답](../uploads/middleflow/experiments/gsm-symbolic-example.png)](../uploads/middleflow/experiments/gsm-symbolic-example.png)
+
+*그림 8. GSM-Symbolic 같은 틀에서 나온 두 문항과 Llama-1B 네 모델의 실제 답. 풀이 단계가 하나 늘자 Latent 없음만 틀렸다.*
+
+[![그림 9. GSM-Symbolic에서 각 모델과 Latent 없음의 짝차이](../uploads/middleflow/experiments/gsm-symbolic-diff.png)](../uploads/middleflow/experiments/gsm-symbolic-diff.png)
+
+*그림 9. 각 모델 − Latent 없음의 같은 문항 짝차이와 문제 틀 단위 95% 구간. 채운 점은 구간이 0을 포함하지 않는다. 11월 24일 15:14까지 끝난 모델만 그렸다.*
+
+GSM8K에서는 CODI와 Latent 없음의 차이가 확인되지 않았지만(+1.21 [−1.11, +3.53]), 이름과 숫자를 바꾼 main에서 CODI가 4.80점, 풀이 단계를 하나 더한 P1에서 CODI 2.98점, L13→L4 2.70점, Middleflow 2.02점 높았다. 회의에서 본 "latent 없이도 같다"는 GSM8K 문항 그대로에서의 결과였고, 바뀐 문항에서는 latent가 있는 모델이 앞섰다. AIME24, AIME25는 모든 모델이 0~1/30이라 비교할 수 없었다.
+
+### latent 경로 변형 (연구 질문 2, 3)
+
+[![그림 10. latent 경로 변형 세 가지와 기준 Middleflow의 step별 경로](../uploads/middleflow/experiments/latent-paths.png)](../uploads/middleflow/experiments/latent-paths.png)
+
+*그림 10. 기준 Middleflow와 경로 변형 세 가지. 루프와 후퇴 후 전진은 한 latent position에서 layer를 두 번 지나므로 칸을 둘로 나눠 그렸다. 연한 파랑은 지나지만 KV를 남기지 않는 칸, 진한 파랑은 KV를 남기는 칸이다.*
+
+넣는 layer가 latent를 쓰는 정도를 바꾼다는 회의 결과에서 출발해, step마다 지나는 layer 범위를 바꾸는 경로 세 가지를 만들었다. 계산량이 같은 짝으로 루프는 L9→L0과, 사선은 Middleflow와 비교한다. 코드와 시험 12개를 11월 24일에 마쳤고, GPT-2 학습이 끝나는 대로 11월 25일 03:30(사선), 05:25(루프), 05:45(후퇴 후 전진)쯤 학습을 시작한다. 한 경로에 약 15시간이 걸릴 것으로 본다.
+
+### 띄엄 배치 (연구 질문 2)
+
+[![그림 11. 1 epoch 예비 비교의 다섯 배치에서 latent가 지나는 7개 layer](../uploads/middleflow/experiments/stride-placement.png)](../uploads/middleflow/experiments/stride-placement.png)
+
+*그림 11. Middleflow와 같은 7개 layer를 앞쪽 연속, 또는 한 칸씩 건너뛰어 둔 배치. 이어진 두 latent position만 확대해 그렸다.*
+
+10 epoch로 끝난 block 1, 3, …, 13 배치는 GSM8K 49.51로 Middleflow와 차이가 확인되지 않았고(−0.91 [−3.02, +1.20]) CODI보다 3.87점 낮았다. 나머지 두 배치는 11월 15일 새벽에 멈춘 뒤 보류 중이다.
+
 ## 한계
 
 - 모든 결과가 시드 하나, 모델 하나(Llama-3.2-1B-Instruct), 수학 문장제 네 가지다.
