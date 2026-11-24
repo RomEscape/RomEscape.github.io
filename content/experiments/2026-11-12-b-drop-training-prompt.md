@@ -2,9 +2,9 @@
 title: 학습 프롬프트 빼기, 표준 SFT에서 시스템 프롬프트만 빼면 QFFT 수준이 된다
 date: 2026-11-12
 project: QFFT
-status: 판정 완료, 후속 진행 중
+status: 완료
 idea: 후보
-idea_rank: 1
+idea_rank: 2
 method_examples:
   - title: 같은 부등식을 지시문 유무에 따라 네 번씩 풀기
     kind: 실제 실험 예시

@@ -4,6 +4,18 @@ date: 2026-11-24
 project: QFFT
 status: 진행 중
 idea: 후보
+idea_rank: 6
+method_examples:
+  - title: 답을 구한 뒤에도 문단 첫머리마다 다시 따져 보는 풀이
+    kind: 실제 실험 예시
+    problem: 'MATH500 Level 1 문항은 1 − 2 + 3 − 4 + … + 99 − 100을 계산합니다. 두 개씩 짝지으면 −1이 50번이므로 정답은 −50입니다.'
+    comparison: 'SFT가 간결하게 답하라는 문장을 받고 쓴 답 하나를 문단 단위로 읽어, 풀기 전에 길게 풀기로 정한 자리와 풀다가 더 따져 보기로 다시 정한 자리를 나눕니다.'
+    assessment: '이 답은 "Okay, so I need to compute this sum …"으로 시작해 앞쪽 문단에서 −50을 구했습니다. 그 뒤 문단 첫머리가 "Wait, let me recall …"로 이어지며 같은 값을 다시 확인했고 길이는 5,592 tokens가 됐습니다. 같은 문항의 다른 답은 1,148 tokens에서 끝났습니다.'
+  - title: 짧게 풀기 시작한 답의 도중에 시스템 프롬프트 넣기
+    kind: 실제 실험 예시
+    problem: '시스템 프롬프트 없이 짧게 풀고 끝낸 답 52개를 골라, 앞 16 tokens("To determine which student has the greatest average speed, we need to calculate the average" 같은 첫머리)를 그대로 둡니다.'
+    comparison: '같은 앞부분에서 이어 쓰게 하되, 한 칸은 입력에 시스템 프롬프트를 넣고 다른 칸은 넣지 않습니다. 64 tokens 지점에서도 같은 비교를 합니다.'
+    assessment: '시스템 프롬프트를 넣은 칸의 길이는 넣지 않은 칸의 2.19배 [1.76, 2.74]였고 긴 풀이 비율은 17.3%에서 76.0%로 올랐습니다. 64 tokens 지점에서는 1.90배 [1.50, 2.47]였습니다. 응답 시작에서 넣을 때는 3.53배여서, 깊어질수록 효과가 줄어듭니다.'
 summary: 적응형 추론을 두 단계로 나눠 봅니다. 풀기 전에 문제를 보고 길게 풀지 정하는 단계와, 풀다가 문단이 바뀔 때마다 더 따져 볼지 다시 정하는 단계입니다. 지금까지의 결과로는 시스템 프롬프트 같은 단서가 두 단계의 기준선을 옮깁니다. 두 기준선을 따로 움직이는 실험들을 설계했습니다.
 published: true
 ---
