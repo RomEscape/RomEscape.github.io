@@ -4,7 +4,7 @@ date: 2026-11-24
 project: QFFT
 status: 진행 중
 idea: 후보
-idea_rank: 1
+idea_rank: 2
 method_examples:
   - title: 쉬운 지수 문제를 세 가지 입력으로 주기
     kind: 실제 실험 예시

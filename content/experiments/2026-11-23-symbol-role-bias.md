@@ -4,7 +4,7 @@ date: 2026-11-23
 project: QFFT
 status: 진행 중
 idea: 후보
-idea_rank: 8
+idea_rank: 9
 summary: 같은 수학 문제에서 기호의 역할만 맞바꿨을 때, 사전에 계산해 둔 특정 오답이 두 모델에서 나타났다. 풀이가 처음 식을 쓰는 지점과 숫자를 대입하는 지점을 구분해 검증한다.
 published: true
 method_examples:

@@ -4,7 +4,7 @@ date: 2026-11-24
 project: QFFT
 status: 진행 중
 idea: 후보
-idea_rank: 4
+idea_rank: 5
 method_examples:
   - title: 공개 모델에서 학습 때의 시스템 프롬프트만 빼기
     kind: 실제 실험 예시

@@ -4,7 +4,7 @@ date: 2026-11-12
 project: QFFT
 status: 완료
 idea: 후보
-idea_rank: 2
+idea_rank: 3
 method_examples:
   - title: 같은 부등식을 지시문 유무에 따라 네 번씩 풀기
     kind: 실제 실험 예시

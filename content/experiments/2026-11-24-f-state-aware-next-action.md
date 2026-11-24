@@ -4,7 +4,7 @@ date: 2026-11-24
 project: QFFT
 status: 진행 중
 idea: 후보
-idea_rank: 9
+idea_rank: 10
 method_examples:
   - title: 같은 중간 풀이에서 다음 행동 다섯 가지를 실제로 이어 써 보기
     kind: 실험 설계 예시

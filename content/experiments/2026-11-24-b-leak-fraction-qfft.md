@@ -4,7 +4,7 @@ date: 2026-11-24
 project: QFFT
 status: 완료
 idea: 후보
-idea_rank: 3
+idea_rank: 4
 method_examples:
   - title: 쉬운 문항과 어려운 문항에서 긴 풀이가 얼마나 남는지 계산하기
     kind: 실제 실험 예시

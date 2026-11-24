@@ -4,7 +4,7 @@ date: 2026-11-24
 project: QFFT
 status: 진행 중
 idea: 후보
-idea_rank: 5
+idea_rank: 6
 method_examples:
   - title: 같은 문제에서 긴 풀이가 시작되는 자리 보기
     kind: 실제 실험 예시
