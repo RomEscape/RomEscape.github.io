@@ -150,8 +150,9 @@ CODI 같은 latent 추론은 세 가지 이유로 나왔다. 이 발표의 결�
 |---|---|---|---|
 | GPT-2 Small에서 같은 비교 | 다음 검증 1, 연구 질문 3 | 세 모델 학습 중, 11월 25일 새벽 끝 예정 | [GPT-2 Small 비교](../experiments/2026-11-24-mf-j-gpt2-plan.html) |
 | 더 어려운 문제(GSM-Symbolic, AIME) | latent가 효과를 내는 조건 | Llama-1B 다섯 모델 끝, 나머지 평가 중 | [더 어려운 문제](../experiments/2026-11-24-mf-k-harder-benchmarks.html) |
-| latent 경로 변형(루프, 사선, 후퇴 후 전진) | 연구 질문 2, 3 | 코드와 시험 끝, 루프는 11월 25일 새벽, 사선과 후퇴 후 전진은 25일 밤과 26일 새벽 학습 시작 | [경로 변형](../experiments/2026-11-24-mf-l-latent-path-plan.html) |
+| latent 경로 변형(루프, 사선, 후퇴 후 전진, 거꾸로) | 연구 질문 2, 3 | 코드와 시험 끝, 루프는 11월 25일 새벽, 사선과 후퇴 후 전진은 25일 밤, 거꾸로는 26일 낮 학습 시작 | [경로 변형](../experiments/2026-11-24-mf-l-latent-path-plan.html) |
 | Llama 학습 시간을 CODI와 같게 | Middleflow가 아낀 학습 시간을 더 학습에 쓰면 CODI만큼 맞히나 | 코드와 시험 끝, 11월 25일 새벽 학습 시작 | [학습 시간 맞춤](../experiments/2026-11-24-mf-m-llama-codi-time.html) |
+| Middleflow가 쓰지 않는 layer의 역할 | 넣는 layer가 latent 의존도를 바꾸는 이유, 연구 질문 2 | 끝(11월 24일 밤, 추론만) | [쓰지 않는 layer](../experiments/2026-11-24-mf-n-unused-layer-role.html) |
 | 띄엄 배치 10 epoch | 연구 질문 2 | 셋 중 하나 끝, 둘 보류 | [띄엄 배치](../experiments/2026-11-14-mf-i-layer-placement-and-stride.html) |
 
 다음 검증 2(여러 시드)는 11월 24일에 시드 하나(11)로 비교 조건을 늘리는 쪽으로 바꿨다. 아래 결과도 모두 시드 하나다.
@@ -162,7 +163,7 @@ CODI 같은 latent 추론은 세 가지 이유로 나왔다. 이 발표의 결�
 
 *그림 7. GPT-2 Small(layer 12개)에서 같은 설정으로 학습하는 네 모델. 파란 칸이 latent를 계산하는 layer다. Middleflow는 Llama의 L13→L7을 layer 비율대로 옮긴 L9→L5(5개 layer)다.*
 
-CODI 저자가 공개한 GPT-2 체크포인트를 우리 평가 코드로 채점하니 GSM8K 42.46%(논문 43.7%)였고, 공식 평가 방식과 1,319문항의 답이 모두 같았다. 이 모델은 추론 때 latent를 비우면 22% 안팎, 다른 문항의 latent를 넣으면 6.37%로 떨어져 latent에 크게 기댄다. CODI(11월 24일 12:49 시작), Latent 없음(13:13), Middleflow(14:31)를 원본 CODI GPT-2 설정(40 epoch)으로 GPU 한 장씩 학습하고 있고, 11월 25일 03:30~05:45쯤 끝난다. L9→L0은 사선 경로 다음에 학습한다.
+CODI 저자가 공개한 GPT-2 체크포인트를 우리 평가 코드로 채점하니 GSM8K 42.46%(논문 43.7%)였고, 공식 평가 방식과 1,319문항의 답이 모두 같았다. 이 모델은 추론 때 latent를 비우면 22% 안팎, 다른 문항의 latent를 넣으면 6.37%로 떨어져 latent에 크게 기댄다. CODI(11월 24일 12:49 시작), Latent 없음(13:13), Middleflow(14:31)를 원본 CODI GPT-2 설정(40 epoch)으로 GPU 한 장씩 학습하고 있고, 11월 25일 03:30~05:45쯤 끝난다. L9→L0은 Llama Latent 없음 학습 시간 맞춤 다음(11월 26일 00:40쯤)에 학습한다.
 
 ### 더 어려운 문제에서 latent의 몫 (latent가 효과를 내는 조건)
 
@@ -178,11 +179,11 @@ GSM8K에서는 CODI와 Latent 없음의 차이가 확인되지 않았지만(+1.2
 
 ### latent 경로 변형 (연구 질문 2, 3)
 
-[![그림 10. latent 경로 변형 세 가지와 기준 Middleflow의 step별 경로](../uploads/middleflow/experiments/latent-paths.png)](../uploads/middleflow/experiments/latent-paths.png)
+[![그림 10. latent 경로 변형 네 가지와 기준 Middleflow의 step별 경로](../uploads/middleflow/experiments/latent-paths.png)](../uploads/middleflow/experiments/latent-paths.png)
 
-*그림 10. 기준 Middleflow와 경로 변형 세 가지. 루프와 후퇴 후 전진은 한 latent position에서 layer를 두 번 지나므로 칸을 둘로 나눠 그렸다. 연한 파랑은 지나지만 KV를 남기지 않는 칸, 진한 파랑은 KV를 남기는 칸이다.*
+*그림 10. 기준 Middleflow와 경로 변형 네 가지. 루프와 후퇴 후 전진은 한 latent position에서 layer를 두 번 지나므로 칸을 둘로 나눠 그렸다. 연한 파랑은 지나지만 KV를 남기지 않는 칸, 진한 파랑은 KV를 남기는 칸이다. 거꾸로는 Middleflow와 같은 칸을 위에서 아래로(흰 화살표) 지난다.*
 
-넣는 layer가 latent를 쓰는 정도를 바꾼다는 회의 결과에서 출발해, step마다 지나는 layer 범위를 바꾸는 경로 세 가지를 만들었다. 계산량이 같은 짝으로 루프는 L9→L0과, 사선은 Middleflow와 비교한다. 코드와 시험 12개를 11월 24일에 마쳤다. 루프는 GPT-2 Middleflow가 끝나는 11월 25일 05:25쯤 시작한다. 사선과 후퇴 후 전진은 11월 24일 22시에 순서를 바꿔, 아래 Llama 학습 시간 맞춤 학습 뒤인 25일 23시쯤과 26일 01시쯤 시작한다. 한 경로에 약 15시간이 걸릴 것으로 본다.
+넣는 layer가 latent를 쓰는 정도를 바꾼다는 회의 결과에서 출발해, step마다 지나는 layer 범위를 바꾸는 경로 세 가지를 만들었고, 11월 24일 23시에 같은 layer를 위에서 아래로 지나는 거꾸로 경로를 더했다. 계산량이 같은 짝으로 루프는 L9→L0과, 사선과 거꾸로는 Middleflow와 비교한다. 코드와 시험 13개를 11월 24일에 마쳤다. 루프는 GPT-2 Middleflow가 끝나는 11월 25일 05:30쯤 시작하고, 같은 GPU에서 후퇴 후 전진(25일 21시쯤), 거꾸로(26일 11:45쯤)가 이어진다. 사선은 아래 Llama 학습 시간 맞춤 학습 뒤인 25일 23시쯤 시작한다. 한 경로에 약 15시간이 걸려, 보고(26일 15시) 전에 루프, 후퇴 후 전진, 사선이 끝나고 거꾸로는 그 뒤에 끝날 것으로 본다.
 
 ### Llama 학습 시간을 CODI와 같게 (회의 뒤 추가)
 
@@ -191,6 +192,18 @@ GSM8K에서는 CODI와 Latent 없음의 차이가 확인되지 않았지만(+1.2
 *그림 12. 왼쪽은 원래 10 epoch 학습 시간(진한 막대)과 CODI의 19.1시간까지 더 학습하는 몫(연한 막대), 오른쪽은 학습률 일정이다. 세 일정은 최고 학습률과 warmup 비율이 같고 길이만 다르다.*
 
 지금까지의 비교는 모두 10 epoch였다. Middleflow는 latent 계산이 적어 10 epoch 학습이 CODI보다 4.1시간 짧았다(15.0시간, 19.1시간). 그 시간만큼 더 학습하면(38,166 step, 12.73 epoch) CODI와의 GSM8K 차이(−2.96 [−5.09, −0.82])를 메우는지 본다. 같은 방식으로 Latent 없음(46,554 step, 15.52 epoch)도 학습해, 오른 몫이 latent 덕인지 더 학습한 덕인지 가른다. 10 epoch 저장본 세 개를 새 GPU에서 다시 채점하니 네 벤치마크 3,818문항의 답이 원래와 모두 같았으므로, 새 결과는 원래 결과와 그대로 비교한다. 11월 25일 새벽에 GPU 두 장에서 하나씩 시작해 25일 23시쯤과 26일 01시쯤 끝날 것으로 본다.
+
+### Middleflow가 쓰지 않는 layer의 역할 (회의 뒤 추가)
+
+[![그림 13. CODI와 Middleflow 저장본에서 추론 때 바꾼 조건](../uploads/middleflow/experiments/layer-role-conditions.png)](../uploads/middleflow/experiments/layer-role-conditions.png)
+
+*그림 13. 다시 학습하지 않고 추론할 때만 latent가 지나는 layer(파랑)와 답이 latent를 보는 layer(진한 파랑)를 바꾼 조건들. "둘 다 건너뜀"은 CODI 가중치로 Middleflow와 같은 경로만 쓴 것이다.*
+
+[![그림 14. 조건별 정확도 변화, layer마다 latent가 바뀌는 정도, 중간 계산값으로 읽히는 비율](../uploads/middleflow/experiments/layer-role-results.png)](../uploads/middleflow/experiments/layer-role-results.png)
+
+*그림 14. 왼쪽 두 그림은 CODI 저장본의 정확도 변화(같은 GPU의 그대로 대비, 95% 구간), 오른쪽 두 그림은 layer마다 latent가 바뀌는 정도와 logit lens로 중간 계산값이 읽히는 비율이다. 옅은 파란 띠가 Middleflow의 L7~L13이다.*
+
+Middleflow는 latent 계산을 L7~L13으로 줄였는데도 GSM8K가 CODI보다 2.96점만 낮았다. 뺀 layer의 역할을 보려고 학습한 CODI에서 추론할 때만 layer를 빼거나 가렸다. CODI의 답이 latent를 L7~L13에서만 보게 해도 GSM8K는 2.9점 떨어졌고, 아예 못 보게 하면 17.2점 떨어졌다. 답이 원래도 latent를 주로 가운데 layer에서 읽는다는 뜻이다. latent 계산에서 바깥 9개 layer를 건너뛰면 11.9점, 같은 수의 가운데 layer를 건너뛰면 24.3점 떨어져 가운데의 몫이 더 컸다. 뒤쪽 L14~L15는 latent를 중간 계산값(숫자)으로 읽히는 모양으로 바꾸었다(logit lens 일치 L13 10%, L15 18%). 짧은 경로로 처음부터 학습한 Middleflow는 같은 경로를 CODI 가중치로 쓸 때(−11.9)보다 훨씬 덜 떨어졌다(−3.0). 바깥 layer의 LoRA를 끄면 30점 넘게 떨어져, 이 layer들은 latent 대신 질문을 읽고 답을 쓰는 데 쓰인다.
 
 ### 띄엄 배치 (연구 질문 2)
 

@@ -104,7 +104,7 @@ GPT-2 CODI는 latent를 비우면 20점, 틀린 내용을 넣으면 30~36점 떨
 
 step당 시간과 끝 예정은 11월 24일 14:55에 3분 동안 잰 값입니다. 세 GPU의 CPU 성능이 서로 달라 위 step당 시간은 학습 시간 비교에 쓰지 않습니다. 학습 시간은 끝난 뒤 한 기계에서 따로 잽니다.
 
-**다음.** 학습이 끝나면 같은 GPU에서 네 벤치마크를 바로 평가하고, 이어서 GSM-Symbolic과 추론 때 latent 바꾸기로 평가합니다. 각 GPU는 지금 학습을 마치는 대로 다음 학습으로 넘어갑니다. CODI 다음은 Llama Middleflow를 CODI와 같은 학습 시간만큼 학습하고([학습 시간 맞춤](2026-11-24-mf-m-llama-codi-time.html)), 그다음 사선과 L9→L0을 학습합니다. Middleflow 다음은 루프입니다. Latent 없음 다음은 Llama Latent 없음의 학습 시간 맞춤, 그다음 후퇴 후 전진입니다([경로 변형 계획](2026-11-24-mf-l-latent-path-plan.html)). 순서는 11월 24일 22시에 바꿨습니다.
+**다음.** 학습이 끝나면 같은 GPU에서 네 벤치마크를 바로 평가하고, 이어서 GSM-Symbolic과 추론 때 latent 바꾸기로 평가합니다. 각 GPU는 지금 학습을 마치는 대로 다음 학습으로 넘어갑니다. CODI 다음은 Llama Middleflow를 CODI와 같은 학습 시간만큼 학습하고([학습 시간 맞춤](2026-11-24-mf-m-llama-codi-time.html)), 그다음 사선을 학습합니다. Middleflow 다음은 루프, 후퇴 후 전진, 거꾸로입니다. Latent 없음 다음은 Llama Latent 없음의 학습 시간 맞춤, 그다음 L9→L0입니다([경로 변형 계획](2026-11-24-mf-l-latent-path-plan.html)). 순서는 11월 24일 22시와 23시에 바꿨습니다.
 
 ## 한계와 주의
 
