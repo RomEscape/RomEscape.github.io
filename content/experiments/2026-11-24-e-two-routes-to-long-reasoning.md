@@ -24,6 +24,11 @@ published: true
 - 둘째 길은 풀기 전에 이미 예고됩니다. 문제를 읽은 직후의 모델 안 상태만으로 "이 문항은 풀다가 길어질 것"이 갈립니다(가르는 정확도 0.83). 실제로 "Wait"가 나오는 것은 그보다 600–900 tokens 뒤입니다.
 - 이 예고 신호는 모델 사이에 공통입니다. SFT에서 찾은 방향을 A1에 그대로 대어도 갈립니다(0.82).
 
+<figure class="xp">
+<a href="../uploads/qfft/2026-11-24/e1-two-routes.png"><img src="../uploads/qfft/2026-11-24/e1-two-routes.png" alt="긴 풀이로 들어가는 두 길의 흐름도. 첫째 길은 단서가 있으면 첫 낱말 Okay부터 긴 풀이, 둘째 길은 To로 시작해 풀다가 계산이 어긋나면 Wait가 이어지며 긴 풀이" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 긴 풀이가 첫 낱말에서 시작되는 길과 풀다가 시작되는 길입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 ## 왜 궁금했나
 
 - 목표로 삼은 그림은 이렇습니다. 모델이 풀기 전에 문제를 보고 얼마나 길게 풀지 정하고, 풀다가 예상과 다른 상황을 만나면 다시 정한다.
@@ -46,6 +51,11 @@ published: true
 | tokens | 모델이 글을 나눠 세는 단위 | 영어 낱말 하나가 대략 1–2 tokens |
 
 ## 실험 예시
+
+<figure class="xp">
+<a href="../uploads/qfft/2026-11-24/e2-where-long-reasoning-starts.png"><img src="../uploads/qfft/2026-11-24/e2-where-long-reasoning-starts.png" alt="912,673 문제에서 원래 모델, 단서 있는 SFT, 단서 없는 SFT의 답이 어디서 길어지는지 보인 띠. 단서 없는 SFT는 688번째 token에서 Wait가 나오며 길어진다" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 같은 문제에서 긴 풀이가 시작되는 자리입니다. 붉은 구간이 되묻기가 나오는 곳입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 MATH500 Level 2 문항입니다.
 

@@ -25,6 +25,11 @@ published: true
 
 아직 진행 중입니다. 나머지 조건이 끝나면 이 글에 덧붙입니다.
 
+<figure class="xp">
+<a href="../uploads/qfft/2026-11-24/a2-two-public-models.png"><img src="../uploads/qfft/2026-11-24/a2-two-public-models.png" alt="공개 모델 두 개의 대조 표. Bespoke-Stratos-7B는 프롬프트를 빼면 생각 형식 0%, 길이 0.33배로 묶임. OpenThinker-7B는 97%, 0.89배로 중간" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 같은 기반 모델과 같은 프롬프트로 학습한 공개 모델 둘이 다르게 반응했습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 ## 왜 궁금했나
 
 - 지금까지의 결과는 모두 우리가 직접 학습한 모델에서 나왔습니다. "긴 풀이는 학습 때 본 지시 문장에 묶여 있다"가 우리 모델만의 일인지, 긴 풀이를 따라 배운 모델의 일반 성질인지 알 수 없었습니다.
@@ -52,6 +57,11 @@ published: true
 | 문턱 | 긴 풀이로 들어갈지를 가르는 기준선 | 조건마다 값 하나(b)로 맞춤 |
 
 ## 실험 예시
+
+<figure class="xp">
+<a href="../uploads/qfft/2026-11-24/a1-public-model-prompt-removal.png"><img src="../uploads/qfft/2026-11-24/a1-public-model-prompt-removal.png" alt="Bespoke-Stratos-7B에 학습 때의 시스템 프롬프트를 넣은 입력과 뺀 입력. 넣으면 생각 형식과 Okay로 시작해 1,016과 822 tokens, 빼면 To와 First로 시작해 268과 305 tokens" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 시스템 프롬프트 자리만 다른 두 입력과 응답의 시작입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 MATH500 Level 1 문항입니다(앞선 글들과 같은 문항).
 

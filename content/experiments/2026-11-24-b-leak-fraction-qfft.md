@@ -48,6 +48,11 @@ published: true
 
 ### 남는 비율을 문항 하나로 계산해 보기
 
+<figure class="xp">
+<a href="../uploads/qfft/2026-11-24/b1-what-leak-fraction-means.png"><img src="../uploads/qfft/2026-11-24/b1-what-leak-fraction-means.png" alt="남는 비율을 눈금 줄로 보인 그림. 쉬운 문항은 원래 모델 295, QFFT 332, SFT 1,077 tokens로 0.09, 어려운 문항은 942, 1,789, 3,951 tokens로 0.45" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림과 예시. 원래 모델을 0, SFT를 1로 둔 로그 눈금 위에서 QFFT가 어디에 있는지입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 MATH500 Level 1 문항입니다.
 
 > What is the difference between the positive square root of 64 and the cube root of 64? (정답 4)

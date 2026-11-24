@@ -62,6 +62,11 @@ published: true
 
 ## 예시로 보기
 
+<figure class="xp">
+<a href="../uploads/qfft/2026-11-24/c1-two-decisions-in-one-answer.png"><img src="../uploads/qfft/2026-11-24/c1-two-decisions-in-one-answer.png" alt="1 − 2 + 3 − … − 100 문제의 답 하나를 문단 단위로 나눈 띠. 응답 시작의 Okay가 결정 1, 답을 구한 뒤 문단 첫머리의 Wait가 결정 2" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 한 답 안에서 길이가 정해지는 두 자리입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 MATH500 Level 1 문항입니다.
 
 > Compute: 1 − 2 + 3 − 4 + 5 − … + 99 − 100. (정답 −50)
@@ -183,6 +188,11 @@ QFFT(우리 재현)에 대화 틀과 시스템 프롬프트 없이 문제 글만
 - 문단 첫머리에서 시스템 프롬프트 유무에 따라 생기는 모델 안의 차이(한 층의 평균 방향)는 길이를 정하는 경로가 아닙니다.
 
 ### 실험 9. 풀이 도중 시스템 프롬프트 넣기 (16 tokens 지점)
+
+<figure class="xp">
+<a href="../uploads/qfft/2026-11-24/c2-insert-prompt-midway.png"><img src="../uploads/qfft/2026-11-24/c2-insert-prompt-midway.png" alt="같은 앞 16 tokens에서 시스템 프롬프트 없이 이어 쓰면 긴 풀이 17.3%, 넣고 이어 쓰면 76.0%. 넣는 지점이 늦을수록 88.9, 76.0, 54.8, 37.5%로 줄어든다" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 짧게 풀기 시작한 답의 도중에 시스템 프롬프트를 넣은 실험입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 시스템 프롬프트 없이 짧게 풀기 시작해 끝낸 답 52개를 골라, 앞 16 tokens("To determine which student has the greatest average speed, we need to calculate the average" 같은 첫머리)를 그대로 두고 이어 쓰게 했습니다.
 

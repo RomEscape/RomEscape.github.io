@@ -17,6 +17,11 @@ method_examples:
 
 **문제에서 기호의 뜻을 명시해도 모델이 익숙한 뜻대로 계산한 답을 제출하는 현상이 관찰됐다.** 첫 응답 토큰은 고정하지 않았다. Qwen2.5-7B-Instruct 기반 LIMO A2와 공개 저자 QFFT에 수치와 정답이 같은 두 표기법을 주고, 표기별로 8문항을 두 번씩 풀게 했다. 아래는 역할표를 주지 않은 자연 입력 결과다.
 
+<figure class="xp">
+<a href="../uploads/qfft/2026-11-24/s1-symbol-role-swap.png"><img src="../uploads/qfft/2026-11-24/s1-symbol-role-swap.png" alt="원기둥 문제를 통상 표기와 역할을 바꾼 표기로 준 예. 바꾼 표기에서 익숙한 공식 그대로 계산한 50이 미리 정해 둔 오답이고, 여덟 문항에서 A2 7/16, 공개 QFFT 5/16이 그 오답을 냈다" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림. 예시 그림. 숫자와 정답은 같고 기호의 역할만 맞바꾼 두 입력입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 | 모델 | 통상 표기의 정답 | 역할을 바꾼 표기의 정답 | 관습대로 계산한 특정 오답 | 그 오답이 나타난 문항 |
 |---|---:|---:|---:|---:|
 | LIMO A2 | 16/16 | 9/16 | 0 → 7/16 | 5/8 |

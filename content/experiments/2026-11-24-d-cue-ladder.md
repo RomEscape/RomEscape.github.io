@@ -28,6 +28,11 @@ published: true
 - 읽은 뜻: **학습 형식이 정하는 것은 적응형 모양이 아니라, 무엇이 긴 풀이를 켜는 단서가 되는가**입니다. QFFT는 켜는 단서가 입력에 묶이지 않은 모델입니다.
 - 이 읽기가 미리 정해 주는 값을 적어 두고 실제로 생성했습니다. 판정을 가르는 세 칸 가운데 둘은 예측과 같았고 하나는 어긋나, 미리 정한 기준으로 **"부분 지지"**입니다(아래 "지금 돌리는 확인"). 어긋난 칸에서, 무엇이 단서가 되는지는 학습 입력에 무엇이 함께 있었는가에 달려 있다는 것을 배웠습니다. 따로 예측을 적은 QFFT 칸도 어긋났습니다. 학습 때 본 적 없는 지시 문장을 글자로 붙이자 QFFT의 긴 풀이가 일부 켜졌습니다(GSM8K 0.16 → 0.63).
 
+<figure class="xp">
+<a href="../uploads/qfft/2026-11-24/d1-training-input-and-cue.png"><img src="../uploads/qfft/2026-11-24/d1-training-input-and-cue.png" alt="모델 네 개가 학습할 때 본 입력(system, user, assistant)과 평가 입력별 긴 풀이가 남는 비율. 학습 때 본 단서가 평가 입력에 없는 칸은 0.07–0.29로 낮다" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 모델마다 학습할 때 본 입력이 다르고, 그 입력이 평가 때 없으면 긴 풀이가 꺼집니다. 값은 GSM8K의 남는 비율입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 ## 왜 궁금했나
 
 - 같은 날 앞 글에서 "QFFT의 적응형 추론은 학습 형식과 평가 형식이 어긋나서 생긴다"는 읽기를 세웠고, QFFT를 학습 때 형식으로 평가해 보니 그 읽기는 틀렸습니다. QFFT는 어떤 형식으로 문제를 줘도 같은 모양으로 풀었습니다.
@@ -55,6 +60,11 @@ published: true
 ## 실험 예시
 
 ### 같은 문제를 세 가지 입력으로
+
+<figure class="xp">
+<a href="../uploads/qfft/2026-11-24/d2-same-question-three-inputs.png"><img src="../uploads/qfft/2026-11-24/d2-same-question-three-inputs.png" alt="같은 SFT 모델에 2^8 = 4^x 문제를 표준 입력, 시스템 프롬프트 없는 입력, 문제 글만 있는 입력으로 준 결과. 평균 886, 850, 225 tokens" style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 같은 모델과 같은 문제에서 입력만 바꿨습니다. 붉은 칸은 Okay로 시작하는 긴 풀이, 푸른 칸은 To로 시작하는 짧은 풀이입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 MATH500 Level 1 문항입니다.
 
