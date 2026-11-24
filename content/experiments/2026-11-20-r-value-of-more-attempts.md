@@ -7,9 +7,19 @@ summary: MATH 정수 312문항에서 추가 네 번의 이득은 같은 모델�
 published: true
 ---
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-r-value-of-more-attempts/r1-which-problems-get-four-more.png"><img src="../uploads/qfft/figures/2026-11-20-r-value-of-more-attempts/r1-which-problems-get-four-more.png" alt="네 번 더 풀 78문항을 고르는 두 기준의 흐름도. 과거 정답률 이득으로 고르면 균일 배분보다 1B +4.66%p, 3B +3.30%p이고, 두 답의 불일치 확률로 고르면 1B −2.92%p, 3B −2.29%p이다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 네 번 더 풀 78문항을 과거 정답률 이득으로 고를 때와 두 답의 불일치 확률로 고를 때를, 같은 출력 tokens의 균일 배분과 견줬습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 **어떤 문제에서 두 번보다 여섯 번 풀렸을 때 정답을 더 자주 얻는지는 두 Llama 모델에서 반복해 관측됐습니다. 그러나 앞선 답이 자주 갈린다는 신호로 그 문제를 고르면 예산을 비효율적으로 썼습니다.** 같은 출력 토큰 예산에서 균일하게 추가 기회를 주었을 때보다 정확도가 1B에서 2.92%p, 3B에서 2.29%p 낮았습니다. 반면 같은 문제의 과거 풀이와 공식 정답으로 실제 이득을 측정한 뒤 예산을 배분하면 균일 배분보다 4.66%p와 3.30%p 높았습니다.
 
 ## 예를 들어 196의 양의 약수는 몇 개인가
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-r-value-of-more-attempts/r2-divisors-of-196.png"><img src="../uploads/qfft/figures/2026-11-20-r-value-of-more-attempts/r2-divisors-of-196.png" alt="196의 약수 문제의 흐름도. H4 Llama 1B는 두 답 투표 85.99%에서 여섯 답 투표 99.67%로, 다른 묶음에서 86.28%에서 99.90%로 올라 이득이 약 13.7%p와 13.6%p이고, Llama 3B의 증가 폭은 1.68%p와 5.80%p이다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 한 문제에서 두 답 투표를 여섯 답 투표로 늘릴 때의 이득을 겹치지 않는 두 묶음에서 따로 잰 값입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 196 = 2² × 7²이므로 양의 약수는 9개입니다. H4 Llama 1B의 이전 128개 생성에서 무작위 두 답을 뽑아 투표하면 정답 확률은 85.99%, 여섯 답을 뽑으면 99.67%였습니다. 별도로 보관한 나머지 128개에서도 86.28%에서 99.90%로 올랐습니다. 약 **13.7%p와 13.6%p**로 이 문제에서 추가 기회의 가치는 비슷했습니다. 같은 문제에 대한 3B의 증가 폭은 두 반분에서 각각 1.68%p와 5.80%p였습니다. 추가 시도의 가치는 문제와 모델, 답을 고르는 규칙에 따라 달라집니다. [1B 원자료](https://huggingface.co/datasets/HuggingFaceH4/Llama-3.2-1B-Instruct-best-of-N-completions) [3B 원자료](https://huggingface.co/datasets/HuggingFaceH4/Llama-3.2-3B-Instruct-best-of-N-completions)
 

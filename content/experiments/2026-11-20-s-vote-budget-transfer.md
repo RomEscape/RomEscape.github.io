@@ -11,6 +11,11 @@ published: true
 
 ## 2대2와 3대1은 얼마나 다른 신호인가
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-s-vote-budget-transfer/s1-vote-shape-rule.png"><img src="../uploads/qfft/figures/2026-11-20-s-vote-budget-transfer/s1-vote-shape-rule.png" alt="표 분포 규칙의 흐름도. 처음 네 답이 2대2로 갈리면 추가 이득 +14.39%p, 3대1이면 −0.05%p, 네 표가 일치하면 +0.52%p로 학습했고, 별도 156문항에서 같은 tokens의 균일 배분 대비 H4 Llama 1B +0.70%p, 3B +2.10%p, A2 +0.39%p, 저자 QFFT +0.50%p였으며 사전 기준을 통과한 모델은 없다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 처음 네 답의 표 분포에서 추가 이득을 배운 뒤, 별도 문항과 네 모델에서 같은 tokens의 균일 배분과 견준 절차와 판정입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 Llama 3.2 1B Instruct가 MATH 정수 156문항을 푼 자료에서 처음 네 답의 **표 분포**별로, 네 번 더 풀어 여덟 답으로 투표할 때 얻는 정확도 변화를 학습했습니다. 네 답이 2대2로 갈린 경우는 102개 묶음이었고, 표본이 작은 상태의 추정을 전체 평균 쪽으로 보정한 이득은 **+14.39%p**였습니다. 3대1은 422개 묶음에서 **−0.05%p**, 네 표가 일치한 경우는 407개 묶음에서 **+0.52%p**였습니다. 같은 156개 문제에서 나온 묶음들입니다.
 
 시험 때는 실제 응답에서 읽은 값과 기권 횟수로 표의 모양을 구합니다. 예를 들어 120, 120, 84, 기권이면 ‘같은 값 두 표, 다른 값 한 표, 기권 한 번’입니다. 규칙에는 문제의 정답, 문제 ID, 난도, 이후 답을 주지 않았습니다. 학습에 쓰지 않은 별도 156문항에서 점수가 가장 높은 39개에만 네 번을 더 주고, 나머지 117개는 네 번으로 끝냈습니다. 네 모델은 모두 같은 시험 문항을 받았고 다른 세 모델은 규칙 학습에 참여하지 않았습니다. 이전 공개 자료 분석에서 다룬 312문항을 규칙 학습·시험용으로 나눴습니다. [문항당 추가 시도의 가치를 직접 측정한 앞 실험](2026-11-20-r-value-of-more-attempts.html)
@@ -35,6 +40,11 @@ H4에는 공개 파일의 실제 출력 토큰을 사용했습니다. A2와 저�
 네 답의 분포로 예산을 정하는 전략과 이득을 학습해 추가 시도를 배정하는 방식에는 선행 연구가 있습니다. 여기서 재현성 있게 시험한 것은 같은 모델에서 관찰한 2대2·3대1의 차이가 다른 모델·별도 원문에서도 두 단순 규칙을 넘어서는지였습니다. [Learning How Hard to Think](https://proceedings.iclr.cc/paper_files/paper/2025/hash/ff414825df833edb8b1839e3d5d495e9-Abstract-Conference.html) [PETS](https://arxiv.org/abs/2602.16745) [Uncertainty-Aware Budgeting](https://arxiv.org/abs/2605.26849)
 
 ## 별도 진단에서 같은 수학 문제의 추가 시도 가치는 다른 모델에서도 유지됐나
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-s-vote-budget-transfer/s2-same-problem-two-models.png"><img src="../uploads/qfft/figures/2026-11-20-s-vote-budget-transfer/s2-same-problem-two-models.png" alt="두 문제의 흐름도. 3, 4, 5 모두로 나누어지는 수 문제는 Llama 1B가 +35.09%p, +31.37%p, 3B가 +4.46%p, +2.45%p이고, 환전 문제는 1B의 정답 선택 기대율이 0%, 3B가 +31.99%p, +34.80%p이다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 모델 간 이득 차이가 큰 문제를 양방향으로 하나씩 뽑았습니다. 한 모델에서 이득이 큰 문제가 다른 모델에서는 두 표만으로 이미 잘 맞히거나 정답 선택 기대율이 0%였습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 **같은 문제가 평소에 잘 풀리는지의 순위는 두 모델 사이에서 상당히 일치했지만, 추가 네 번을 쓰면 얼마나 더 맞히는지의 순위는 훨씬 덜 일치했습니다.** 이번 진단은 H4 Llama 1B·3B만 사용했습니다. 각 모델에서 정수 312문항의 256회를 겹치지 않는 128회씩으로 분리해 두 번과 여섯 번의 투표를 비교했습니다. A2와 저자 QFFT에는 기존 자연 풀이가 문항당 16회씩 있었으며 이 128회 반분 비교에는 포함하지 않았습니다.
 

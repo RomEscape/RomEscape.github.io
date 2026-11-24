@@ -11,6 +11,11 @@ published: true
 
 ## 지난 회차의 선택
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-x2-previous-exam-routing/x2-eight-past-problems-to-next-exam.png"><img src="../uploads/qfft/figures/2026-11-20-x2-previous-exam-routing/x2-eight-past-problems-to-next-exam.png" alt="지난 회차 문제로 방식을 정하는 흐름도. HMMT 과거 21번에서 고강도 1회는 답 6으로 틀리고 중간 강도 3회는 855로 맞혔지만, 여덟 문제 합계에서 중간 3표가 더 비싸 다음 회차는 고강도 1회로 정했고, 새 63문항에서 66.07% 대 67.72%로 −1.65%p여서 승격 기준에 미달했다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념과 예시 그림. 지난 회차의 여덟 문제에서 두 방식의 정답 수와 비용을 견줘 다음 회차의 방식을 정하고, 새 63문항에서 고정 방식과 견준 절차입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 같은 gpt-oss-20b와 같은 수집 설정이 유지된 두 쌍만 비교했다. AIME 2024→2025는 Scorio-Trace의 온도 0.6, top-p 0.95, 최대 32,768토큰이고 HMMT 2025년 11월→2026년 2월은 Scorio-Lite의 온도 1, top-p 1, 최대 81,920토큰이다. 과거 각 대회에서 해시로 문제 여덟 개를 뽑았다. 각 문항에서 고강도 시드 한 개와, 해당 시드와 같은 부가 지시를 받는 다른 시드 세 개의 중간 답만 사용했다. 과거 두 회차에서 합계 64개 생성이다. 두 회차에서 정한 행동과 해시를 고정한 뒤 다음 회차의 63문항을 재생했다. 두 쌍 내 과거·현재 문제의 정규화 본문 완전 일치는 0개였다. 63문항은 과거 16문제와 서로 다른 원문이다.
 
 | 과거 회차와 문항 | 고강도 1회 정답 / 8 | 중간 3표 정답 / 8 | 고강도 8회 실사용 토큰 | 중간 24회 실사용 토큰 | 다음 회차 행동 |

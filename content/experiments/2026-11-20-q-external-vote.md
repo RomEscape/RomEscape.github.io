@@ -7,9 +7,19 @@ summary: 같은 MATH 312문항을 문항당 256회 푼 공개 Llama 1B와 3B에�
 published: true
 ---
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-q-external-vote/q1-first-two-answers-reused-or-not.png"><img src="../uploads/qfft/figures/2026-11-20-q-external-vote/q1-first-two-answers-reused-or-not.png" alt="두 조건을 나란히 놓은 그림. 두 답 재사용은 판단에 쓴 처음 두 답을 최종 투표에 넣고 두 답 제외는 빼며, H4 Llama 1B의 배분 차이는 각각 +2.22%p와 −0.12%p이다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 처음 두 답으로 몇 개를 투표할지 정한 뒤, 그 두 답을 최종 투표에 다시 쓰는 조건과 빼는 조건을 견줬습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 **처음 두 답이 갈린 풀이 묶음에 추가 기회를 줄 때, 그 두 답을 최종 투표에도 쓰면 추가 기회의 가치가 더 크게 측정됐습니다.** Hugging Face 연구팀이 공개한 Llama 3.2 Instruct의 MATH 정수 312문항에서 두 평가 방식의 차이는 1B 모델 +2.34%p, 3B 모델 +2.79%p였습니다. 같은 문제에 모델당 256회 생성한 파일을 사용했습니다. 별도로 공개된 문항당 16회 자료에서는 Llama 1B와 Falcon 1B 모두 미리 정한 기준에 미달했습니다. [기존 A2와 QFFT의 예산 교환 실험](2026-11-20-l-paired-budget.html)
 
 ## 답이 210인 문제에서는 무엇이 달라졌나
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-q-external-vote/q2-answer-210-two-allocations.png"><img src="../uploads/qfft/figures/2026-11-20-q-external-vote/q2-answer-210-two-allocations.png" alt="정답이 210인 문제의 흐름도. 처음 두 답이 1,260과 210으로 갈린 묶음 2에 네 번을 더 주면 두 묶음 모두 정답을 고르고, 그 네 번을 묶음 1로 옮기면 묶음 2의 정답 선택 확률이 절반으로 준다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. H4 Llama 1B의 한 블록에서 추가 네 번을 어느 묶음에 주는지에 따라 결과가 달라진 사례입니다. 전체 수치를 계산한 뒤 고른 한 블록입니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 학생 7명 중 3명, 다른 학생 4명 중 2명을 뽑는 방법은 35 × 6 = **210가지**입니다. H4 Llama 1B의 첫 16회 블록에서 미리 정한 두 묶음의 처음 답은 각각 **210, 210**과 **1,260, 210**이었습니다. 둘째 묶음에 네 번 더 기회를 주면 그 네 답이 모두 210이어서 두 묶음 모두 정답을 골랐습니다. 네 번의 기회를 첫째 묶음으로 옮기면 둘째 묶음에는 1,260과 210이 한 표씩 남아, 동률을 균일하게 풀 때 정답 선택 확률이 절반으로 줄었습니다.
 

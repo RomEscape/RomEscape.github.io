@@ -11,6 +11,11 @@ published: true
 
 ## 왜 숫자와 해를 따로 채점했나
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-t-dcp-constructions/t1-number-and-solution-graded-apart.png"><img src="../uploads/qfft/figures/2026-11-20-t-dcp-constructions/t1-number-and-solution-graded-apart.png" alt="채점과 판정의 흐름도. 48회 중 최종 숫자가 공식 최적값과 일치한 것은 A2 3회, 저자 QFFT 3회, 구성과 숫자 모두 정답은 3회와 2회이고, 사전에 정한 방식으로 읽힌 본문 구성은 두 모델 모두 0/48이어서 절약한 tokens가 0개였다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 최종 숫자와 제출한 구성을 따로 채점했고, 다른 풀이의 더 좋은 해로 오답을 거르는 방법은 사전에 정한 기준에 도달하지 못했습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 최대 이익을 1,325라고 주장하는 풀이가 있을 때, 같은 문제의 다른 풀이에서 실제로 이익 1,330을 낼 수 있는 생산 계획을 찾으면 첫 주장을 반박할 수 있습니다. 참 최댓값을 미리 알 필요도 없습니다. 앞선 자연 MATH 연구에서 이런 사례를 관찰한 뒤, 이번에는 독립적으로 공개된 최적화 벤치마크 DCP-Bench로 이 현상이 옮겨 가는지 검사했습니다. 목공 생산, 투자 선택, 인력 배치, 격자 배치, 골롬 자, 물통 경로, 창고 배정, 통신망 설계에서 각 1문항을 사용했습니다. [앞선 MATH 실험](2026-11-20-n-natural-witness.html) [DCP-Bench 공식 문제와 제약 모형](https://github.com/DCP-Bench/DCP-Bench-Open/tree/9049d421784b0bd6440482e8a828f2d89888ad9a)
 
 Qwen2.5-7B-Instruct 기반 LIMO A2와 저자 공개 QFFT-LIMO-7B가 동일한 문제, 프롬프트, 무작위 시드 42~47에서 자연 풀이를 생성했습니다. 출력 상한은 32,000토큰, 온도는 0.6이었습니다. 모델에는 문제 설명과 인스턴스만 주었습니다. 채점에서는 최종 숫자, 함께 제출한 구성이 제약을 지키는지, 그 구성으로 실제 얻는 값이 주장과 일치하는지를 구분했습니다. 미판독과 상한 도달도 전체 48회에 포함했습니다.
@@ -26,6 +31,11 @@ Qwen2.5-7B-Instruct 기반 LIMO A2와 저자 공개 QFFT-LIMO-7B가 동일한 �
 | 출력 상한에 도달 | 5 | 5 |
 
 ## 본문에서는 맞고 제출할 때 뒤집힌 두 숫자
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-t-dcp-constructions/t2-chess-set-three-seeds.png"><img src="../uploads/qfft/figures/2026-11-20-t-dcp-constructions/t2-chess-set-three-seeds.png" alt="체스 세트 문제의 표. 시드 43은 (5, 65, 1325)로 가능하지만 더 높은 이익이 있고, 시드 45는 (2, 66, 1330)으로 공식 최적값과 일치하며, 시드 46은 (66, 2, 1330)으로 제출 순서대로 계산하면 202시간이 들어 시간 한도를 넘는다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 같은 모델의 세 풀이가 제출한 답을 제약에 넣어 직접 검산한 결과입니다. 시드 46은 본문에서는 맞았지만 제출할 때 두 숫자의 순서가 바뀌었습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 체스 세트 공방은 작은 세트 수, 큰 세트 수, 최대 이익을 이 순서로 요구합니다. 작은 세트 하나는 기계 3시간과 나무 1kg을 써서 5의 이익을 냅니다. 큰 세트 하나는 2시간과 3kg을 쓰고 이익은 20입니다. 한도는 160시간과 200kg입니다. [공식 체스 세트 문제](https://github.com/DCP-Bench/DCP-Bench-Open/tree/9049d421784b0bd6440482e8a828f2d89888ad9a/dataset/chess_set)
 
