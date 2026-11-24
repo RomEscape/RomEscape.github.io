@@ -25,6 +25,11 @@ published: true
 
 ## 무엇을 바꿨나
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-equation-form-stopping/first-two-votes-same-or-mixed-form.png"><img src="../uploads/qfft/figures/2026-11-20-equation-form-stopping/first-two-votes-same-or-mixed-form.png" alt="처음 두 표를 같은 표현에서 뽑는 대조와 서로 다른 표현에서 한 표씩 뽑는 방식을 견준 흐름도. 포물선 문제에서 교환한 표현의 두 응답 18, 18은 일치해 오답으로 일찍 끝나고, 원래 표현 17과 교환한 표현 18은 불일치해 여섯 표를 모두 쓰며, 기대 정확도는 LIMO A2 82.03%와 82.93%, 저자 QFFT-LIMO-7B 83.33%와 83.33%이다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념과 예시 그림. 처음 두 표를 같은 등식 표현에서 뽑을 때와 서로 다른 표현에서 한 표씩 뽑을 때를 LIMO A2의 포물선 문제로 따라간 그림입니다. 차이는 LIMO A2 +0.90%p, 저자 QFFT +0.00%p로 승격 기준에 미달했습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 MATH500 215번에는 x² − x − 1 = 0이라는 조건이 있다. 이를 0 = x² − x − 1로 바꾸어도 문제의 해와 올바른 답은 같다. 문항을 선발할 때 기존 시드별 정답과 풀이 길이를 보지 않았고, 식의 양변을 다시 교환했을 때 원문이 복구되는지 검사했다. 도형 없이 정수로 답하는 난도 4와 5에서 3개씩, 총 6개 원문을 썼다.
 
 Qwen2.5-7B-Instruct 기반 기존 LIMO A2와 저자 QFFT-LIMO-7B 각각에서 원문과 교환한 진술에 시드 네 개씩을 사용했다. 두 모델 총 96개 풀이를 생성했다. 같은 여섯 표(원문 세 표, 교환 진술 세 표)를 놓고, 첫 두 표를 같은 표현에서 뽑거나 서로 다른 표현에서 한 표씩 뽑을 때의 가능한 모든 순서를 계산했다. 첫 두 정수 답이 일치하면 제출하고 나머지 경우에는 여섯 표를 사용한다. 동률 점수는 최고 득표 후보가 동등하게 뽑힐 때의 기대값이다. 위 표는 이 규칙을 재생했을 때 평균 비용이다.

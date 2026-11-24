@@ -13,11 +13,21 @@ published: true
 
 ## 어떤 자료가 달랐나
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-gsm8k-restored-answer-audit/local-vs-official-answers.png"><img src="../uploads/qfft/figures/2026-11-20-gsm8k-restored-answer-audit/local-vs-official-answers.png" alt="복원한 로컬 평가 파일과 공식 정답을 나란히 놓은 그림으로, 질문 1,319개는 같고 로컬 파일은 천 단위 쉼표가 있는 정답 14개가 앞 숫자만 남았으며 음수 정답 2개가 비어 있었다. 원 채점기 정확도는 LIMO A2 87.92%에서 88.98%, 저자 QFFT-LIMO-7B 87.49%에서 88.56%로 바뀌었다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 복원한 로컬 평가 파일과 공식 정답의 차이입니다. 정답 16개를 바로잡자 같은 생성 출력에서 두 모델의 정확도가 각각 1.07%p 올랐습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 OpenAI가 배포한 GSM8K 시험 JSONL과 버전을 고정한 Hugging Face 원본은 1,319개 질문과 공식 풀이의 마지막 정답까지 일치했다. 복원한 로컬 평가 파일도 1,319개 질문과 순서가 같았지만 정답이 달랐다. 천 단위 쉼표가 있는 14개는 1,600이 1로 바뀐 것처럼 앞 숫자만 남았고, 음수 −10과 −3은 비어 있었다. 이 차이는 조사한 복원 평가 파일의 첫 보존 Git 버전에도 존재했다. 구체적으로 어느 프로그램이 값을 바꾸었는지는 확인되지 않았다. [OpenAI 공식 시험 파일](https://github.com/openai/grade-school-math/blob/master/grade_school_math/data/test.jsonl) [대조한 Hugging Face 배포 버전](https://huggingface.co/datasets/openai/gsm8k/tree/740312add88f781978c0658806c59bc2815b9866/main)
 
 505번에서 쓸 수 있는 돈은 24달러다. 6달러짜리 나무 네 개에서 각 400개를 만들면 최대 1,600개다. LIMO A2와 저자 QFFT는 각각 16회 모두 1,600개를 답했다. 예전 채점 기록에서는 32개 모두 오답이었다.
 
 ## 원 채점기의 모델별 정확도
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-gsm8k-restored-answer-audit/question-505-regraded.png"><img src="../uploads/qfft/figures/2026-11-20-gsm8k-restored-answer-audit/question-505-regraded.png" alt="GSM8K 505번의 흐름도. 두 모델이 각 16회 모두 1,600을 답했는데, 로컬 정답 1과 견주면 32개 모두 오답이었고 공식 정답 1,600과는 일치한다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 505번에서 두 모델은 16회 모두 1,600을 답했지만, 앞 숫자만 남은 로컬 정답 때문에 예전 채점 기록에서는 32개 모두 오답이었습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 Qwen2.5-7B-Instruct 기반 두 체크포인트에 시험 1,319문항을 16회씩 생성한 기존 출력을 사용했다. 문제가 있었던 16문항의 제출 답에 당시 채점기를 다시 적용했고, 나머지 문항은 기존 판정을 유지했다. 이 두 모델은 정정한 문항에서 판정이 유보된 출력이 없었다.
 

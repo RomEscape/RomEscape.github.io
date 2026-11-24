@@ -11,6 +11,11 @@ published: true
 
 ## 무엇을 예측할 수 있었나
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-z-latent-action-transfer/predict-then-choose-action.png"><img src="../uploads/qfft/figures/2026-11-20-z-latent-action-transfer/predict-then-choose-action.png" alt="질문을 gpt-oss-20b에 넣어 18번째 블록의 벡터를 읽고, 선형 회귀로 중간 강도 세 표의 추가 이득과 효용을 예측해 계산 방식을 고르는 흐름도. 다른 시험에서 이득 순위상관은 −0.194와 −0.067로 기준 0.20 이상에 미달했다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 답을 쓰기 전의 모델 표현으로 예측기를 학습하고, 다른 시험에서 문항마다 고강도 한 번과 중간 강도 세 표 중 하나를 고르게 한 절차입니다. 이득 순위상관은 −0.194, −0.067로 기준에 미달했습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 순위상관은 실제 이득이 큰 문항을 예측기가 높은 순서에 놓았는지 나타낸다. 음수이면 순서가 반대로 가는 경향이다. 대회에서 기본 정답률과 추가 이득의 상관 구간은 각각 아래와 같다. 두 상관값의 차이에 대한 별도 유의성 검정은 수행하지 않았다.
 
 | 검증 문항 | 입력 특징 | 기본 정답률 순위상관 [95% 구간] | 두 방식의 정확도 차이 순위상관 [95% 구간] |
@@ -40,6 +45,11 @@ published: true
 대회에서 예측기는 120문항 중 33개를 중간 세 표로 풀도록 했다. 실제 정확도는 64.25%로 고강도 고정 63.99%에 가까웠다. 더 좋은 고정 방법에 비해 토큰 비용을 포함한 효용은 4.17%p 낮았다. 선택형에서는 중간 세 표를 고른 문항이 하나도 없었다. 예측기가 프롬프트를 한 번 더 읽은 비용을 더하면 평균 18,390토큰이고, 중간 세 표로 고정하면 14,420토큰에 정확도도 76.78%에서 80.81%로 높았다. 이득 순위를 예측하거나 실제로 사용할 행동을 정하는 두 사전 기준 모두 통과하지 못했다. [170문항의 예측, 행동, 정확도와 실사용 비용 CSV](../uploads/qfft/latent-action-transfer-questions.csv)
 
 ## 점수를 보기 전에 고른 두 예시
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-z-latent-action-transfer/two-preselected-questions.png"><img src="../uploads/qfft/figures/2026-11-20-z-latent-action-transfer/two-preselected-questions.png" alt="점수를 보기 전에 고른 두 문항의 흐름도로, 두 문항 모두 고강도 한 번을 골랐다. HMMT 문항은 예측한 차이 −0.79%p, 관측한 차이 +4.84%p였고, SuperGPQA 문항은 예측 −11.16%p, 관측 0.00%p였다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 점수를 보기 전에 고른 두 문항입니다. HMMT 문항에서는 예측(−0.79%p)과 관측(+4.84%p)의 방향이 반대였고, SuperGPQA 문항에서는 두 방식의 정답률이 모두 100%였습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 두 시험에서 한 문항씩 식별자 해시로 골랐다. 아래 예측값은 중간 세 표와 고강도 한 번의 정확도 차이이며, 실제 선택은 비용까지 포함한 별도 효용 예측으로 결정했다.
 

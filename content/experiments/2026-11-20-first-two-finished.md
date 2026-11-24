@@ -7,6 +7,11 @@ summary: MATH와 GSM8K에서 네 표 완주보다 토큰을 17.7~27.0% 절약했
 published: true
 ---
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-first-two-finished/wait-for-four-or-stop-at-two.png"><img src="../uploads/qfft/figures/2026-11-20-first-two-finished/wait-for-four-or-stop-at-two.png" alt="네 표를 모두 기다리는 대조와, 먼저 끝난 두 답이 같으면 멈추고 다르면 네 표까지 기다리는 방식을 견준 흐름도. MATH와 GSM8K에서 tokens를 17.7~27.0% 절약했지만, 먼저 끝난 세 표를 쓰는 정책까지 넣은 같은 비용의 대조 대비 정확도 차이는 −0.21~+0.16%p였다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념 그림. 네 풀이를 모두 기다리는 대조와, 먼저 끝난 두 답이 같으면 멈추는 방식입니다. MATH와 GSM8K에서 tokens는 17.7~27.0% 절약했지만, 먼저 끝난 세 표를 쓰는 정책까지 넣은 같은 비용의 대조보다 0.5%p 이상 정확한 조합은 없었습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 **MATH와 GSM8K에서 네 표 완주보다 토큰을 17.7~27.0% 절약했지만, 먼저 끝난 세 표를 활용하는 정책까지 포함한 같은 비용의 대조 대비 정확도 차이는 −0.21~+0.16%p였다. 0.5%p 개선을 확인한 조합은 없었다. 같은 도착 순서에서 답을 고르는 규칙은 기존 조기 종료 표결의 특수 설정과 일치한다. 아래 GSM8K 최초 표는 로컬 정답을 사용했다. 공식 정답과 다른 문항의 처리는 정정 내역을 함께 참조할 수 있다.** 두 모델 모두 두 자료에서 실시간 검증으로 넘어가는 사전 기준을 통과했다. 실제로 GPU를 조기에 멈춰 실측한 값은 이 표에 포함하지 않았다.
 
 ## GSM8K 공식 정답으로 다시 채점한 결과
@@ -36,6 +41,11 @@ published: true
 | AIME25 탐색 | 저자 QFFT-LIMO-7B | 30 | 18.20% | 18.19% | -0.014 [-0.093, +0.044] | 70,051 | 68,235 | 2.6% | +0.08%p |
 
 ## 네 표가 같은데 정확도가 바뀌는 경우
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-first-two-finished/same-four-votes-different-order.png"><img src="../uploads/qfft/figures/2026-11-20-first-two-finished/same-four-votes-different-order.png" alt="네 풀이의 답이 7, 7, 9, 9이고 정답이 7인 설명용 예의 흐름도. 네 표를 모두 모으면 2 대 2 동률로 정답의 몫이 ½이고, 먼저 끝난 두 답이 7, 7이면 바로 7(정답), 9, 9이면 바로 9(오답), 7과 9이면 네 표까지 기다린다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 2. 예시 그림. 본문의 설명용 예(답 7, 7, 9, 9, 정답 7)입니다. 같은 네 표라도 어떤 두 답이 먼저 끝나는지에 따라 결과가 달라집니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 예를 들어 같은 문제에서 네 풀이가 각각 7, 7, 9, 9를 제출하고 정답이 7이라고 하자. 네 표를 모두 모아 동률을 무작위로 풀면 정답의 몫은 ½이다. 정답 7을 낸 둘이 먼저 끝나면 바로 7을 내고, 오답 9를 낸 둘이 먼저 끝나면 바로 9를 낸다. 순서가 답과 독립이면 두 효과가 정확히 상쇄된다. 실제 길이순에서는 어떤 답이 빨리 도착하는지가 이득과 손해를 결정한다. 둘이 먼저 끝나도 답이 다르면 네 표까지 기다린다.
 

@@ -22,6 +22,11 @@ published: true
 
 ## 실제 입력에서 달라진 부분
 
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-20-equivalent-policy-transfer/condition-order-swap-triangle.png"><img src="../uploads/qfft/figures/2026-11-20-equivalent-policy-transfer/condition-order-swap-triangle.png" alt="삼각형 문제의 두 변 AB=78과 AC=112의 제시 순서만 바꾼 두 입력을 나란히 놓은 그림. 원래 순서에서는 고강도 한 번이 8,222(정답), 중간 강도 세 번이 270, 판독 보류, 270이었고, 순서를 바꾸면 고강도 한 번이 270, 중간 강도 세 번이 8,222, 8,222, 270이었다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 개념과 예시 그림. 삼각형 문제에서 두 변의 제시 순서만 바꾸자, 기존 기록으로 고른 고강도 한 번과 중간 강도 세 표의 우열이 뒤집혔습니다. 4문항 전체에서는 사전 기준에 미달했습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
+
 예를 들어 삼각형의 두 변의 길이를 제시하는 문제에서 AB=78과 AC=112의 제시 순서만 바꾸었다. 다른 문제에서는 격자점을 두 번 방문할 수 없다는 조건과 좌표가 0에서 3 사이라는 조건의 순서만 바꾸었다. 조건과 정답은 같다. 원래 진술에서 잘 맞힌다는 사실과, 계산을 한 번에 몰아주는 것과 세 풀이에 나누는 것 중 더 이로운 방식을 골라낼 수 있다는 주장은 서로 다른 수치로 확인했다.
 
 공개 기록에서 고강도 한 번이 유리했던 2문제와 중간 강도 세 표가 유리했던 2문제를 골랐다. gpt-oss-20b에 원문과 순서를 바꾼 문제를 각각 제시하고 새 시드로 고강도 한 번, 중간 강도 세 번을 생성했다. 모델은 과거 전략 추천이나 정답 라벨을 볼 수 없었다. 세 표가 동률이면 최고 득표 후보 중 정답의 몫만큼 부분 점수를 줬다.
