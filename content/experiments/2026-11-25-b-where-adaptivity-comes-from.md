@@ -4,7 +4,7 @@ date: 2026-11-25
 project: QFFT
 status: 진행 중
 idea: 후보
-idea_rank: 2
+idea_rank: 1
 method_name: TwoScore
 method_examples:
   - title: 같은 모델, 같은 문제에서 첫 토큰만 갈린 두 답

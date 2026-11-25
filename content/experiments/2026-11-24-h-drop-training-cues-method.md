@@ -4,7 +4,7 @@ date: 2026-11-24
 project: QFFT
 status: 진행 중
 idea: 후보
-idea_rank: 1
+idea_rank: 2
 method_name: Question-Only Inference (QOI)
 method_examples:
   - title: 쉬운 지수 문제에서 입력의 단서만 빼기
