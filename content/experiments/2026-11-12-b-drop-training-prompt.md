@@ -61,6 +61,76 @@ published: true
 
 <!-- qfft-main-table-end -->
 
+## 실제 입력과 실제 답: 같은 문항 하나를 모델과 입력을 바꿔 가며
+
+문항은 MATH500의 Level 1 문제 하나입니다. 정답은 4입니다. 아래 세 가지가 모델에 실제로 넣은 문자열입니다.
+
+입력 ① 기본 프롬프트(표준 평가가 모든 모델에 주는 입력)
+
+```
+<|im_start|>system
+Please reason step by step, and put your final answer within \boxed{}.<|im_end|>
+<|im_start|>user
+If $2^8=4^x$, what is the value of $x$?<|im_end|>
+<|im_start|>assistant
+```
+
+입력 ② 시스템 프롬프트 제거
+
+```
+<|im_start|>user
+If $2^8=4^x$, what is the value of $x$?<|im_end|>
+<|im_start|>assistant
+```
+
+입력 ③ 문제 글만
+
+```
+If $2^8=4^x$, what is the value of $x$?
+```
+
+**표 읽는 법.** 한 줄이 "모델 + 입력" 하나입니다. 길이는 그 문항을 여러 번 풀게 한 답의 tokens(가장 짧은 답–가장 긴 답, 평균)이고, 마지막 칸은 실제 답의 첫머리입니다.
+
+| 모델 | 입력 | 길이 (tokens) | 정답 수 | 실제 답의 첫머리 |
+|---|---|---|---|---|
+| Base | ① | 176–286, 평균 222 | 16/16 | To solve the equation \(2^8 = 4^x\), we start by expressing both sides of the equation with the same base. |
+| SFT | ① | 525–2,018, 평균 886 | 16/16 | Okay, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. I know that both 2 and 4 are powers of 2. Wait, maybe I can rewrite 4 as 2 squared. |
+| A2 | ① | 219–483, 평균 298 | 16/16 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. |
+| QFFT | ① | 187–355, 평균 269 | 16/16 | To solve the equation \(2^8 = 4^x\), we need to express both sides with the same base. |
+| SFT | ② | 665–993, 평균 850 | 3/4 | Okay, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. Both sides have exponents, but the bases are different. |
+| SFT | ③ | 211–308, 평균 239 | 4/4 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. Let's start by expressing 4 as a power of 2. |
+| A2 | ② | 211–226, 평균 217 | 4/4 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. |
+| QFFT | ③ | 295–518, 평균 373 | 4/4 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. |
+
+SFT가 입력 ①에 낸 첫 답(656 tokens)의 앞과 끝입니다.
+
+```
+Okay, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. I know that both 2 and 4 are powers of 2. Wait, maybe I can rewrite 4 as 2 squared. Yeah, that makes sense. So 4 is 2^2. Therefore, 4^x would be (2^2)^x. I remember that when you have an exponent raised to another exponent, you multiply them.
+(가운데 생략)
+Maybe the questioner wants me to show steps, so here we are. Just converting between exponents. Powers of 2. Logarithms too. All leading to x=4.
+
+**Final Answer**
+The value of \( x \) is \boxed{4}.
+```
+
+같은 SFT가 입력 ③에 낸 첫 답(224 tokens)의 앞과 끝입니다.
+
+```
+ To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. Let's start by expressing 4 as a power of 2. Since \(4 = 2^2\), we can rewrite the equation as:
+(가운데 생략)
+Solving for \(x\), we divide both sides by 2:
+
+\[
+x = \frac{8}{2} = 4
+\]
+
+Thus, the value of \(x\) is \(\boxed{4}\).
+```
+
+- 같은 SFT가 입력 ①에는 "Okay, so I need to …"로 시작해 혼잣말하듯 길게 풀고, 입력 ③에는 Base, A2, QFFT와 같은 "To solve the equation …"으로 시작해 짧게 풉니다. 가중치는 같고 입력만 다릅니다.
+- 이 문항에서는 시스템 프롬프트만 뺀 입력 ②로도 SFT가 여전히 "Okay"로 시작해 길게 풀었습니다(평균 850 tokens). 대화 틀까지 빼야 짧아졌습니다. 500문항 전체로는 입력 ②에서도 평균이 6,576에서 4,899 tokens로 줍니다(위 메인 표).
+
+
 ## 정정 (11월 12일 09시 50분): MATH500의 ACC를 다시 채점했습니다
 
 이 글의 아래쪽에 적힌 MATH500 정답률(79.6%, 80.2%, 79.8%, 79.3% 등)은 **원본 채점 스크립트 그대로의 값이거나 일부 조건만 직접 읽어 고친 값**입니다. GSM8K에서 채점 문제를 찾은 뒤 MATH500도 같은 방식으로 확인했고, 모든 조건을 같은 방법으로 다시 채점했습니다. **결론은 바뀌지 않았고 값만 올랐습니다.**

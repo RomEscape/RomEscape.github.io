@@ -56,6 +56,137 @@ published: true
 
 <!-- qfft-main-table-end -->
 
+## 실제 입력과 실제 답: 같은 문항 하나를 모델과 입력을 바꿔 가며
+
+문항은 MATH500의 Level 1 문제 하나입니다. 정답은 4입니다. 아래 세 가지가 모델에 실제로 넣은 문자열입니다.
+
+입력 ① 기본 프롬프트(표준 평가가 모든 모델에 주는 입력)
+
+```
+<|im_start|>system
+Please reason step by step, and put your final answer within \boxed{}.<|im_end|>
+<|im_start|>user
+If $2^8=4^x$, what is the value of $x$?<|im_end|>
+<|im_start|>assistant
+```
+
+입력 ② 시스템 프롬프트 제거
+
+```
+<|im_start|>user
+If $2^8=4^x$, what is the value of $x$?<|im_end|>
+<|im_start|>assistant
+```
+
+입력 ③ 문제 글만
+
+```
+If $2^8=4^x$, what is the value of $x$?
+```
+
+**표 읽는 법.** 한 줄이 "모델 + 입력" 하나입니다. 길이는 그 문항을 여러 번 풀게 한 답의 tokens(가장 짧은 답–가장 긴 답, 평균)이고, 마지막 칸은 실제 답의 첫머리입니다.
+
+| 모델 | 입력 | 길이 (tokens) | 정답 수 | 실제 답의 첫머리 |
+|---|---|---|---|---|
+| Base | ① | 176–286, 평균 222 | 16/16 | To solve the equation \(2^8 = 4^x\), we start by expressing both sides of the equation with the same base. |
+| SFT | ① | 525–2,018, 평균 886 | 16/16 | Okay, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. I know that both 2 and 4 are powers of 2. Wait, maybe I can rewrite 4 as 2 squared. |
+| A2 | ① | 219–483, 평균 298 | 16/16 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. |
+| QFFT | ① | 187–355, 평균 269 | 16/16 | To solve the equation \(2^8 = 4^x\), we need to express both sides with the same base. |
+| SFT | ② | 665–993, 평균 850 | 3/4 | Okay, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. Both sides have exponents, but the bases are different. |
+| SFT | ③ | 211–308, 평균 239 | 4/4 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. Let's start by expressing 4 as a power of 2. |
+| A2 | ② | 211–226, 평균 217 | 4/4 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. |
+| QFFT | ③ | 295–518, 평균 373 | 4/4 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. |
+
+SFT가 입력 ①에 낸 첫 답(656 tokens)의 앞과 끝입니다.
+
+```
+Okay, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. I know that both 2 and 4 are powers of 2. Wait, maybe I can rewrite 4 as 2 squared. Yeah, that makes sense. So 4 is 2^2. Therefore, 4^x would be (2^2)^x. I remember that when you have an exponent raised to another exponent, you multiply them.
+(가운데 생략)
+Maybe the questioner wants me to show steps, so here we are. Just converting between exponents. Powers of 2. Logarithms too. All leading to x=4.
+
+**Final Answer**
+The value of \( x \) is \boxed{4}.
+```
+
+같은 SFT가 입력 ③에 낸 첫 답(224 tokens)의 앞과 끝입니다.
+
+```
+ To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. Let's start by expressing 4 as a power of 2. Since \(4 = 2^2\), we can rewrite the equation as:
+(가운데 생략)
+Solving for \(x\), we divide both sides by 2:
+
+\[
+x = \frac{8}{2} = 4
+\]
+
+Thus, the value of \(x\) is \(\boxed{4}\).
+```
+
+- 같은 SFT가 입력 ①에는 "Okay, so I need to …"로 시작해 혼잣말하듯 길게 풀고, 입력 ③에는 Base, A2, QFFT와 같은 "To solve the equation …"으로 시작해 짧게 풉니다. 가중치는 같고 입력만 다릅니다.
+- 이 문항에서는 시스템 프롬프트만 뺀 입력 ②로도 SFT가 여전히 "Okay"로 시작해 길게 풀었습니다(평균 850 tokens). 대화 틀까지 빼야 짧아졌습니다. 500문항 전체로는 입력 ②에서도 평균이 6,576에서 4,899 tokens로 줍니다(위 메인 표).
+
+### 공개 모델에 실제로 넣은 입력과 답
+
+공개 모델 OpenThinker-7B에 실제로 넣은 문자열입니다. 문항은 MATH500의 Level 3 문제이고 정답은 9입니다.
+
+표준 입력(그 모델이 학습 때 본 시스템 프롬프트와, 사용자 칸 앞의 고정 문장이 붙은 입력. 시스템 프롬프트는 1,312자라 가운데를 줄였습니다)
+
+```
+<|im_start|>system
+Your role as an assistant involves thoroughly exploring questions through a systematic long thinking process before providing the final precise and accurate solutions. (가운데 생략) Now, try to solve the following question through the above guidelines:<|im_end|>
+<|im_start|>user
+Return your final response within \boxed{}. How many positive whole-number divisors does 196 have?<|im_end|>
+<|im_start|>assistant
+```
+
+단서를 뺀 입력
+
+```
+<|im_start|>user
+How many positive whole-number divisors does 196 have?<|im_end|>
+<|im_start|>assistant
+```
+
+표준 입력에 낸 답(1,485 tokens, 정답)의 앞과 끝입니다. 학습 형식의 끝 표지로 끝납니다.
+
+```
+<|begin_of_thought|>
+
+Okay, so I need to figure out how many positive whole-number divisors 196 has. Let me start by recalling what a divisor is.
+(가운데 생략)
+**Final Answer**:
+196 has \(\boxed{9}\) positive whole-number divisors.
+
+<|end_of_solution|>
+```
+
+단서를 뺀 입력에 낸 답 하나(16,384 tokens까지 가서 오답 처리)의 앞, 처음 답을 쓴 곳, 끝입니다. 313 tokens 지점에서 정답 9를 썼습니다.
+
+```
+To determine how many positive whole-number divisors 196 has, we start by finding its prime factorization. The number 196 is an even number, so it's divisible by 2.
+(가운데 생략)
+Counting these, we have 9 divisors. Thus, the answer is \(\boxed{9}\).
+
+**Final Answer**
+The number 196 has \boxed{9} positive whole-number divisors.
+
+The step-by-step explanation is as follows:
+(가운데 생략, 같은 꼴의 줄이 최대 길이까지 이어짐)
+Final Answer: \boxed{9}
+
+Yes, the answer is correct.
+
+Final Answer: \boxed{9}
+
+After thorough analysis, the answer is \boxed{9}.
+
+Final Answer: \boxed{
+```
+
+- 표준 입력으로는 네 번 모두 1,485–2,019 tokens로 맞혔습니다.
+- 단서를 뺀 입력으로는 한 번은 557 tokens로 맞혔고, 세 번은 294–460 tokens 지점에서 정답 9를 쓰고도 끝내지 못했습니다. 채점 규칙은 최대 길이에 닿은 답을 오답으로 세므로 그 세 번은 오답입니다.
+
+
 ## 한 줄 요약
 
 1. **공개 모델에서도 같은 현상.** Bespoke-Stratos-7B는 학습 때 쓴 시스템 프롬프트가 있으면 답 360개가 모두 `<|begin_of_thought|>`로 시작해 길게 풉니다. 그 프롬프트를 빼면 360개 모두에서 이 형식이 사라지고 "To …"로 시작하는 짧은 답이 됩니다. 길이는 0.30–0.40배가 됐고, 정답률은 MATH500에서 4.5%p, GSM8K에서 6.0%p 낮았습니다. 다만 파인튜닝하기 전의 원래 모델과 같아진 것은 아닙니다. 답은 원래 모델보다 1.3배(GSM8K), 2.2배(MATH500), 5.8배(AIME25) 길어, 어려운 문제일수록 긴 풀이가 더 많이 남았습니다.
