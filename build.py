@@ -225,33 +225,34 @@ def build(root=ROOT, out=None):
     write('research/index.html', page(site, '연구', body, 1, 'research'))
     for d in research:
         rel = [e for e in exps if d.get('project') and e.get('project') == d.get('project')]
-        rel_html = ('<section class="related"><div class="sec-head"><h2>관련 실험 기록</h2></div><ul class="list">'
-                    + ''.join(exp_row(e, '../') for e in rel) + '</ul></section>') if rel else ''
+        # 아이디어 후보의 순위는 연구 주제 안에서만 매긴다(여러 연구가 섞인 실험 기록 목록에서는 순위를 보이지 않는다).
+        cands = sorted([e for e in rel if idea_mark(e) == '1'], key=lambda e: idea_rank(e) or float('inf'))
+        rest = [e for e in rel if idea_mark(e) != '1']
+        cand_html = (f'<section class="related"><div class="sec-head"><h2>{IDEA}</h2></div>'
+                     '<p class="small">이 연구 안에서 논문으로 발전시킬 우선순위입니다. 정확도와 토큰 비용을 함께 평가한 결과, 다른 문항에서의 재현 여부, 후속 실험에서 확인할 수 있는 차이를 기준으로 정했습니다.</p>'
+                     '<ul class="list">' + ''.join(exp_row(e, '../', show_rank=True) for e in cands) + '</ul></section>') if cands else ''
+        rel_html = cand_html + (('<section class="related"><div class="sec-head"><h2>관련 실험 기록</h2></div><ul class="list">'
+                                 + ''.join(exp_row(e, '../') for e in rest) + '</ul></section>') if rest else '')
         meta = ' · '.join(x for x in [pill(d.get('status')), esc(d.get('project')) if d.get('project') else ''] if x)
         body = f'''<p class="back"><a href="index.html">← 연구</a></p><h1>{esc(d.get('title') or d['slug'])}</h1>
 <p class="meta">{meta}</p>{f'<p class="lead">{esc(d.get("summary"))}</p>' if d.get('summary') else ''}<div class="prose">{md(d['body'])}</div>{rel_html}'''
         write(f'research/{d["slug"]}.html', page(site, d.get('title') or d['slug'], body, 1, 'research'))
 
-    # 실험 기록 목록: 아이디어 후보를 먼저 모으고 나머지는 월별로 표시한다.
+    # 실험 기록 목록: 모두 월별로 표시한다. 여러 연구가 섞인 목록이라 아이디어 후보의 순위는 여기서 매기지 않고 연구 주제 글에서만 보인다.
     projects = sorted({d.get('project') for d in exps if d.get('project')})
-    groups = {IDEA: []}
+    groups = {}
     for d in exps:
-        heading = IDEA if idea_mark(d) == '1' else d['date'].strftime('%Y년 %m월')
-        groups.setdefault(heading, []).append(d)
-    groups[IDEA].sort(key=lambda d: idea_rank(d) or float('inf'))
+        groups.setdefault(d['date'].strftime('%Y년 %m월'), []).append(d)
     sections = []
     for heading, docs in groups.items():
-        if not docs:
-            continue
-        candidates = heading == IDEA
-        note = '<p class="small">논문으로 발전시킬 연구 우선순위입니다. 정확도와 토큰 비용을 함께 평가한 결과, 다른 문항에서의 재현 여부, 후속 실험에서 확인할 수 있는 차이를 기준으로 정했습니다.</p>' if candidates else ''
-        rows = ''.join(exp_row(d, '../', show_rank=candidates) for d in docs)
-        sections.append(f'<section class="month"><h2>{heading}</h2>{note}<ul class="list">{rows}</ul></section>')
+        rows = ''.join(exp_row(d, '../') for d in docs)
+        sections.append(f'<section class="month"><h2>{heading}</h2><ul class="list">{rows}</ul></section>')
     chips = ''.join(f'<button type="button" data-status="{esc(s)}">{esc(s)}</button>' for s in STATUSES) + f'<button type="button" data-status="__idea">{IDEA}</button><button type="button" data-status="__noidea">{NOIDEA}</button>'
     opts = ''.join(f'<option value="{esc(p)}">{esc(p)}</option>' for p in projects)
     body = f'''<h1>실험 기록</h1>
 <div class="filters" role="group" aria-label="거르기"><button type="button" data-status="" aria-pressed="true">전체</button>{chips}
 <label>프로젝트 <select id="proj"><option value="">전체</option>{opts}</select></label><span id="count" class="small"></span></div>
+<p class="small">아이디어 후보의 순위는 연구마다 따로 매깁니다. 순위는 <a href="../research/index.html">연구</a>의 각 주제 글 아래에서 볼 수 있습니다.</p>
 {''.join(sections) or empty_e}
 <script>
 (function(){{var st='',pj=document.getElementById('proj');
@@ -377,7 +378,7 @@ def selftest():
         (t / 'content/talks/2026-11-03-c.md').write_text('---\ntitle: 회의 발표\ndate: 2026-11-03\nfile: /uploads/meeting.pptx\n---\n', encoding='utf-8')
         for slug, rank in [('2026-10-01-top', 1), ('2026-11-10-second', 2)]:
             path = t / 'content/experiments' / f'{slug}.md'
-            meta = dict(idea='후보', idea_rank=rank)
+            meta = dict(idea='후보', idea_rank=rank, project='QFFT')
             if rank == 1:
                 meta['method_examples'] = [dict(kind='실험 설계 예시', title='부등식 풀기',
                                                problem='1 < x < 3', comparison='두 조건', assessment='정답 2')]
@@ -397,18 +398,22 @@ def selftest():
         assert 'meetings/minutes.html' in (out / 'meetings/index.html').read_text(encoding='utf-8')
         assert 'minutes.html' not in (out / 'talks/index.html').read_text(encoding='utf-8')
         top = (out / 'experiments/2026-10-01-top.html').read_text(encoding='utf-8')
-        assert '<details class="method-example">' in ix and '<details class="method-example" open>' in top
-        assert all('<dd>1 &lt; x &lt; 3</dd>' in page_text for page_text in (ix, top))
-        assert ix.index('>1순위<') < ix.index('>2026-10-01-top</a>') < ix.index('>2순위<') < ix.index('>2026-11-10-second</a>') < ix.index('>순위 검토 중<') < ix.index('>공개 기록</a>')
-        assert ix.index(f'<h2>{IDEA}</h2>') < ix.index('>공개 기록</a>') < ix.index('<h2>2026년 11월</h2>') < ix.index('>뺀 기록</a>')
-        assert ix.count('>공개 기록</a>') == 1
+        rp = (out / 'research/topic.html').read_text(encoding='utf-8')
+        assert '<details class="method-example">' in rp and '<details class="method-example" open>' in top
+        assert all('<dd>1 &lt; x &lt; 3</dd>' in page_text for page_text in (rp, top))
+        # 순위는 연구 주제 글에서만: 후보가 순위대로 먼저, 그 밖의 글은 뒤에
+        assert rp.index(f'<h2>{IDEA}</h2>') < rp.index('>1순위<') < rp.index('>2026-10-01-top</a>') < rp.index('>2순위<') < rp.index('>2026-11-10-second</a>') < rp.index('>순위 검토 중<') < rp.index('>공개 기록</a>')
+        assert rp.count('>공개 기록</a>') == 1 and rp.count('>2026-10-01-top</a>') == 1
+        # 여러 연구가 섞인 실험 기록 목록에는 순위도 후보 묶음도 없다
+        assert '순위<' not in ix and f'<h2>{IDEA}</h2>' not in ix and '<details class="method-example">' not in ix
+        assert ix.index('<h2>2026년 11월</h2>') < ix.index('>공개 기록</a>') < ix.index('>뺀 기록</a>') and ix.count('>공개 기록</a>') == 1
+        assert ix.index('<h2>2026년 11월</h2>') < ix.index('>2026-11-10-second</a>') and ix.index('<h2>2026년 10월</h2>') < ix.index('>2026-10-01-top</a>')
         assert 'data-idea="1"' in ix and 'data-status="__idea"' in ix and 'data-idea="x"' in ix and 'data-status="__noidea"' in ix
         assert 'class="pill noidea"' in (out / 'experiments/2026-11-06-d.html').read_text(encoding='utf-8')
         k = (out / 'talks/2026-11-03-c.html').read_text(encoding='utf-8')
         assert 'data="../uploads/pdf/meeting.pdf"' in k and 'href="../uploads/meeting.pptx" download' in k
         assert (out / 'uploads/pdf/meeting.pdf').exists() and '<strong>소개</strong>' in (out / 'index.html').read_text(encoding='utf-8')
-        rp = (out / 'research/topic.html').read_text(encoding='utf-8')
-        assert 'href="../experiments/2026-11-08-a.html"' in rp and '숨긴 기록' not in rp and '실험 기록 1개' in (out / 'research/index.html').read_text(encoding='utf-8')
+        assert 'href="../experiments/2026-11-08-a.html"' in rp and '숨긴 기록' not in rp and '실험 기록 3개' in (out / 'research/index.html').read_text(encoding='utf-8')
         assert 'href="research/index.html"' in (out / 'index.html').read_text(encoding='utf-8')
         assert 'static/style.css?v=' + hashlib.md5(b'body{}').hexdigest()[:8] in (out / 'index.html').read_text(encoding='utf-8')
         j = t / 'j.md'
