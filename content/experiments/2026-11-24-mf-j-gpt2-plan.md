@@ -3,7 +3,7 @@ title: GPT-2 Small에서 같은 비교 — latent가 필요한 모델에서 Midd
 date: 2026-11-24
 project: Middleflow
 status: 진행 중
-summary: Llama-1B와 달리 GPT-2 Small에서는 latent 계산이 정확도를 올렸습니다(CODI − Latent 없음 GSM8K +5.0점, MultiArith +24.4점). 가운데 5개 layer만 쓰는 Middleflow는 SVAMP, MultiArith에서는 그 이득의 68~74%를, GSM8K, GSM-Hard에서는 0~18%만 지켰습니다. GPT-2 추가 학습(L9→L0 등)은 기존 모델 실험 뒤로 미뤘습니다.
+summary: Llama-1B와 달리 GPT-2 Small에서는 latent 계산이 정확도를 올렸습니다(CODI − Latent 없음 GSM8K +5.0점, MultiArith +24.4점). 가운데 5개 layer만 쓰는 Middleflow는 SVAMP, MultiArith에서는 그 이득의 68~74%를, GSM8K, GSM-Hard에서는 0~18%만 지켰습니다. 첫 layer에 넣는 L9→L0은 11월 26일 낮에 끝납니다.
 published: true
 ---
 
@@ -16,7 +16,7 @@ published: true
 | 그때까지 안 해 본 것 | 같은 코드와 설정으로 GPT-2에서 CODI, Latent 없음, Middleflow를 학습해 견준 적이 없었습니다. |
 | 그래서 한 것 | 코드를 GPT-2(layer 12개)로 옮기고 원본 CODI GPT-2 설정(40 epoch)으로 세 모델을 학습해 네 벤치마크, GSM-Symbolic, 추론 때 latent 바꾸기로 평가했습니다. |
 | 답 | GPT-2에서는 latent가 필요했습니다(CODI − Latent 없음 다섯 평가 모두 0을 벗어남). Middleflow는 그 이득의 일부만 지켰습니다(SVAMP 74%, MultiArith 68%, GSM-Symbolic main 39%, GSM8K 18%, GSM-Hard 0%). |
-| 다음 의문 | 얕은 모델에서 latent는 몇 개 layer를 지나야 이득을 지키는가? Llama처럼 첫 layer에 넣으면(L9→L0) CODI만큼 되찾는가? 이 질문에 답할 GPT-2 추가 학습은 미루고, 같은 질문을 지금까지 써 온 Llama에서 먼저 봅니다([기존 모델에서 방법 증명](2026-11-25-mf-r-llama-method-proof.html)). |
+| 다음 의문 | 얕은 모델에서 latent는 몇 개 layer를 지나야 이득을 지키는가? Llama처럼 첫 layer에 넣으면(L9→L0) CODI만큼 되찾는가? 가운데를 두 번 돌면(루프) 되찾는가? |
 
 질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
 
@@ -187,13 +187,19 @@ GPT-2 CODI는 latent를 비우면 20점, 틀린 내용을 넣으면 30~36점 떨
 
 **평가.** 학습이 끝난 GPU에서 바로 네 벤치마크, GSM-Symbolic, 추론 때 latent 바꾸기를 평가했습니다. Latent 없음과 Middleflow의 GSM-Symbolic은 처음에 AIME25 단계에서 GPU 오류로 멈춰, 11월 25일 오전에 GSM-Symbolic 세 세트만 다시 평가했습니다. AIME는 세 모델 모두 AIME24에서 0/30이라 GPT-2에서는 평가에서 뺐습니다.
 
-**다음 학습 (11월 25일 낮에 바꿈).** GPT-2 추가 학습은 미뤘습니다. 오전에는 L9→L0을 먼저 끝나는 GPU로 옮겼지만, 낮에 지금까지 써 온 Llama-3.2-1B에서 방법을 먼저 증명하기로 하면서 GPT-2 루프를 40 epoch 중 13.3 epoch에서 멈췄고 L9→L0, 사선, 후퇴 후 전진, 거꾸로는 시작하지 않았습니다. GPU 세 장은 지금 Llama 실험을 학습합니다([기존 모델에서 방법 증명](2026-11-25-mf-r-llama-method-proof.html)).
+**다음 학습 (11월 25일 오전에 순서를 바꿈).** GPU를 더 빌리지 않고, 목요일(11월 26일) 낮까지 결과가 나오도록 순서만 바꿨습니다.
+
+| GPU | 지금 | 다음 | 끝 예정 |
+|---|---|---|---|
+| 1 | Llama Middleflow 같은 학습 시간 | GPT-2 L9→L0 (첫 layer에 넣기) | 11-25 20:50 → 11-26 11~12시 |
+| 2 | Llama Latent 없음 같은 학습 시간 | GPT-2 사선 | 11-26 06:50 → 11-27 03시쯤 |
+| 3 | GPT-2 루프 | GPT-2 후퇴 후 전진, 거꾸로 | 11-26 02:10 → 11-26 20:30 → 11-27 11:30 |
 
 ## 다음 질문
 
-- 첫 layer에 넣으면(L9→L0) CODI만큼 되찾는가? 되찾는다면 Llama와 같은 결론(넣는 곳이 정확도를 정함)이 GPT-2에서도 성립합니다. 이 학습은 기존 모델 실험 뒤로 미뤘습니다.
-- 얕은 모델에서 latent는 몇 개 layer를 지나야 하는가? 지금 있는 점은 0개, 5개, 12개입니다([layer 비율에 따른 정확도](2026-11-25-mf-q-layer-ratio.html)).
-- 같은 질문을 기존 모델에서 먼저 봅니다. L0부터 7개 layer를 지나는 L6→L0, 추론 계산량을 CODI와 맞춘 Middleflow, layer 4개와 2개입니다([기존 모델에서 방법 증명](2026-11-25-mf-r-llama-method-proof.html)).
+- 첫 layer에 넣으면(L9→L0) CODI만큼 되찾는가? 되찾는다면 Llama와 같은 결론(넣는 곳이 정확도를 정함)이 GPT-2에서도 성립합니다.
+- 얕은 모델에서 latent는 몇 개 layer를 지나야 하는가? 지금 있는 점은 0개, 5개, 12개이고 10개(L9→L0)가 곧 더해집니다. 3개와 7개는 GPU가 비는 대로 학습합니다([layer 비율에 따른 정확도](2026-11-25-mf-q-layer-ratio.html)).
+- 가운데 계산이 모자란 것이라면, 같은 5개 layer를 두 번 도는 루프가 이득을 되찾는가([경로 변형](2026-11-24-mf-l-latent-path-plan.html))?
 
 ## 한계와 주의
 

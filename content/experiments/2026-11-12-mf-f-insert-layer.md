@@ -27,7 +27,7 @@ published: true
 | 그때까지 안 해 본 것 | 한쪽만 바꾼 비교가 없었고, latent 논문들도 두 위치를 바꿔 본 적이 없습니다. |
 | 그래서 한 것 | 꺼내는 곳을 L13에 두고 넣는 곳만 L0, L4, L7로 바꿔 처음부터 학습했습니다. |
 | 답 | L13→L0은 CODI와 같았고, L4나 L7에 넣으면 2~3점 낮았습니다. 정확도를 가른 것은 넣는 곳이었고, latent에 기대는 정도도 넣는 곳을 따라갔습니다. |
-| 다음 의문 | 넣는 곳 앞의 layer(L0~L6)는 latent에 무엇을 하길래 빼면 3점을 잃나([쓰지 않는 layer](2026-11-24-mf-n-unused-layer-role.html))? GSM8K에서 같던 L13→L0과 CODI는 바뀐 문항에서도 같은가([더 어려운 문제](2026-11-24-mf-k-harder-benchmarks.html))? L0부터 시작하면 Middleflow와 같은 7개 layer로도 되는가([기존 모델에서 방법 증명](2026-11-25-mf-r-llama-method-proof.html))? |
+| 다음 의문 | 넣는 곳 앞의 layer(L0~L6)는 latent에 무엇을 하길래 빼면 3점을 잃나([쓰지 않는 layer](2026-11-24-mf-n-unused-layer-role.html))? GSM8K에서 같던 L13→L0과 CODI는 바뀐 문항에서도 같은가([더 어려운 문제](2026-11-24-mf-k-harder-benchmarks.html))? |
 
 질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
 

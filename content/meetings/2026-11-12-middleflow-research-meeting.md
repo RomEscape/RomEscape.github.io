@@ -151,10 +151,9 @@ CODI 같은 latent 추론은 세 가지 이유로 나왔다. 이 발표의 결�
 | 연구 질문 다시 쓰기와 글 14편 점검 | 11월 25일 회의 지적(실험마다 어떤 현상을 보고 무엇이 궁금해 설계했는지) | 끝(11월 25일) | [연구 질문 정리](../experiments/2026-11-25-mf-o-research-questions.html) |
 | GPT-2 Small에서 같은 비교 | 다음 검증 1, 연구 질문 3 | 끝(11월 25일). GPT-2에서는 latent가 필요했고(GSM8K +5.0점), Middleflow는 이득의 일부만 지킴 | [GPT-2 Small 비교](../experiments/2026-11-24-mf-j-gpt2-plan.html) |
 | FLOPs와 실제 시간 | 11월 25일 회의 지적(비용을 FLOPs로) | 끝(11월 25일). FLOPs 차이 2~8%, 시간 차이 21~41% | [FLOPs와 실제 시간](../experiments/2026-11-25-mf-p-flops-vs-time.html) |
-| latent가 지나는 layer 비율에 따른 정확도 | 11월 25일 회의 지적(layer 수를 줄여 가며 꺾은선) | Llama 끝(처음부터 학습한 모델 5개, 추론 때만 줄인 19가지), 처음부터 학습한 4개와 2개 layer 점은 학습 중, GPT-2는 3점(추가 학습은 미룸) | [layer 비율](../experiments/2026-11-25-mf-q-layer-ratio.html) |
+| latent가 지나는 layer 비율에 따른 정확도 | 11월 25일 회의 지적(layer 수를 줄여 가며 꺾은선) | Llama 끝(처음부터 학습한 모델 5개, 추론 때만 줄인 19가지), GPT-2는 3점, L9→L0 11월 26일 낮 | [layer 비율](../experiments/2026-11-25-mf-q-layer-ratio.html) |
 | 더 어려운 문제(GSM-Symbolic, AIME) | latent가 효과를 내는 조건 | Llama-1B 아홉 모델과 GPT-2 세 모델 끝 | [더 어려운 문제](../experiments/2026-11-24-mf-k-harder-benchmarks.html) |
-| latent 경로 변형(루프, 사선, 후퇴 후 전진, 거꾸로) | 연구 질문 2, 3 | 보류(11월 25일 낮). GPT-2 루프를 13.3 epoch에서 멈췄고 나머지와 L9→L0은 시작하지 않음 | [경로 변형](../experiments/2026-11-24-mf-l-latent-path-plan.html) |
-| 기존 모델(Llama)에서 방법 증명 | 11월 25일 회의 지적(추론 시간을 같게, layer 수 꺾은선)과 넣는 layer 결과 | 학습 중. 추론 계산량을 맞춘 Middleflow(latent 14개)와 L0부터 7개 layer(L6→L0)는 11월 26일 오전, layer 4개와 2개는 26일 저녁과 27일 새벽 | [기존 모델에서 방법 증명](../experiments/2026-11-25-mf-r-llama-method-proof.html) |
+| latent 경로 변형(루프, 사선, 후퇴 후 전진, 거꾸로) | 연구 질문 2, 3 | 루프 학습 중(11월 26일 새벽 끝), 후퇴 후 전진 26일 밤, 사선 27일 새벽, 거꾸로 27일 낮, 비교 모델 L9→L0 26일 낮 | [경로 변형](../experiments/2026-11-24-mf-l-latent-path-plan.html) |
 | Llama 학습 시간을 CODI와 같게 | Middleflow가 아낀 학습 시간을 더 학습에 쓰면 CODI만큼 맞히나 | 학습 중. Middleflow 11월 25일 20:50, Latent 없음 26일 06:50 끝 | [학습 시간 맞춤](../experiments/2026-11-24-mf-m-llama-codi-time.html) |
 | Middleflow가 쓰지 않는 layer의 역할 | 넣는 layer가 latent 의존도를 바꾸는 이유, 연구 질문 2 | 끝(11월 24일 밤, 추론만) | [쓰지 않는 layer](../experiments/2026-11-24-mf-n-unused-layer-role.html) |
 | 띄엄 배치 10 epoch | 연구 질문 2 | 셋 중 하나 끝, 둘 보류 | [띄엄 배치](../experiments/2026-11-14-mf-i-layer-placement-and-stride.html) |
