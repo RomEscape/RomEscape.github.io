@@ -10,10 +10,51 @@ method_examples:
     kind: 실제 실험 예시
     problem: 'MATH500 Level 1 문항은 2^8 = 4^x에서 x를 묻습니다. 정답은 4입니다. 파인튜닝하기 전의 원래 모델(Qwen2.5-7B-Instruct)은 이 문항에 평균 222 tokens를 씁니다.'
     comparison: '평범하게 학습한 SFT에 같은 문제를 두 가지로 줍니다. 하나는 학습 때와 같은 표준 입력(대화 틀과 시스템 프롬프트가 있음)이고, 다른 하나는 그 단서를 모두 뺀 입력(문제 글만)입니다. 모델은 다시 학습하지 않았습니다.'
-    assessment: 'SFT의 평균 길이는 표준 입력에서 886 tokens, 단서를 뺀 입력에서 225 tokens였습니다. 단서를 빼면 원래 모델과 같은 길이로 풀고 답은 같습니다. 어려운 Level 5 문항에서는 두 입력 모두 16,000 tokens 넘게 썼습니다. 쉬운 문제만 짧아진 것입니다.'
+    assessment: 'SFT의 평균 길이는 표준 입력에서 886 tokens, 단서를 뺀 입력에서 239 tokens였습니다(네 번 풀이의 평균). 단서를 빼면 원래 모델과 비슷한 길이로 풀고 답은 같습니다. 어려운 Level 5 문항에서는 두 입력 모두 16,000 tokens 넘게 썼습니다. 쉬운 문제만 짧아진 것입니다.'
 summary: 긴 풀이를 학습한 모델을 다시 학습하지 않고, 추론 입력에서 학습 때의 단서만 빼서 길이를 줄이는 방법입니다. 우리 SFT는 MATH500에서 길이 0.44배, 정답률은 못지않았습니다. 공개 모델 둘은 0.26배, 0.47배로 줄었지만 정답률은 판정 불가와 손해이고, AIME25에서는 둘 다 내려가는 방향입니다. 멈춤 규칙과 더 긴 한도로 다시 잽니다.
 published: true
 ---
+
+## 연구 질문
+
+| 순서 | 내용 |
+|---|---|
+| 본 현상 | 우리 SFT에 문제 글만 주면 MATH500 500문항에서 길이가 0.44배 [0.41, 0.46]가 되고 정답률 차는 +0.3 [−1.3, +1.9]%p였습니다. 난이도 수준마다 QFFT의 표준 사용과 가까운 길이였습니다. |
+| 든 의문 | 새로 학습하지 않고 입력만 바꾸는 것으로 충분한가? 남의 모델에서도, 어려운 문제에서도 정답률이 지켜지는가? 정답률이 내려간다면 어디서 내려가는가? |
+| 그때까지 안 해 본 것 | 앞의 시험은 100문항 크기라 정답률을 판정할 수 없었습니다. 그리고 최대 길이에 닿은 답은 한 덩어리로 오답 처리했을 뿐, 읽어서 종류를 나눠 본 적이 없었습니다. |
+| 그래서 한 것 | 우리 모델 셋과 공개 모델 둘을 MATH500 500문항 전체로, 결과 전에 적은 기준으로 판정했습니다. 정답률이 내려간 칸은 최대 길이에 닿은 답을 직접 읽어 나눴습니다. |
+| 답 | 우리 SFT에서는 통했습니다. 공개 모델은 길이가 0.26배, 0.47배로 줄었지만 정답률은 "판정 불가"와 "정답률 손해"였습니다. 손해의 큰 부분은 답을 쓰고도 끝내지 못한 답이었고(답의 7.9%, 그 73%는 처음 쓴 답이 정답), AIME25에서는 두 모델 모두 정답률이 내려가는 방향이었습니다. |
+| 다음 의문 | 왜 답을 쓰고도 끝내지 못하는가? 어려운 문제에서 단서가 필요한 때를 알 수 있는가? ([열려 있는 질문](2026-11-25-a-research-questions.html)) |
+
+질문의 사슬 전체와, 모델에 실제로 넣은 입력 문자열과 실제 답은 [연구 질문으로 다시 쓴 QFFT 연구](2026-11-25-a-research-questions.html)에 있습니다.
+
+## 메인 표: Base, SFT, A1, A2, QFFT와 추론 입력을 바꾼 조건
+
+<!-- qfft-main-table-start -->
+
+**표 읽는 법.** 한 줄이 "모델 + 추론 입력" 하나입니다. ACC는 정답률(%), Tokens는 답 하나의 평균 출력 tokens입니다. 굵게 적은 A2와 QFFT가 견줄 기준이고, 그 아래 줄들이 추론 입력만 바꾼 조건입니다. "대기"는 지금 돌고 있는 칸입니다.
+
+| 모델 | 추론 입력 | GSM8K ACC | GSM8K Tokens | MATH500 ACC | MATH500 Tokens | AIME25 ACC | AIME25 Tokens |
+|---|---|---|---|---|---|---|---|
+| Base | 기본 프롬프트 | 92.0 | 301 | 76.1 | 635 | 8.8 | 1,060 |
+| SFT | 기본 프롬프트 | 91.6 | 2,060 | 81.0 | 6,576 | 16.7 | 20,574 |
+| A1 | 기본 프롬프트 | 91.4 | 1,856 | 80.9 | 6,149 | 17.5 | 18,965 |
+| **A2** | 기본 프롬프트 | **91.6** | **888** | **81.3** | **4,587** | **17.5** | **17,735** |
+| **QFFT** | 기본 프롬프트 | **92.0** | **831** | **81.4** | **4,630** | **15.4** | **18,133** |
+| SFT | 시스템 프롬프트 제거 | 91.0 | 1,517 | 80.9 | 4,899 | 19.2 | 18,382 |
+| SFT | 문제 글만 | 대기 | 대기 | 81.4 | 4,221 | 대기 | 대기 |
+| A1 | 시스템 프롬프트 제거 | 91.5 | 587 | 81.6 | 3,778 | 12.5 | 16,270 |
+| A2 | 시스템 프롬프트 제거 | 91.6 | 514 | 82.0 | 3,948 | 값 없음 | 값 없음 |
+| QFFT | 시스템 프롬프트 제거 | 91.3 | 630 | 82.5 | 4,122 | 값 없음 | 값 없음 |
+| QFFT | 문제 글만 | 대기 | 대기 | 77.5 | 5,046 | 대기 | 대기 |
+
+- **모델.** Base는 파인튜닝 전의 Qwen2.5-7B-Instruct입니다. 나머지는 모두 LIMO 817문항으로 학습했습니다. SFT는 질문과 긴 풀이로, A1은 질문을 지우고, A2는 질문을 지우고 응답 첫 토큰의 loss까지 빼고, QFFT는 논문 방법대로 질문 없이 풀이만으로 학습한 모델입니다.
+- **추론 입력.** 기본 프롬프트는 대화 틀, 시스템 프롬프트 "Please reason step by step, and put your final answer within \boxed{}.", 질문으로 이루어집니다. 시스템 프롬프트 제거는 거기서 시스템 프롬프트만 뺀 입력이고, 문제 글만은 대화 틀까지 빼고 질문 글자만 준 입력입니다. 실제 문자열은 아래 "실제 입력과 실제 답"에 있습니다.
+- **크기.** GSM8K 1,319문항, MATH500 500문항, AIME25 30문항입니다. 기본 프롬프트 줄은 문항마다 16회, 나머지 줄은 4회 풀게 했습니다. 최대 32,000 tokens입니다.
+- **채점.** GSM8K와 MATH500의 ACC는 `\boxed{}` 없이 끝난 답을 직접 읽어 반영하고, 표기만 다른 같은 답을 맞게 고친 값입니다(GSM8K는 평가 자료의 정답 16문항도 바로잡았습니다). AIME25는 공식 채점 스크립트 값 그대로입니다.
+- **읽기.** MATH500에서 SFT에 문제 글만 준 조건은 ACC 81.4%, 4,221 tokens입니다. A2(81.3%, 4,587)와 QFFT(81.4%, 4,630)와 정답률이 같고 8–9% 짧습니다. 다시 학습하지 않은 SFT 그대로입니다. 다만 A2와 QFFT도 시스템 프롬프트를 빼면 더 짧아집니다(3,948, 4,122 tokens). GSM8K와 AIME25의 "문제 글만" 칸은 아직 돌지 않았습니다.
+
+<!-- qfft-main-table-end -->
 
 ## 한 줄 요약
 
@@ -32,10 +73,76 @@ published: true
 
 ## 방법
 
-<figure class="xp">
-<a href="../uploads/qfft/figures/2026-11-24-h-drop-training-cues-method/same-model-two-inputs.png"><img src="../uploads/qfft/figures/2026-11-24-h-drop-training-cues-method/same-model-two-inputs.png" alt="두 열 비교. 같은 SFT 모델에 표준 입력을 주면 긴 풀이 비율이 GSM8K 87%, MATH500 90%, AIME25 100%로 늘 길게 푼다. 단서를 뺀 입력(문제 글만)을 주면 14%, 27%, 90%로 쉬운 문제는 짧게, 어려운 문제는 길게 푼다. 남는 비율은 1.00, 0.98, 1.00에서 0.08, 0.49, 0.87이 된다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
-<figcaption class="xp-cap">그림 1. 개념 그림. 방법은 입력에서 학습 때의 단서를 빼는 것뿐입니다. 쉬운 문제에서만 긴 풀이가 꺼지고 어려운 문제에서는 남습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
-</figure>
+### 실제 입력과 실제 답: 같은 문항 하나
+
+문항은 MATH500의 Level 1 문제 하나입니다. 정답은 4입니다. 아래 세 가지가 모델에 실제로 넣은 문자열입니다.
+
+입력 ① 기본 프롬프트(표준 평가가 모든 모델에 주는 입력)
+
+```
+<|im_start|>system
+Please reason step by step, and put your final answer within \boxed{}.<|im_end|>
+<|im_start|>user
+If $2^8=4^x$, what is the value of $x$?<|im_end|>
+<|im_start|>assistant
+```
+
+입력 ② 시스템 프롬프트 제거
+
+```
+<|im_start|>user
+If $2^8=4^x$, what is the value of $x$?<|im_end|>
+<|im_start|>assistant
+```
+
+입력 ③ 문제 글만
+
+```
+If $2^8=4^x$, what is the value of $x$?
+```
+
+**표 읽는 법.** 한 줄이 "모델 + 입력" 하나입니다. 길이는 그 문항을 여러 번 풀게 한 답의 tokens(가장 짧은 답–가장 긴 답, 평균)이고, 마지막 칸은 실제 답의 첫머리입니다.
+
+| 모델 | 입력 | 길이 (tokens) | 정답 수 | 실제 답의 첫머리 |
+|---|---|---|---|---|
+| Base | ① | 176–286, 평균 222 | 16/16 | To solve the equation \(2^8 = 4^x\), we start by expressing both sides of the equation with the same base. |
+| SFT | ① | 525–2,018, 평균 886 | 16/16 | Okay, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. I know that both 2 and 4 are powers of 2. Wait, maybe I can rewrite 4 as 2 squared. |
+| A2 | ① | 219–483, 평균 298 | 16/16 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. |
+| QFFT | ① | 187–355, 평균 269 | 16/16 | To solve the equation \(2^8 = 4^x\), we need to express both sides with the same base. |
+| SFT | ② | 665–993, 평균 850 | 3/4 | Okay, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. Both sides have exponents, but the bases are different. |
+| SFT | ③ | 211–308, 평균 239 | 4/4 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. Let's start by expressing 4 as a power of 2. |
+| A2 | ② | 211–226, 평균 217 | 4/4 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. |
+| QFFT | ③ | 295–518, 평균 373 | 4/4 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. |
+
+SFT가 입력 ①에 낸 첫 답(656 tokens)의 앞과 끝입니다.
+
+```
+Okay, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. I know that both 2 and 4 are powers of 2. Wait, maybe I can rewrite 4 as 2 squared. Yeah, that makes sense. So 4 is 2^2. Therefore, 4^x would be (2^2)^x. I remember that when you have an exponent raised to another exponent, you multiply them.
+(가운데 생략)
+Maybe the questioner wants me to show steps, so here we are. Just converting between exponents. Powers of 2. Logarithms too. All leading to x=4.
+
+**Final Answer**
+The value of \( x \) is \boxed{4}.
+```
+
+같은 SFT가 입력 ③에 낸 첫 답(224 tokens)의 앞과 끝입니다.
+
+```
+ To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. Let's start by expressing 4 as a power of 2. Since \(4 = 2^2\), we can rewrite the equation as:
+(가운데 생략)
+Solving for \(x\), we divide both sides by 2:
+
+\[
+x = \frac{8}{2} = 4
+\]
+
+Thus, the value of \(x\) is \(\boxed{4}\).
+```
+
+- 같은 SFT가 입력 ①에는 "Okay, so I need to …"로 시작해 혼잣말하듯 길게 풀고, 입력 ③에는 Base, A2, QFFT와 같은 "To solve the equation …"으로 시작해 짧게 풉니다. 가중치는 같고 입력만 다릅니다.
+- 이 문항에서는 시스템 프롬프트만 뺀 입력 ②로도 SFT가 여전히 "Okay"로 시작해 길게 풀었습니다(평균 850 tokens). 대화 틀까지 빼야 짧아졌습니다. 500문항 전체로는 입력 ②에서도 평균이 6,576에서 4,899 tokens로 줍니다(위 메인 표).
+
+### 방법의 세 단계
 
 1. **단서를 찾습니다.** 그 모델의 학습 자료에서 긴 풀이와 늘 함께 있던 입력 요소를 봅니다. 우리 SFT는 시스템 프롬프트 문장("Please reason step by step, …")과 대화 틀이고, 공개 모델은 시스템 프롬프트와 사용자 칸 앞에 늘 붙던 고정 문장입니다.
 2. **추론 입력에서 그 단서를 뺍니다.** 모델과 가중치는 그대로입니다.
@@ -44,6 +151,11 @@ published: true
 QFFT는 학습 자료에서 질문을 지우고 새로 학습해 같은 모양을 얻습니다. 이 방법은 이미 있는 모델에 그대로 씁니다.
 
 **쓸 수 있는 모델(11-25에 좁힘).** 학습 입력에 풀이를 서술하는 지시문이 있던 모델입니다. 그런 모델에서는 긴 풀이가 지시문에 묶여 있어 지시문을 빼면 꺼집니다. 무관한 문장을 넣었거나 시스템 프롬프트 없이 학습한 모델은 긴 풀이가 대화 틀에 묶여 있어 뗄 지시문이 없습니다(아래 "시험 ① 결과와 방법의 범위").
+
+<figure class="xp">
+<a href="../uploads/qfft/figures/2026-11-24-h-drop-training-cues-method/same-model-two-inputs.png"><img src="../uploads/qfft/figures/2026-11-24-h-drop-training-cues-method/same-model-two-inputs.png" alt="두 열 비교. 같은 SFT 모델에 표준 입력을 주면 긴 풀이 비율이 GSM8K 87%, MATH500 90%, AIME25 100%로 늘 길게 푼다. 단서를 뺀 입력(문제 글만)을 주면 14%, 27%, 90%로 쉬운 문제는 짧게, 어려운 문제는 길게 푼다. 남는 비율은 1.00, 0.98, 1.00에서 0.08, 0.49, 0.87이 된다." style="display:block;width:100%;height:auto;border-radius:6px"></a>
+<figcaption class="xp-cap">그림 1. 위 예시를 벤치마크 전체로 요약한 개념 그림입니다(100문항 크기의 값). 방법은 입력에서 학습 때의 단서를 빼는 것뿐입니다. 쉬운 문제에서만 긴 풀이가 꺼지고 어려운 문제에서는 남습니다. 그림을 누르면 원본 크기로 열립니다.</figcaption>
+</figure>
 
 ## 왜 궁금했나
 
@@ -231,6 +343,65 @@ QFFT는 학습 자료에서 질문을 지우고 새로 학습해 같은 모양�
 | Level 5: 2 × 3 × 4 × 5 + 1에 괄호를 넣어 만들 수 있는 값은 몇 가지인가? 정답 4 | 네 번 모두 경우를 세다가 최대 길이에 닿음 | 두 번은 8,626과 13,068 tokens로 끝났지만 오답, 두 번은 최대 길이에 닿음 |
 
 첫 줄이 이 모델에서 새로 보인 모양입니다. 답은 짧게 맞혔는데 생성을 끝내지 못했습니다. 채점 규칙은 최대 길이에 닿은 답을 내용과 무관하게 오답으로 세므로, 그 세 번은 오답입니다. 셋째 줄은 표준 입력 쪽이 풀이 중에 끊긴 경우입니다.
+
+**첫 줄의 실제 입력과 실제 답.** 공개 모델 OpenThinker-7B에 실제로 넣은 문자열입니다. 문항은 MATH500의 Level 3 문제이고 정답은 9입니다.
+
+표준 입력(그 모델이 학습 때 본 시스템 프롬프트와, 사용자 칸 앞의 고정 문장이 붙은 입력. 시스템 프롬프트는 1,312자라 가운데를 줄였습니다)
+
+```
+<|im_start|>system
+Your role as an assistant involves thoroughly exploring questions through a systematic long thinking process before providing the final precise and accurate solutions. (가운데 생략) Now, try to solve the following question through the above guidelines:<|im_end|>
+<|im_start|>user
+Return your final response within \boxed{}. How many positive whole-number divisors does 196 have?<|im_end|>
+<|im_start|>assistant
+```
+
+단서를 뺀 입력
+
+```
+<|im_start|>user
+How many positive whole-number divisors does 196 have?<|im_end|>
+<|im_start|>assistant
+```
+
+표준 입력에 낸 답(1,485 tokens, 정답)의 앞과 끝입니다. 학습 형식의 끝 표지로 끝납니다.
+
+```
+<|begin_of_thought|>
+
+Okay, so I need to figure out how many positive whole-number divisors 196 has. Let me start by recalling what a divisor is.
+(가운데 생략)
+**Final Answer**:
+196 has \(\boxed{9}\) positive whole-number divisors.
+
+<|end_of_solution|>
+```
+
+단서를 뺀 입력에 낸 답 하나(16,384 tokens까지 가서 오답 처리)의 앞, 처음 답을 쓴 곳, 끝입니다. 313 tokens 지점에서 정답 9를 썼습니다.
+
+```
+To determine how many positive whole-number divisors 196 has, we start by finding its prime factorization. The number 196 is an even number, so it's divisible by 2.
+(가운데 생략)
+Counting these, we have 9 divisors. Thus, the answer is \(\boxed{9}\).
+
+**Final Answer**
+The number 196 has \boxed{9} positive whole-number divisors.
+
+The step-by-step explanation is as follows:
+(가운데 생략, 같은 꼴의 줄이 최대 길이까지 이어짐)
+Final Answer: \boxed{9}
+
+Yes, the answer is correct.
+
+Final Answer: \boxed{9}
+
+After thorough analysis, the answer is \boxed{9}.
+
+Final Answer: \boxed{
+```
+
+- 표준 입력으로는 네 번 모두 1,485–2,019 tokens로 맞혔습니다.
+- 단서를 뺀 입력으로는 한 번은 557 tokens로 맞혔고, 세 번은 294–460 tokens 지점에서 정답 9를 쓰고도 끝내지 못했습니다. 채점 규칙은 최대 길이에 닿은 답을 오답으로 세므로 그 세 번은 오답입니다.
 
 **표 읽는 법.** 위 첫 결과의 표와 같습니다. 한 줄이 입력 하나이고, "최대 길이에 닿은 답"은 채점에서 모두 오답입니다.
 
