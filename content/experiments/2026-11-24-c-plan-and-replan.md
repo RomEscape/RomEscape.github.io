@@ -4,7 +4,7 @@ date: 2026-11-24
 project: QFFT
 status: 진행 중
 idea: 후보
-idea_rank: 2
+idea_rank: 3
 method_name: DecideTwice
 method_examples:
   - title: 답을 구한 뒤에도 문단 첫머리마다 다시 따져 보는 풀이
