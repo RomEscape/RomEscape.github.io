@@ -5,6 +5,7 @@ project: QFFT
 status: 진행 중
 idea: 후보
 idea_rank: 4
+method_name: CueGate
 method_examples:
   - title: 공개 모델에서 학습 때의 시스템 프롬프트만 빼기
     kind: 실제 실험 예시
@@ -14,6 +15,8 @@ method_examples:
 summary: 공개 모델 Bespoke-Stratos-7B는 학습 때 쓴 시스템 프롬프트를 빼자 생각 형식이 100%에서 0%가 됐습니다. 더 큰 자료를 학습한 OpenThinker-7B는 시스템 프롬프트만 빼면 95–100% 남았지만, 사용자 칸에 늘 붙던 고정 문장까지 빼자 0%가 됐습니다. 두 모델 모두 긴 풀이 형식이 학습 때의 입력 단서에 묶여 있고, 묶인 단서가 서로 다릅니다.
 published: true
 ---
+
+**방법 이름: CueGate.** 공개 모델에서 학습 때의 단서(cue)가 긴 풀이 형식을 여닫는 문(gate)처럼 작동한다는 관찰에 붙인 이름입니다.
 
 ## 연구 질문
 
@@ -58,33 +61,61 @@ published: true
 
 ## 실제 입력과 실제 답: 같은 문항 하나를 모델과 입력을 바꿔 가며
 
-문항은 MATH500의 Level 1 문제 하나입니다. 정답은 4입니다. 아래 세 가지가 모델에 실제로 넣은 문자열입니다.
+문항은 MATH500의 Level 1 문제 하나입니다(정답 4). 그림의 칸은 모델에 실제로 넣은 입력이고, 글상자는 저장된 실제 출력입니다.
 
-입력 ① 기본 프롬프트(표준 평가가 모든 모델에 주는 입력)
+<!-- xp-q77 -->
+<figure class="xp"><p class="xp-t">같은 SFT, 입력에서 학습 때의 단서만 뺍니다 (MATH500 문항 77, 정답 4)</p><div class="xp-cols"><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">If $2^8=4^x$, what is the value of $x$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">입력 ① 기본 프롬프트(표준 평가)</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">If $2^8=4^x$, what is the value of $x$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">입력 ② 시스템 프롬프트 제거</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div></div><div class="xp-ctx"><div class="">If $2^8=4^x$, what is the value of $x$?</div></div><div class="xp-del"><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">입력 ③ 문제 글만</div></div></div><div class="xp-note"><b>바꾸는 것</b>추론 입력뿐입니다. ②는 시스템 프롬프트 칸을 뺐고, ③은 대화 표지까지 빼고 문제 글자만 줍니다.<b>그대로 두는 것</b>모델의 가중치(다시 학습하지 않음), 문제, 온도 0.6, top_p 1, 최대 32,000 tokens<b>재는 것</b>같은 문제의 답 길이(tokens)와 정답 여부. ①은 16번, ②와 ③은 4번 풀게 했습니다.</div><div class="xp-cols" style="margin-top:14px"><div><p class="xp-name">SFT, 입력 ①: 16번 모두 정답, 525–2,018 tokens(평균 886)</p><pre class="xp-ex"><span class="xp-hit">Okay</span>, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. I know that both 2 and 4 are powers of 2. Wait, maybe I can rewrite 4 as 2 squared. Yeah, that makes sense. So 4 is 2^2. Therefore, 4^x would be (2^2)^x. I …
+<span class="xp-sp">(가운데 줄임)</span>
+… here we are. Just converting between exponents. Powers of 2. Logarithms too. All leading to x=4. 
+**Final Answer**
+The value of \( x \) is \boxed{4}.</pre></div><div><p class="xp-name">SFT, 입력 ②: 4번 가운데 3번 정답, 665–993 tokens(평균 850)</p><pre class="xp-ex"><span class="xp-hit">Okay</span>, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. Both sides have exponents, but the bases are different. Wait, 4 is 2 squared, right? So, 4 equals 2 squared. Maybe I can rewrite 4^x as (2^2)^x. That way, both …
+<span class="xp-sp">(가운데 줄임)</span>
+… equals 2^(2x), exponents must be equal. So, 8 = 2x. Therefore, x = 4. That seems straightforward. I think that's correct.
+**Final Answer**
+\boxed{4}</pre></div><div><p class="xp-name">SFT, 입력 ③: 4번 모두 정답, 211–308 tokens(평균 239)</p><pre class="xp-ex"> <span class="xp-hit">To solve</span> the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. Let's start by expressing 4 as a power of 2. Since \(4 = 2^2\), we can rewrite the equation as:
+\[
+2^8 = (2^2)^x
+\]
+Next, we …
+<span class="xp-sp">(가운데 줄임)</span>
+… other. Therefore:
+\[
+8 = 2x
+\]
+Solving for \(x\), we divide both sides by 2:
+\[
+x = \frac{8}{2} = 4
+\]
+Thus, the value of \(x\) is \(\boxed{4}\).</pre></div></div><div class="xp-cols" style="margin-top:14px"><div><p class="xp-name">A2, 입력 ①: 16번 모두 정답, 219–483 tokens(평균 298)</p><pre class="xp-ex"><span class="xp-hit">To solve</span> the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. Let's start by expressing 4 as a power of 2. Since \(4 = 2^2\), we can rewrite the equation as:
+\[
+2^8 = (2^2)^x
+\]
+Next, we …
+<span class="xp-sp">(가운데 줄임)</span>
+… each other:
+\[
+8 = 2x
+\]
+Now, solve for \(x\) by dividing both sides by 2:
+\[
+x = \frac{8}{2} = 4
+\]
+Therefore, the value of \(x\) is \(\boxed{4}\).</pre></div><div><p class="xp-name">QFFT, 입력 ①: 16번 모두 정답, 187–355 tokens(평균 269)</p><pre class="xp-ex"><span class="xp-hit">To solve</span> the equation \(2^8 = 4^x\), we need to express both sides with the same base. Let's start by recognizing that 4 can be written as a power of 2. Specifically, \(4 = 2^2\). Therefore, \(4^x\) can be rewritten as …
+<span class="xp-sp">(가운데 줄임)</span>
+… each other. Therefore, \(8 = 2x\).
+Solving for \(x\), we divide both sides by 2:
+\[
+x = \frac{8}{2} = 4
+\]
+Thus, the value of \(x\) is \(\boxed{4}\).</pre></div><div><p class="xp-name">Base, 입력 ①: 16번 모두 정답, 176–286 tokens(평균 222)</p><pre class="xp-ex"><span class="xp-hit">To solve</span> the equation \(2^8 = 4^x\), we start by expressing both sides of the equation with the same base. We know that \(4\) can be written as a power of \(2\), specifically \(4 = 2^2\). Therefore, we can rewrite the right-hand …
+<span class="xp-sp">(가운데 줄임)</span>
+… = 2x.\]
+To solve for \(x\), we divide both sides of the equation by \(2\):
+\[x = \frac{8}{2} = 4.\]
+Thus, the value of \(x\) is \(\boxed{4}\).</pre></div></div><div class="xp-legend"><span><i class="xp-sw" style="box-shadow:inset 0 0 0 2px var(--xp-ctx)"></i>입력으로 읽기만 함</span><span><i class="xp-sw" style="background:var(--xp-del)"></i>입력에서 지움</span><span><i class="xp-sw" style="background:var(--sheet);border-color:var(--ink)"></i>모델이 새로 생성</span></div><p class="xp-cap">글상자는 저장된 실제 출력의 첫 답입니다(가운데는 줄였습니다). 같은 SFT가 입력 ①과 ②에는 "Okay, so I need to …"로 시작해 혼잣말하듯 길게 풀고, 입력 ③에는 A2, QFFT, Base처럼 "To solve the equation …"으로 시작해 짧게 풉니다.</p></figure>
+<!-- /xp-q77 -->
 
-```
-<|im_start|>system
-Please reason step by step, and put your final answer within \boxed{}.<|im_end|>
-<|im_start|>user
-If $2^8=4^x$, what is the value of $x$?<|im_end|>
-<|im_start|>assistant
-```
-
-입력 ② 시스템 프롬프트 제거
-
-```
-<|im_start|>user
-If $2^8=4^x$, what is the value of $x$?<|im_end|>
-<|im_start|>assistant
-```
-
-입력 ③ 문제 글만
-
-```
-If $2^8=4^x$, what is the value of $x$?
-```
-
-**표 읽는 법.** 한 줄이 "모델 + 입력" 하나입니다. 길이는 그 문항을 여러 번 풀게 한 답의 tokens(가장 짧은 답–가장 긴 답, 평균)이고, 마지막 칸은 실제 답의 첫머리입니다.
+**표 읽는 법.** 한 줄이 "모델 + 입력" 하나입니다. 입력 ①, ②, ③은 위 그림의 세 입력입니다. 길이는 그 문항을 여러 번 풀게 한 답의 tokens(가장 짧은 답–가장 긴 답, 평균)이고, 마지막 칸은 실제 답의 첫머리입니다.
 
 | 모델 | 입력 | 길이 (tokens) | 정답 수 | 실제 답의 첫머리 |
 |---|---|---|---|---|
@@ -97,91 +128,34 @@ If $2^8=4^x$, what is the value of $x$?
 | A2 | ② | 211–226, 평균 217 | 4/4 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. |
 | QFFT | ③ | 295–518, 평균 373 | 4/4 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. |
 
-SFT가 입력 ①에 낸 첫 답(656 tokens)의 앞과 끝입니다.
-
-```
-Okay, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. I know that both 2 and 4 are powers of 2. Wait, maybe I can rewrite 4 as 2 squared. Yeah, that makes sense. So 4 is 2^2. Therefore, 4^x would be (2^2)^x. I remember that when you have an exponent raised to another exponent, you multiply them.
-(가운데 생략)
-Maybe the questioner wants me to show steps, so here we are. Just converting between exponents. Powers of 2. Logarithms too. All leading to x=4.
-
-**Final Answer**
-The value of \( x \) is \boxed{4}.
-```
-
-같은 SFT가 입력 ③에 낸 첫 답(224 tokens)의 앞과 끝입니다.
-
-```
- To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. Let's start by expressing 4 as a power of 2. Since \(4 = 2^2\), we can rewrite the equation as:
-(가운데 생략)
-Solving for \(x\), we divide both sides by 2:
-
-\[
-x = \frac{8}{2} = 4
-\]
-
-Thus, the value of \(x\) is \(\boxed{4}\).
-```
-
 - 같은 SFT가 입력 ①에는 "Okay, so I need to …"로 시작해 혼잣말하듯 길게 풀고, 입력 ③에는 Base, A2, QFFT와 같은 "To solve the equation …"으로 시작해 짧게 풉니다. 가중치는 같고 입력만 다릅니다.
 - 이 문항에서는 시스템 프롬프트만 뺀 입력 ②로도 SFT가 여전히 "Okay"로 시작해 길게 풀었습니다(평균 850 tokens). 대화 틀까지 빼야 짧아졌습니다. 500문항 전체로는 입력 ②에서도 평균이 6,576에서 4,899 tokens로 줍니다(위 메인 표).
 
 ### 공개 모델에 실제로 넣은 입력과 답
 
-공개 모델 OpenThinker-7B에 실제로 넣은 문자열입니다. 문항은 MATH500의 Level 3 문제이고 정답은 9입니다.
+공개 모델 OpenThinker-7B에 실제로 넣은 입력과 저장된 실제 출력입니다. 문항은 MATH500의 Level 3 문제이고 정답은 9입니다. 시스템 프롬프트는 1,312자라 가운데를 줄였습니다.
 
-표준 입력(그 모델이 학습 때 본 시스템 프롬프트와, 사용자 칸 앞의 고정 문장이 붙은 입력. 시스템 프롬프트는 1,312자라 가운데를 줄였습니다)
-
-```
-<|im_start|>system
-Your role as an assistant involves thoroughly exploring questions through a systematic long thinking process before providing the final precise and accurate solutions. (가운데 생략) Now, try to solve the following question through the above guidelines:<|im_end|>
-<|im_start|>user
-Return your final response within \boxed{}. How many positive whole-number divisors does 196 have?<|im_end|>
-<|im_start|>assistant
-```
-
-단서를 뺀 입력
-
-```
-<|im_start|>user
-How many positive whole-number divisors does 196 have?<|im_end|>
-<|im_start|>assistant
-```
-
-표준 입력에 낸 답(1,485 tokens, 정답)의 앞과 끝입니다. 학습 형식의 끝 표지로 끝납니다.
-
-```
-<|begin_of_thought|>
-
-Okay, so I need to figure out how many positive whole-number divisors 196 has. Let me start by recalling what a divisor is.
-(가운데 생략)
-**Final Answer**:
+<!-- xp-public -->
+<figure class="xp"><p class="xp-t">공개 모델에서 학습 때의 단서를 뺍니다 (OpenThinker-7B, MATH500 문항 3, 정답 9)</p><div class="xp-cols"><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Your role as an assistant involves thoroughly exploring questions through a systematic long thinking process before providing the final precise and accurate solutions. <span class="xp-sp">(가운데 줄임, 전체 1,312자)</span> Now, try to solve the following question through the above guidelines:</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">Return your final response within \boxed{}.</div><div class="">How many positive whole-number divisors does 196 have?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">표준 입력(그 모델이 학습 때 본 입력)</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Your role as an assistant involves thoroughly exploring questions through a systematic long thinking process before providing the final precise and accurate solutions. <span class="xp-sp">(가운데 줄임, 전체 1,312자)</span> Now, try to solve the following question through the above guidelines:</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div></div><div class="xp-del"><div class="">Return your final response within \boxed{}.</div></div><div class="xp-ctx"><div class="">How many positive whole-number divisors does 196 have?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">단서를 뺀 입력</div></div></div><div class="xp-note"><b>바꾸는 것</b>추론 입력에서 학습 때의 시스템 프롬프트와, 사용자 칸 앞에 늘 붙던 고정 문장을 뺍니다. 대화 표지는 그대로 둡니다.<b>그대로 두는 것</b>모델의 가중치, 문제, 온도 0.6, top_p 1, 최대 16,384 tokens. 문항마다 4번 풀게 했습니다.</div><div class="xp-cols" style="margin-top:14px"><div><p class="xp-name">표준 입력: 4번 모두 정답, 1,485–2,019 tokens(평균 1,812)</p><pre class="xp-ex">&lt;|begin_of_thought|&gt;
+Okay, so I need to figure out how many positive whole-number divisors 196 has. Let me start by recalling what a divisor is. A divisor of a number is another whole number that can …
+<span class="xp-sp">(가운데 줄임)</span>
+… 196 \).  
+   This confirms there are **9 divisors**.
+**Final Answer**:  
 196 has \(\boxed{9}\) positive whole-number divisors.
+<span class="xp-hit">&lt;|end_of_solution|&gt;</span></pre></div><div><p class="xp-name">단서를 뺀 입력: 1번은 557 tokens로 정답, 3번은 294–460 tokens 지점에서 정답을 쓰고도 끝내지 못해 16,384 tokens</p><pre class="xp-ex">To determine how many positive whole-number divisors 196 has, we start by finding its prime factorization. The number 196 is an even number, so it's …
+<span class="xp-sp">(가운데 줄임)</span>
+… 4, 7, 14, 28, 49, 98, 196
 
-<|end_of_solution|>
-```
+Counting these, we have 9 divisors. Thus, the answer is \(<span class="xp-hit">\boxed{9}</span>
+<span class="xp-sp">(여기가 313 tokens 지점. 정답을 썼지만 끝내지 않고 이어 씀. 가운데 줄임)</span>
+… 
+Final Answer: <span class="xp-hit">\boxed{9}</span> 
 
-단서를 뺀 입력에 낸 답 하나(16,384 tokens까지 가서 오답 처리)의 앞, 처음 답을 쓴 곳, 끝입니다. 313 tokens 지점에서 정답 9를 썼습니다.
+After thorough analysis, the answer is <span class="xp-hit">\boxed{9}</span>. 
 
-```
-To determine how many positive whole-number divisors 196 has, we start by finding its prime factorization. The number 196 is an even number, so it's divisible by 2.
-(가운데 생략)
-Counting these, we have 9 divisors. Thus, the answer is \(\boxed{9}\).
-
-**Final Answer**
-The number 196 has \boxed{9} positive whole-number divisors.
-
-The step-by-step explanation is as follows:
-(가운데 생략, 같은 꼴의 줄이 최대 길이까지 이어짐)
-Final Answer: \boxed{9}
-
-Yes, the answer is correct.
-
-Final Answer: \boxed{9}
-
-After thorough analysis, the answer is \boxed{9}.
-
-Final Answer: \boxed{
-```
+Final Answer: \boxed{</pre></div></div><div class="xp-legend"><span><i class="xp-sw" style="box-shadow:inset 0 0 0 2px var(--xp-ctx)"></i>입력으로 읽기만 함</span><span><i class="xp-sw" style="background:var(--xp-del)"></i>입력에서 지움</span><span><i class="xp-sw" style="background:var(--sheet);border-color:var(--ink)"></i>모델이 새로 생성</span></div><p class="xp-cap">글상자는 저장된 실제 출력입니다. 표준 입력의 답은 학습 형식의 끝 표지(빨간 글자)로 끝납니다. 단서를 뺀 입력의 답은 정답을 쓴 뒤에도 "Final Answer" 줄을 최대 길이까지 되풀이했고, 채점 규칙은 최대 길이에 닿은 답을 오답으로 셉니다.</p></figure>
+<!-- /xp-public -->
 
 - 표준 입력으로는 네 번 모두 1,485–2,019 tokens로 맞혔습니다.
 - 단서를 뺀 입력으로는 한 번은 557 tokens로 맞혔고, 세 번은 294–460 tokens 지점에서 정답 9를 쓰고도 끝내지 못했습니다. 채점 규칙은 최대 길이에 닿은 답을 오답으로 세므로 그 세 번은 오답입니다.

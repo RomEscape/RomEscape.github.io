@@ -5,6 +5,7 @@ project: QFFT
 status: 완료
 idea: 후보
 idea_rank: 3
+method_name: SysDrop
 method_examples:
   - title: 같은 부등식을 지시문 유무에 따라 네 번씩 풀기
     kind: 실제 실험 예시
@@ -19,6 +20,8 @@ method_examples:
 summary: 표준 SFT 모델은 추론 때 학습에 쓴 시스템 프롬프트만 빼도 답 길이가 문항 기준 0.60배로 줄고 정답률은 그대로다(MATH500, 500문항 × 4회). 그 프롬프트 없이 학습한 모델은 1.04배, 미세조정 전 기반 모델은 0.95배로 거의 변하지 않는다. 미리 정한 판정은 "재현"이다. QFFT와의 길이 차이는 1.98배에서 1.20배로 줄어든다. 긴 풀이가 묶인 곳은 시스템 프롬프트라는 칸이 아니라 그 안의 지시 문장이다(답 형식 지시 한 문장만 질문 뒤에 붙여도 다시 길어진다).
 published: true
 ---
+
+**방법 이름: SysDrop.** 추론 입력에서 학습 때의 시스템 프롬프트(system prompt)만 뺀다(drop)는 뜻입니다. CueDrop의 첫 형태입니다.
 
 ## 연구 질문
 
@@ -63,33 +66,61 @@ published: true
 
 ## 실제 입력과 실제 답: 같은 문항 하나를 모델과 입력을 바꿔 가며
 
-문항은 MATH500의 Level 1 문제 하나입니다. 정답은 4입니다. 아래 세 가지가 모델에 실제로 넣은 문자열입니다.
+문항은 MATH500의 Level 1 문제 하나입니다(정답 4). 그림의 칸은 모델에 실제로 넣은 입력이고, 글상자는 저장된 실제 출력입니다.
 
-입력 ① 기본 프롬프트(표준 평가가 모든 모델에 주는 입력)
+<!-- xp-q77 -->
+<figure class="xp"><p class="xp-t">같은 SFT, 입력에서 학습 때의 단서만 뺍니다 (MATH500 문항 77, 정답 4)</p><div class="xp-cols"><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">If $2^8=4^x$, what is the value of $x$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">입력 ① 기본 프롬프트(표준 평가)</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">If $2^8=4^x$, what is the value of $x$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">입력 ② 시스템 프롬프트 제거</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div></div><div class="xp-ctx"><div class="">If $2^8=4^x$, what is the value of $x$?</div></div><div class="xp-del"><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">입력 ③ 문제 글만</div></div></div><div class="xp-note"><b>바꾸는 것</b>추론 입력뿐입니다. ②는 시스템 프롬프트 칸을 뺐고, ③은 대화 표지까지 빼고 문제 글자만 줍니다.<b>그대로 두는 것</b>모델의 가중치(다시 학습하지 않음), 문제, 온도 0.6, top_p 1, 최대 32,000 tokens<b>재는 것</b>같은 문제의 답 길이(tokens)와 정답 여부. ①은 16번, ②와 ③은 4번 풀게 했습니다.</div><div class="xp-cols" style="margin-top:14px"><div><p class="xp-name">SFT, 입력 ①: 16번 모두 정답, 525–2,018 tokens(평균 886)</p><pre class="xp-ex"><span class="xp-hit">Okay</span>, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. I know that both 2 and 4 are powers of 2. Wait, maybe I can rewrite 4 as 2 squared. Yeah, that makes sense. So 4 is 2^2. Therefore, 4^x would be (2^2)^x. I …
+<span class="xp-sp">(가운데 줄임)</span>
+… here we are. Just converting between exponents. Powers of 2. Logarithms too. All leading to x=4. 
+**Final Answer**
+The value of \( x \) is \boxed{4}.</pre></div><div><p class="xp-name">SFT, 입력 ②: 4번 가운데 3번 정답, 665–993 tokens(평균 850)</p><pre class="xp-ex"><span class="xp-hit">Okay</span>, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. Both sides have exponents, but the bases are different. Wait, 4 is 2 squared, right? So, 4 equals 2 squared. Maybe I can rewrite 4^x as (2^2)^x. That way, both …
+<span class="xp-sp">(가운데 줄임)</span>
+… equals 2^(2x), exponents must be equal. So, 8 = 2x. Therefore, x = 4. That seems straightforward. I think that's correct.
+**Final Answer**
+\boxed{4}</pre></div><div><p class="xp-name">SFT, 입력 ③: 4번 모두 정답, 211–308 tokens(평균 239)</p><pre class="xp-ex"> <span class="xp-hit">To solve</span> the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. Let's start by expressing 4 as a power of 2. Since \(4 = 2^2\), we can rewrite the equation as:
+\[
+2^8 = (2^2)^x
+\]
+Next, we …
+<span class="xp-sp">(가운데 줄임)</span>
+… other. Therefore:
+\[
+8 = 2x
+\]
+Solving for \(x\), we divide both sides by 2:
+\[
+x = \frac{8}{2} = 4
+\]
+Thus, the value of \(x\) is \(\boxed{4}\).</pre></div></div><div class="xp-cols" style="margin-top:14px"><div><p class="xp-name">A2, 입력 ①: 16번 모두 정답, 219–483 tokens(평균 298)</p><pre class="xp-ex"><span class="xp-hit">To solve</span> the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. Let's start by expressing 4 as a power of 2. Since \(4 = 2^2\), we can rewrite the equation as:
+\[
+2^8 = (2^2)^x
+\]
+Next, we …
+<span class="xp-sp">(가운데 줄임)</span>
+… each other:
+\[
+8 = 2x
+\]
+Now, solve for \(x\) by dividing both sides by 2:
+\[
+x = \frac{8}{2} = 4
+\]
+Therefore, the value of \(x\) is \(\boxed{4}\).</pre></div><div><p class="xp-name">QFFT, 입력 ①: 16번 모두 정답, 187–355 tokens(평균 269)</p><pre class="xp-ex"><span class="xp-hit">To solve</span> the equation \(2^8 = 4^x\), we need to express both sides with the same base. Let's start by recognizing that 4 can be written as a power of 2. Specifically, \(4 = 2^2\). Therefore, \(4^x\) can be rewritten as …
+<span class="xp-sp">(가운데 줄임)</span>
+… each other. Therefore, \(8 = 2x\).
+Solving for \(x\), we divide both sides by 2:
+\[
+x = \frac{8}{2} = 4
+\]
+Thus, the value of \(x\) is \(\boxed{4}\).</pre></div><div><p class="xp-name">Base, 입력 ①: 16번 모두 정답, 176–286 tokens(평균 222)</p><pre class="xp-ex"><span class="xp-hit">To solve</span> the equation \(2^8 = 4^x\), we start by expressing both sides of the equation with the same base. We know that \(4\) can be written as a power of \(2\), specifically \(4 = 2^2\). Therefore, we can rewrite the right-hand …
+<span class="xp-sp">(가운데 줄임)</span>
+… = 2x.\]
+To solve for \(x\), we divide both sides of the equation by \(2\):
+\[x = \frac{8}{2} = 4.\]
+Thus, the value of \(x\) is \(\boxed{4}\).</pre></div></div><div class="xp-legend"><span><i class="xp-sw" style="box-shadow:inset 0 0 0 2px var(--xp-ctx)"></i>입력으로 읽기만 함</span><span><i class="xp-sw" style="background:var(--xp-del)"></i>입력에서 지움</span><span><i class="xp-sw" style="background:var(--sheet);border-color:var(--ink)"></i>모델이 새로 생성</span></div><p class="xp-cap">글상자는 저장된 실제 출력의 첫 답입니다(가운데는 줄였습니다). 같은 SFT가 입력 ①과 ②에는 "Okay, so I need to …"로 시작해 혼잣말하듯 길게 풀고, 입력 ③에는 A2, QFFT, Base처럼 "To solve the equation …"으로 시작해 짧게 풉니다.</p></figure>
+<!-- /xp-q77 -->
 
-```
-<|im_start|>system
-Please reason step by step, and put your final answer within \boxed{}.<|im_end|>
-<|im_start|>user
-If $2^8=4^x$, what is the value of $x$?<|im_end|>
-<|im_start|>assistant
-```
-
-입력 ② 시스템 프롬프트 제거
-
-```
-<|im_start|>user
-If $2^8=4^x$, what is the value of $x$?<|im_end|>
-<|im_start|>assistant
-```
-
-입력 ③ 문제 글만
-
-```
-If $2^8=4^x$, what is the value of $x$?
-```
-
-**표 읽는 법.** 한 줄이 "모델 + 입력" 하나입니다. 길이는 그 문항을 여러 번 풀게 한 답의 tokens(가장 짧은 답–가장 긴 답, 평균)이고, 마지막 칸은 실제 답의 첫머리입니다.
+**표 읽는 법.** 한 줄이 "모델 + 입력" 하나입니다. 입력 ①, ②, ③은 위 그림의 세 입력입니다. 길이는 그 문항을 여러 번 풀게 한 답의 tokens(가장 짧은 답–가장 긴 답, 평균)이고, 마지막 칸은 실제 답의 첫머리입니다.
 
 | 모델 | 입력 | 길이 (tokens) | 정답 수 | 실제 답의 첫머리 |
 |---|---|---|---|---|
@@ -101,31 +132,6 @@ If $2^8=4^x$, what is the value of $x$?
 | SFT | ③ | 211–308, 평균 239 | 4/4 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. Let's start by expressing 4 as a power of 2. |
 | A2 | ② | 211–226, 평균 217 | 4/4 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. |
 | QFFT | ③ | 295–518, 평균 373 | 4/4 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. |
-
-SFT가 입력 ①에 낸 첫 답(656 tokens)의 앞과 끝입니다.
-
-```
-Okay, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. I know that both 2 and 4 are powers of 2. Wait, maybe I can rewrite 4 as 2 squared. Yeah, that makes sense. So 4 is 2^2. Therefore, 4^x would be (2^2)^x. I remember that when you have an exponent raised to another exponent, you multiply them.
-(가운데 생략)
-Maybe the questioner wants me to show steps, so here we are. Just converting between exponents. Powers of 2. Logarithms too. All leading to x=4.
-
-**Final Answer**
-The value of \( x \) is \boxed{4}.
-```
-
-같은 SFT가 입력 ③에 낸 첫 답(224 tokens)의 앞과 끝입니다.
-
-```
- To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. Let's start by expressing 4 as a power of 2. Since \(4 = 2^2\), we can rewrite the equation as:
-(가운데 생략)
-Solving for \(x\), we divide both sides by 2:
-
-\[
-x = \frac{8}{2} = 4
-\]
-
-Thus, the value of \(x\) is \(\boxed{4}\).
-```
 
 - 같은 SFT가 입력 ①에는 "Okay, so I need to …"로 시작해 혼잣말하듯 길게 풀고, 입력 ③에는 Base, A2, QFFT와 같은 "To solve the equation …"으로 시작해 짧게 풉니다. 가중치는 같고 입력만 다릅니다.
 - 이 문항에서는 시스템 프롬프트만 뺀 입력 ②로도 SFT가 여전히 "Okay"로 시작해 길게 풀었습니다(평균 850 tokens). 대화 틀까지 빼야 짧아졌습니다. 500문항 전체로는 입력 ②에서도 평균이 6,576에서 4,899 tokens로 줍니다(위 메인 표).

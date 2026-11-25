@@ -111,6 +111,10 @@ def page(site, title, body, depth, active):
 '''
 
 
+def method_name(d):  # 머리말 method_name: 아이디어 후보의 방법에 붙인 이름. 목록의 제목 앞에 굵게 보인다
+    return f'<strong>{esc(d["method_name"])}</strong>: ' if d.get('method_name') else ''
+
+
 def method_examples(d, *, expanded=False):
     blocks = []
     fields = [('problem', '문제와 입력'), ('comparison', '비교 방법'), ('assessment', '판정')]
@@ -132,7 +136,7 @@ def exp_row(d, r, *, show_rank=False):
         date = f'<span><strong>{label}</strong><br>{date}</span>'
     return (f'<li class="row" data-status="{esc(d.get("status"))}" data-project="{esc(d.get("project"))}" data-idea="{idea_mark(d)}">'
             f'{date}{pill(d.get("status"))}{idea_pill(d)}'
-            f'<a class="title" href="{r}experiments/{quote(d["slug"])}.html">{esc(d.get("title") or d["slug"])}</a>{proj}{summ}'
+            f'<a class="title" href="{r}experiments/{quote(d["slug"])}.html">{method_name(d)}{esc(d.get("title") or d["slug"])}</a>{proj}{summ}'
             f'{method_examples(d) if show_rank else ""}</li>')
 
 
@@ -265,7 +269,8 @@ pj.addEventListener('change',apply);apply();}})();
 </script>'''
     write('experiments/index.html', page(site, '실험 기록', body, 1, 'experiments'))
     for d in exps:
-        meta = ' · '.join(x for x in [d['date'].isoformat(), esc(d.get('project')) if d.get('project') else '', pill(d.get('status')), idea_pill(d)] if x)
+        meta = ' · '.join(x for x in [d['date'].isoformat(), esc(d.get('project')) if d.get('project') else '', pill(d.get('status')), idea_pill(d),
+                                      f'방법 이름 <strong>{esc(d["method_name"])}</strong>' if d.get('method_name') else ''] if x)
         examples = method_examples(d, expanded=True)
         if examples:
             examples = f'<section class="prose" id="method-examples"><h2>방법론 예시</h2>{examples}</section>'
@@ -380,6 +385,7 @@ def selftest():
             path = t / 'content/experiments' / f'{slug}.md'
             meta = dict(idea='후보', idea_rank=rank, project='QFFT')
             if rank == 1:
+                meta['method_name'] = 'TopName'
                 meta['method_examples'] = [dict(kind='실험 설계 예시', title='부등식 풀기',
                                                problem='1 < x < 3', comparison='두 조건', assessment='정답 2')]
             path.write_text('---\n' + yaml.safe_dump(meta, allow_unicode=True) + '---\n', encoding='utf-8')
@@ -402,12 +408,13 @@ def selftest():
         assert '<details class="method-example">' in rp and '<details class="method-example" open>' in top
         assert all('<dd>1 &lt; x &lt; 3</dd>' in page_text for page_text in (rp, top))
         # 순위는 연구 주제 글에서만: 후보가 순위대로 먼저, 그 밖의 글은 뒤에
-        assert rp.index(f'<h2>{IDEA}</h2>') < rp.index('>1순위<') < rp.index('>2026-10-01-top</a>') < rp.index('>2순위<') < rp.index('>2026-11-10-second</a>') < rp.index('>순위 검토 중<') < rp.index('>공개 기록</a>')
-        assert rp.count('>공개 기록</a>') == 1 and rp.count('>2026-10-01-top</a>') == 1
+        assert rp.index(f'<h2>{IDEA}</h2>') < rp.index('>1순위<') < rp.index('2026-10-01-top</a>') < rp.index('>2순위<') < rp.index('>2026-11-10-second</a>') < rp.index('>순위 검토 중<') < rp.index('>공개 기록</a>')
+        assert rp.count('>공개 기록</a>') == 1 and rp.count('<strong>TopName</strong>: 2026-10-01-top</a>') == 1
+        assert '방법 이름 <strong>TopName</strong>' in top and '<strong>TopName</strong>: 2026-10-01-top</a>' in ix
         # 여러 연구가 섞인 실험 기록 목록에는 순위도 후보 묶음도 없다
         assert '순위<' not in ix and f'<h2>{IDEA}</h2>' not in ix and '<details class="method-example">' not in ix
         assert ix.index('<h2>2026년 11월</h2>') < ix.index('>공개 기록</a>') < ix.index('>뺀 기록</a>') and ix.count('>공개 기록</a>') == 1
-        assert ix.index('<h2>2026년 11월</h2>') < ix.index('>2026-11-10-second</a>') and ix.index('<h2>2026년 10월</h2>') < ix.index('>2026-10-01-top</a>')
+        assert ix.index('<h2>2026년 11월</h2>') < ix.index('>2026-11-10-second</a>') and ix.index('<h2>2026년 10월</h2>') < ix.index('2026-10-01-top</a>')
         assert 'data-idea="1"' in ix and 'data-status="__idea"' in ix and 'data-idea="x"' in ix and 'data-status="__noidea"' in ix
         assert 'class="pill noidea"' in (out / 'experiments/2026-11-06-d.html').read_text(encoding='utf-8')
         k = (out / 'talks/2026-11-03-c.html').read_text(encoding='utf-8')

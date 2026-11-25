@@ -5,6 +5,7 @@ project: QFFT
 status: 진행 중
 idea: 후보
 idea_rank: 10
+method_name: StatePick
 method_examples:
   - title: 같은 중간 풀이에서 다음 행동 다섯 가지를 실제로 이어 써 보기
     kind: 실험 설계 예시
@@ -14,6 +15,8 @@ method_examples:
 summary: 적응형 추론을 길이 조절이 아니라, 풀이 상태를 보고 계속, 탐색, 전환, 검증, 종료를 고르는 능력으로 다시 정리했습니다. 이 생각의 뼈대는 우리가 이미 여러 번 시험했고 대부분 기준에 못 미쳤으며, 같은 방향의 선행 연구도 여럿 있습니다. 남은 빈칸 두 가지와, 방법으로 갈지를 가르는 첫 실험을 적었습니다.
 published: true
 ---
+
+**방법 이름: StatePick.** 풀이의 상태(state)를 보고 다음 행동을 고른다(pick)는 방향에 붙인 이름입니다.
 
 ## 한 줄 요약
 

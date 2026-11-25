@@ -59,6 +59,25 @@ published: true
 
 <!-- qfft-main-table-end -->
 
+## 실제 입력과 실제 답: 문항 하나
+
+<!-- xp-causal -->
+<figure class="xp"><p class="xp-t">시스템 프롬프트 칸에 무관한 문장을 넣어 두 모델에 줍니다 (GSM8K 문항 55, 정답 14)</p><div class="xp-cols"><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class=""><span class="xp-hit">The harbor town holds a small fish market every Saturday near the old pier.</span></div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">Jean has 30 lollipops. Jean eats 2 of the lollipops. With the remaining lollipops, Jean wants to package 2 lollipops in one bag. How many bags can Jean fill?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">입력: 두 모델 동일</div></div><div class="xp-note"><b>두 모델의 차이</b>기존 SFT는 학습 때 시스템 프롬프트로 "Please reason step by step, …"를 봤습니다. 새 단서 SFT는 같은 자료에서 그 문장만 위의 빨간 문장으로 바꿔 학습했습니다. 그 밖의 학습 설정은 같습니다.<b>미리 적은 예측</b>새 단서 SFT는 자기가 학습 때 본 이 문장이 있을 때만 길게 풀 것이다.<b>결과</b>새 단서 SFT는 이 문장이 있든 없든 길게 풀었습니다. 예측이 틀렸습니다.</div></div><div class="xp-cols" style="margin-top:14px"><div><p class="xp-name">기존 SFT: 97 tokens, 답 14는 맞지만 \boxed{} 없이 끝나 공식 채점은 오답</p><pre class="xp-ex">Jean initially has 30 lollipops. After eating 2, she has 30 - 2 = 28 lollipops left. She wants to package them in bags with 2 lollipops each. 
+To find out how many bags she can fill, divide the remaining lollipops by the number per bag: 28 ÷ 2 = 14. 
+So Jean can fill 14 bags.</pre></div><div><p class="xp-name">새 단서 SFT: 515 tokens, 정답</p><pre class="xp-ex"><span class="xp-hit">Okay</span>, let me try to figure this problem out step by step. It's about Jean and lollipops. Hmm. Let's see...
+First, the problem says Jean has 30 lollipops. Then, Jean eats 2 of them. So, I need to …
+<span class="xp-sp">(가운데 줄임)</span>
+… the answer is 14. So, I think that's correct.
+**Final Answer**
+Jean can fill \boxed{14} bags.</pre></div><div><p class="xp-name">새 단서 SFT, 시스템 프롬프트 칸을 비움: 1,005 tokens, 정답</p><pre class="xp-ex"><span class="xp-hit">Okay</span>, let me try to figure this out. So, Jean starts with 30 lollipops. Then she eats 2 of them. Hmm, so how many are left? Let me subtract: 30 - 2 = 28. So, she has 28 lollipops left.
+Now, she wants …
+<span class="xp-sp">(가운데 줄임)</span>
+… eaten ones. So, that's correct.
+So, yes, the answer is 14. So, I think I'm good.
+**Final Answer**
+\boxed{14}</pre></div></div><div class="xp-legend"><span><i class="xp-sw" style="box-shadow:inset 0 0 0 2px var(--xp-ctx)"></i>입력으로 읽기만 함</span><span><i class="xp-sw" style="background:var(--sheet);border-color:var(--ink)"></i>모델이 새로 생성</span></div><p class="xp-cap">글상자는 저장된 실제 출력입니다(가운데는 줄였습니다). 한 문항의 예시이고, 판정은 본문 표의 200문항 값으로 냈습니다.</p></figure>
+<!-- /xp-causal -->
+
 ## 한 줄 요약
 
 - **미리 적은 예측은 틀렸습니다.** 주 판정은 "반대"입니다. 무관한 문장 X로 학습한 모델에서 X는 긴 풀이를 켜는 단서가 되지 않았습니다.
@@ -131,6 +150,33 @@ published: true
 **무엇을 했나.** 파인튜닝하기 전의 모델(Qwen2.5-7B-Instruct)에 같은 문항을 같은 여덟 가지 입력으로 줬습니다. 묻는 것은 "지시문 S는 학습 전부터 답을 길게 만드는가"입니다. 그렇다면 기존 SFT에서 S가 긴 풀이를 켜는 것이 학습 때문이 아닐 수 있습니다. 결과를 보기 전에 기준("S를 붙인 답의 길이가 1.25배 이상이고 구간 아래쪽이 1을 넘으면 학습 전부터 뚜렷이 길어짐")과 예측("두 입력 형식 모두 1.25배 미만")을 적어 두었습니다.
 
 **실험 예시.** 위 예시의 사탕 문제(정답 14)를 학습 전 모델에 줬습니다.
+
+<!-- xp-base -->
+<figure class="xp"><p class="xp-t">학습 전 모델에 지시문 S를 두 가지로 줍니다 (Qwen2.5-7B-Instruct, GSM8K 문항 55, 정답 14)</p><div class="xp-cols"><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">Jean has 30 lollipops. Jean eats 2 of the lollipops. With the remaining lollipops, Jean wants to package 2 lollipops in one bag. How many bags can Jean fill?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">대화 틀의 시스템 프롬프트 칸에 S</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="">Jean has 30 lollipops. Jean eats 2 of the lollipops. With the remaining lollipops, Jean wants to package 2 lollipops in one bag. How many bags can Jean fill?</div></div></div><div class="xp-turn"><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">대화 표지 없이 S + 문제 글</div></div></div><div class="xp-cols" style="margin-top:14px"><div><p class="xp-name">대화 틀: 161 tokens, 정답</p><pre class="xp-ex">Let's break down the problem step by step:
+1. Jean starts with 30 lollipops.
+2. Jean eats 2 lollipops. So, the number of lollipops left is:
+   \[
+   30 - 2 = 28
+   \]
+3. …
+<span class="xp-sp">(가운데 줄임)</span>
+… number of lollipops per bag:
+   \[
+   \frac{28}{2} = 14
+   \]
+Therefore, Jean can fill \(\boxed{14}\) bags.</pre></div><div><p class="xp-name">대화 표지 없음: 최대 길이 32,000 tokens까지 감(채점은 오답)</p><pre class="xp-ex"> Let's break down the problem step by step:
+
+1. Jean starts with 30 lollipops.
+2. Jean eats 2 lollipops. So, we need to …
+<span class="xp-sp">(가운데 줄임)</span>
+… 2:
+   \[
+   28 \div 2 = 14
+   \]
+
+Therefore, Jean can fill <span class="xp-hit">\boxed{14}</span> bags. <span class="xp-hit">\boxed{14}</span> is the final answer. <span class="xp-hit">\boxed{14}</span> is the final answer. <span class="xp-hit">\boxed{14}</span> is the final answer. <span class="xp-hit">\boxed{14}</span> is the final answer. \boxe …
+<span class="xp-sp">(160 tokens 지점에서 정답을 쓴 뒤 같은 문장을 32,000 tokens까지 되풀이)</span></pre></div></div><div class="xp-legend"><span><i class="xp-sw" style="box-shadow:inset 0 0 0 2px var(--xp-ctx)"></i>입력으로 읽기만 함</span><span><i class="xp-sw" style="background:var(--sheet);border-color:var(--ink)"></i>모델이 새로 생성</span></div><p class="xp-cap">글상자는 저장된 실제 출력입니다. 두 답의 풀이와 답은 같습니다. 대화 표지가 없는 입력에서는 답을 쓴 뒤 생성을 끝내지 못했습니다.</p></figure>
+<!-- /xp-base -->
 
 | 입력 | 학습 전 모델의 답 |
 |---|---|

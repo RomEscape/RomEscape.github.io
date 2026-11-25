@@ -5,6 +5,7 @@ project: QFFT
 status: 진행 중
 idea: 후보
 idea_rank: 6
+method_name: TwoRoute
 method_examples:
   - title: 같은 문제에서 긴 풀이가 시작되는 자리 보기
     kind: 실제 실험 예시
@@ -14,6 +15,8 @@ method_examples:
 summary: 긴 풀이가 어디서 시작되는지를 저장된 답으로 쟀습니다. 단서가 있으면 첫 낱말부터 긴 풀이로 시작하고, 단서가 없으면 원래 모델처럼 풀다가 600–900 tokens쯤에서 되묻기가 나오며 길어집니다. 뒤의 길은 세 모델에서 같은 난도 곡선이고, 문제를 읽은 직후의 상태만으로 어느 문항이 그렇게 될지 갈렸습니다.
 published: true
 ---
+
+**방법 이름: TwoRoute.** 긴 풀이로 들어가는 두 길(단서가 켜는 길, 풀다가 켜지는 길)을 나눠 재는 분석입니다.
 
 ## 연구 질문
 

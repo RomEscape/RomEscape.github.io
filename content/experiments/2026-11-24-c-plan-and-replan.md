@@ -5,6 +5,7 @@ project: QFFT
 status: 진행 중
 idea: 후보
 idea_rank: 7
+method_name: DecideTwice
 method_examples:
   - title: 답을 구한 뒤에도 문단 첫머리마다 다시 따져 보는 풀이
     kind: 실제 실험 예시
@@ -19,6 +20,8 @@ method_examples:
 summary: 적응형 추론을 두 단계로 나눠 봅니다. 풀기 전에 문제를 보고 길게 풀지 정하는 단계와, 풀다가 문단이 바뀔 때마다 더 따져 볼지 다시 정하는 단계입니다. 지금까지의 결과로는 시스템 프롬프트 같은 단서가 두 단계의 기준선을 옮깁니다. 두 기준선을 따로 움직이는 실험들을 설계했습니다.
 published: true
 ---
+
+**방법 이름: DecideTwice.** 풀기 전에 한 번, 풀다가 한 번, 얼마나 길게 풀지를 두 번 정하게 한다는 설계에 붙인 이름입니다.
 
 ## 한 줄 요약
 
