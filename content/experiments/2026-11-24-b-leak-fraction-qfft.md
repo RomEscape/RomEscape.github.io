@@ -27,7 +27,7 @@ published: true
 | 그때까지 안 해 본 것 | 모델마다 답 길이의 크기가 달라서 한 표에 놓고 견준 적이 없었습니다. 이 둘을 이어서 본 연구도 찾지 못했습니다. |
 | 그래서 한 것 | 길이를 모델끼리 견줄 수 있는 값으로 바꿨습니다. 파인튜닝으로 늘어난 답 길이 가운데 그 조건에서 얼마가 남았는지입니다(0이면 학습 전 모델과 같은 길이, 1이면 표준 SFT가 평소 입력으로 풀 때와 같은 길이). 이미 저장된 평가 결과만으로 계산했습니다. |
 | 답 | 학습 때의 입력 요소가 평가 입력에 그대로 있는 모델은 쉬운 문제든 어려운 문제든 늘 길게 풀었습니다(남은 몫 약 1). 그 요소가 없으면 쉬운 문제에서는 조금만 남고 어려운 문제에서는 거의 다 남았습니다. 문제 문장만 줬을 때 표준 SFT는 0.08(GSM8K), 0.49(MATH500), 0.87(AIME25)이고 QFFT는 0.16, 0.55, 0.90이었습니다. |
-| 다음 의문 | 긴 풀이를 켜는 입력 요소는 정확히 무엇인가? 시스템 프롬프트뿐인가, 대화 표지도인가? 다르게 학습한 모델은 다른 요소에 기대는가? ([단서 사다리](2026-11-24-d-cue-ladder.html)) |
+| 다음 의문 | 긴 풀이를 켜는 입력 요소는 정확히 무엇인가? 시스템 프롬프트뿐인가, 프롬프트 템플릿도인가? 다르게 학습한 모델은 다른 요소에 기대는가? ([단서 사다리](2026-11-24-d-cue-ladder.html)) |
 
 질문의 사슬 전체는 [연구 질문으로 다시 쓴 QFFT 연구](2026-11-25-a-research-questions.html)에 있습니다.
 
@@ -44,8 +44,8 @@ published: true
 | 기준 | A1 | 기본 프롬프트 | 91.4 | 1,856 | 80.9 | 6,149 | 17.5 | 18,965 |
 | 기준 | **A2** | 기본 프롬프트 | **91.6** | **888** | **81.3** | **4,587** | **17.5** | **17,735** |
 | 기준 | **QFFT** | 기본 프롬프트 | **92.0** | **831** | **81.4** | **4,630** | **15.4** | **18,133** |
-| 방법 (SysDrop) | SFT | 시스템 프롬프트 제거 | 91.0 | 1,517 | 80.9 | 4,899 | 19.2 | 18,382 |
-| 방법 (CueDrop) | SFT | 문제 글만 | 대기 | 대기 | 81.4 | 4,221 | 대기 | 대기 |
+| 방법 (SPFI) | SFT | 시스템 프롬프트 제거 | 91.0 | 1,517 | 80.9 | 4,899 | 19.2 | 18,382 |
+| 방법 (QOI) | SFT | 문제 글만 | 대기 | 대기 | 81.4 | 4,221 | 대기 | 대기 |
 | 참고 | A1 | 시스템 프롬프트 제거 | 91.5 | 587 | 81.6 | 3,778 | 12.5 | 16,270 |
 | 참고 | A2 | 시스템 프롬프트 제거 | 91.6 | 514 | 82.0 | 3,948 | 값 없음 | 값 없음 |
 | 참고 | QFFT | 시스템 프롬프트 제거 | 91.3 | 630 | 82.5 | 4,122 | 값 없음 | 값 없음 |
@@ -53,10 +53,10 @@ published: true
 
 - **모델.** Base는 파인튜닝 전의 Qwen2.5-7B-Instruct입니다. 나머지는 모두 LIMO 817문항으로 학습했습니다. SFT는 QFFT 논문이 비교 기준으로 쓴 표준 SFT로, 시스템 프롬프트와 질문, 긴 풀이를 그대로 학습한 모델입니다. A1은 질문을 지우고, A2는 질문을 지우고 응답 첫 토큰의 loss까지 빼고, QFFT는 논문 방법대로 질문 없이 풀이만으로 학습한 모델입니다.
 - **무엇을 견주는가.** A2와 QFFT는 학습 방법을 바꿔 새로 학습한 모델입니다. 방법 줄은 표준 SFT의 가중치를 그대로 두고 추론 입력만 바꾼 것입니다. A2나 QFFT 위에 얹은 것이 아니라, A2, QFFT와 나란히 견주는 다른 길입니다. 같은 입력 변경을 A1, A2, QFFT에 얹어 본 값은 참고 줄에 따로 두었습니다.
-- **추론 입력.** 기본 프롬프트는 대화 틀, 시스템 프롬프트 "Please reason step by step, and put your final answer within \boxed{}.", 질문으로 이루어집니다. 시스템 프롬프트 제거는 거기서 시스템 프롬프트만 뺀 입력이고, 문제 글만은 대화 틀까지 빼고 질문 글자만 준 입력입니다. 실제 문자열은 아래 "실제 입력과 실제 답"에 있습니다.
+- **추론 입력.** 기본 프롬프트는 프롬프트 템플릿, 시스템 프롬프트 "Please reason step by step, and put your final answer within \boxed{}.", 질문으로 이루어집니다. 시스템 프롬프트 제거는 거기서 시스템 프롬프트만 뺀 입력이고, 문제 글만은 프롬프트 템플릿까지 빼고 질문 글자만 준 입력입니다. 실제 문자열은 아래 "실제 입력과 실제 답"에 있습니다.
 - **크기.** GSM8K 1,319문항, MATH500 500문항, AIME25 30문항입니다. 기본 프롬프트 줄은 문항마다 16회, 나머지 줄은 4회 풀게 했습니다. 최대 32,000 tokens입니다.
 - **채점.** GSM8K와 MATH500의 ACC는 `\boxed{}` 없이 끝난 답을 직접 읽어 반영하고, 표기만 다른 같은 답을 맞게 고친 값입니다(GSM8K는 평가 자료의 정답 16문항도 바로잡았습니다). AIME25는 공식 채점 스크립트 값 그대로입니다.
-- **읽기.** MATH500에서 표준 SFT에 문제 글만 준 줄(CueDrop)은 ACC 81.4%, 4,221 tokens입니다. A2(81.3%, 4,587)와 QFFT(81.4%, 4,630)와 정답률이 같고 8–9% 짧습니다. GSM8K와 AIME25의 같은 칸은 아직 돌지 않았습니다. 참고 줄을 보면 A2와 QFFT도 시스템 프롬프트를 빼면 더 짧아집니다(3,948, 4,122 tokens).
+- **읽기.** MATH500에서 표준 SFT에 문제 글만 준 줄(QOI)은 ACC 81.4%, 4,221 tokens입니다. A2(81.3%, 4,587)와 QFFT(81.4%, 4,630)와 정답률이 같고 8–9% 짧습니다. GSM8K와 AIME25의 같은 칸은 아직 돌지 않았습니다. 참고 줄을 보면 A2와 QFFT도 시스템 프롬프트를 빼면 더 짧아집니다(3,948, 4,122 tokens).
 
 <!-- qfft-main-table-end -->
 
@@ -65,7 +65,7 @@ published: true
 문항은 MATH500의 Level 1 문제 하나입니다(정답 4). 그림의 칸은 모델에 실제로 넣은 입력이고, 글상자는 저장된 실제 출력입니다.
 
 <!-- xp-q77 -->
-<figure class="xp"><p class="xp-t">같은 SFT, 입력에서 학습 때의 단서만 뺍니다 (MATH500 문항 77, 정답 4)</p><div class="xp-cols"><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">If $2^8=4^x$, what is the value of $x$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">입력 ① 기본 프롬프트(표준 평가)</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">If $2^8=4^x$, what is the value of $x$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">입력 ② 시스템 프롬프트 제거</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div></div><div class="xp-ctx"><div class="">If $2^8=4^x$, what is the value of $x$?</div></div><div class="xp-del"><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">입력 ③ 문제 글만</div></div></div><div class="xp-note"><b>바꾸는 것</b>추론 입력뿐입니다. ②는 시스템 프롬프트 칸을 뺐고, ③은 대화 표지까지 빼고 문제 글자만 줍니다.<b>그대로 두는 것</b>모델의 가중치(다시 학습하지 않음), 문제, 온도 0.6, top_p 1, 최대 32,000 tokens<b>재는 것</b>같은 문제의 답 길이(tokens)와 정답 여부. ①은 16번, ②와 ③은 4번 풀게 했습니다.</div><div class="xp-cols" style="margin-top:14px"><div><p class="xp-name">SFT, 입력 ①: 16번 모두 정답, 525–2,018 tokens(평균 886)</p><pre class="xp-ex"><span class="xp-hit">Okay</span>, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. I know that both 2 and 4 are powers of 2. Wait, maybe I can rewrite 4 as 2 squared. Yeah, that makes sense. So 4 is 2^2. Therefore, 4^x would be (2^2)^x. I …
+<figure class="xp"><p class="xp-t">같은 SFT, 입력에서 학습 때의 단서만 뺍니다 (MATH500 문항 77, 정답 4)</p><div class="xp-cols"><div class="xp-card"><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">If $2^8=4^x$, what is the value of $x$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">입력 ① 기본 프롬프트(표준 평가)</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div><div class="">If $2^8=4^x$, what is the value of $x$?</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-ctx"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">입력 ② 시스템 프롬프트 제거</div></div><div class="xp-card"><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">system</div><div class="">Please reason step by step, and put your final answer within \boxed{}.</div><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">user</div></div><div class="xp-ctx"><div class="">If $2^8=4^x$, what is the value of $x$?</div></div><div class="xp-del"><div class="xp-sp">&lt;|im_end|&gt;</div></div></div><div class="xp-turn"><div class="xp-del"><div class="xp-sp">&lt;|im_start|&gt;</div><div class="xp-role">assistant</div></div><div class="">(끝까지 새로 생성)</div></div><div class="xp-name">입력 ③ 문제 글만</div></div></div><div class="xp-note"><b>바꾸는 것</b>추론 입력뿐입니다. ②는 시스템 프롬프트 칸을 뺐고, ③은 프롬프트 템플릿까지 빼고 문제 글자만 줍니다.<b>그대로 두는 것</b>모델의 가중치(다시 학습하지 않음), 문제, 온도 0.6, top_p 1, 최대 32,000 tokens<b>재는 것</b>같은 문제의 답 길이(tokens)와 정답 여부. ①은 16번, ②와 ③은 4번 풀게 했습니다.</div><div class="xp-cols" style="margin-top:14px"><div><p class="xp-name">SFT, 입력 ①: 16번 모두 정답, 525–2,018 tokens(평균 886)</p><pre class="xp-ex"><span class="xp-hit">Okay</span>, so I need to solve this equation: 2^8 = 4^x. Hmm, let me see. I know that both 2 and 4 are powers of 2. Wait, maybe I can rewrite 4 as 2 squared. Yeah, that makes sense. So 4 is 2^2. Therefore, 4^x would be (2^2)^x. I …
 <span class="xp-sp">(가운데 줄임)</span>
 … here we are. Just converting between exponents. Powers of 2. Logarithms too. All leading to x=4. 
 **Final Answer**
@@ -130,21 +130,21 @@ Thus, the value of \(x\) is \(\boxed{4}\).</pre></div></div><div class="xp-legen
 | QFFT | ③ | 295–518, 평균 373 | 4/4 | To solve the equation \(2^8 = 4^x\), we need to express both sides of the equation with the same base. |
 
 - 같은 SFT가 입력 ①에는 "Okay, so I need to …"로 시작해 혼잣말하듯 길게 풀고, 입력 ③에는 Base, A2, QFFT와 같은 "To solve the equation …"으로 시작해 짧게 풉니다. 가중치는 같고 입력만 다릅니다.
-- 이 문항에서는 시스템 프롬프트만 뺀 입력 ②로도 SFT가 여전히 "Okay"로 시작해 길게 풀었습니다(평균 850 tokens). 대화 틀까지 빼야 짧아졌습니다. 500문항 전체로는 입력 ②에서도 평균이 6,576에서 4,899 tokens로 줍니다(위 메인 표).
+- 이 문항에서는 시스템 프롬프트만 뺀 입력 ②로도 SFT가 여전히 "Okay"로 시작해 길게 풀었습니다(평균 850 tokens). 프롬프트 템플릿까지 빼야 짧아졌습니다. 500문항 전체로는 입력 ②에서도 평균이 6,576에서 4,899 tokens로 줍니다(위 메인 표).
 
 
 ## 한 줄 요약
 
 - QFFT는 "쉬운 문제는 짧게, 어려운 문제는 길게" 푸는 것을 자기 학습 방법의 장점으로 보고했습니다.
 - 같은 모양이 다른 곳에서도 나옵니다. 평범하게 학습한 SFT에서 **시스템 프롬프트만 빼도**, 공개 모델에서 학습 프롬프트를 빼도, 쉬운 문제에서는 긴 풀이가 조금만 남고 어려운 문제에서는 거의 전부 남습니다.
-- 반대로 긴 풀이가 묶인 단서(학습 때 늘 있던 시스템 프롬프트와 대화 틀)가 평가 입력에 그대로 있는 모델은 난도와 무관하게 늘 길게 풉니다.
+- 반대로 긴 풀이가 묶인 단서(학습 때 늘 있던 시스템 프롬프트와 프롬프트 템플릿)가 평가 입력에 그대로 있는 모델은 난도와 무관하게 늘 길게 풉니다.
 - 위 분석은 새로 생성한 답 없이 저장된 평가 결과로 계산했습니다.
 - 같은 날 뒤이은 시험에서, "QFFT를 학습 때 형식으로 평가하면 쉬운 문제에서도 길게 풀 것"이라는 예측은 틀린 것으로 나왔습니다(아래 "뒤이은 시험").
 
 ## 왜 궁금했나
 
 - 같은 날 앞 글에서, 학습 프롬프트를 뺀 공개 모델은 원래 모델로 돌아가지 않고 어려운 문제일수록 긴 풀이가 더 많이 남았습니다.
-- QFFT는 학습할 때 질문, 시스템 프롬프트, 대화 표지를 모두 지우고 풀이 글만 학습합니다. 그런데 평가할 때는 대화 틀, 시스템 프롬프트, 질문이 모두 들어갑니다. QFFT 모델은 늘 "학습 때 없던 입력"에서 쓰이는 셈입니다.
+- QFFT는 학습할 때 질문, 시스템 프롬프트, 프롬프트 템플릿를 모두 지우고 풀이 글만 학습합니다. 그런데 평가할 때는 프롬프트 템플릿, 시스템 프롬프트, 질문이 모두 들어갑니다. QFFT 모델은 늘 "학습 때 없던 입력"에서 쓰이는 셈입니다.
 - 그렇다면 QFFT의 적응형 추론은 QFFT 학습만의 성질이 아니라, 학습 때의 단서와 평가 입력이 어긋날 때 생기는 공통 모양일 수 있습니다. 이 연결을 다룬 연구는 찾지 못했습니다.
 
 ## 용어 풀이
@@ -154,7 +154,7 @@ Thus, the value of \(x\) is \(\boxed{4}\).</pre></div></div><div class="xp-legen
 | 원래 모델 | 파인튜닝하기 전의 Qwen2.5-7B-Instruct | 문제를 짧게 바로 풂(평균 305–1,564 tokens) |
 | SFT | 질문과 긴 풀이를 그대로 학습한 모델 | 학습 때 시스템 프롬프트 "Please reason step by step, and put your final answer within \boxed{}."가 늘 있었음 |
 | QFFT | 질문 없이 풀이만 학습하는 논문 방법 | 우리가 재현한 모델과 저자가 공개한 모델, 학습 자료 두 가지(LIMO, S1.1)로 네 모델 |
-| A1 | 학습 때 질문 자리만 비우고 시스템 프롬프트와 대화 틀은 둔 모델 | 우리가 학습 |
+| A1 | 학습 때 질문 자리만 비우고 시스템 프롬프트와 프롬프트 템플릿은 둔 모델 | 우리가 학습 |
 | 시스템 프롬프트 없이 학습한 SFT | SFT와 같지만 학습 입력에 시스템 프롬프트가 없던 모델 | 우리가 학습 |
 | 남는 비율 | 파인튜닝으로 늘어난 길이 가운데 그 조건에서 남아 있는 몫 | 0이면 원래 모델과 같고, 1이면 SFT가 기본 시스템 프롬프트로 풀 때와 같음 |
 | 묶음 | 난도가 비슷한 문항 무리 | GSM8K, MATH500 Level 1–5, AMC23, Minerva, AIME24, AIME25의 10개 |
@@ -261,7 +261,7 @@ AIME25의 한 문항입니다.
 
 ## 뒤이은 시험: QFFT를 학습 때 형식으로 평가 (같은 날 추가)
 
-위 결과에서 한 가지 예측을 세워 시험했습니다. QFFT는 대화 틀과 시스템 프롬프트 없이 풀이 글만 학습했으니, 평가도 그 형식(문제 글만)으로 하면 쉬운 문제에서도 길게 풀 것이라는 예측입니다.
+위 결과에서 한 가지 예측을 세워 시험했습니다. QFFT는 프롬프트 템플릿과 시스템 프롬프트 없이 풀이 글만 학습했으니, 평가도 그 형식(문제 글만)으로 하면 쉬운 문제에서도 길게 풀 것이라는 예측입니다.
 
 | 벤치마크 | 남는 비율: 학습 형식(문제 글만) | 남는 비율: 대화 형식 | 학습 형식의 평균 길이 | 긴 풀이 비율 |
 |---|---|---|---|---|
@@ -302,7 +302,7 @@ AIME25의 한 문항입니다.
 
 | 이번 분석 | 가장 가까운 자료 | 이번에 다른 점 |
 |---|---|---|
-| QFFT의 적응형 추론을 다른 조건과 한 지표로 비교 | QFFT(2506.12860)는 질문과 시스템 프롬프트, 대화 표지를 함께 지우고 학습한 결과로 보고. 저장소의 저자 댓글에 "시스템 프롬프트를 두든 빼든 QFFT 학습 결과가 비슷했다"는 한 줄이 있음 | 평범한 SFT에서 평가 때 시스템 프롬프트만 빼도 같은 모양이 나온다는 것, 단서가 그대로 있는 모델에서는 안 나온다는 것을 같은 지표로 보임 |
+| QFFT의 적응형 추론을 다른 조건과 한 지표로 비교 | QFFT(2506.12860)는 질문과 시스템 프롬프트, 프롬프트 템플릿를 함께 지우고 학습한 결과로 보고. 저장소의 저자 댓글에 "시스템 프롬프트를 두든 빼든 QFFT 학습 결과가 비슷했다"는 한 줄이 있음 | 평범한 SFT에서 평가 때 시스템 프롬프트만 빼도 같은 모양이 나온다는 것, 단서가 그대로 있는 모델에서는 안 나온다는 것을 같은 지표로 보임 |
 | 학습 자료의 연결이 추론을 켜는 단서를 정한다는 원리 | "Base Models Can Reason By Taking a Cue From Training Data"(2610.06851). 학습 자료의 낱말이나 지시문 구절을 무관한 것으로 바꿔 학습하면 그것이 추론 단서가 됨. 대화 형식을 배우기 전의 모델, 지표는 정답률 | 이 원리를 QFFT에 적용해, QFFT의 길이 배분이 "단서가 평가 입력에 없어서" 나온다는 것을 평범한 SFT와 나란히 보임. 원리는 새것이 아님 |
 | 프롬프트만 바꿔 난도별 배분을 얻을 수 있는가 | AutoThink(2505.10832)는 R1 증류 모델에서 "프롬프트만으로는 난도에 따른 배분이 나오지 않는다"고 보고. Reasoning Shift(2604.01161)는 입력 조건이 달라지면 추론이 짧아지고 정확도가 내려간다고 보고 | 우리 결과는 긴 풀이로 SFT한 모델에서 학습 단서를 빼면 난도별 배분이 나오고 MATH500 정답률이 유지된다는 것. 모델 계열이 달라 맞서는 결과로 함께 적고, R1 증류 모델에서의 확인을 계획 |
 | 학습 때의 조건에 행동이 묶인다는 틀 | 학습 때 넣은 시스템 프롬프트에 성향이 묶여, 빼면 그 성향이 줄어든다는 연구들(2510.04340, 2510.05024). 모두 안전 성향 대상 | 추론 길이에 적용하고, 줄어드는 정도가 난도에 따라 달라진다는 점을 봄 |

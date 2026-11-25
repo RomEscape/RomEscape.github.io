@@ -18,7 +18,7 @@ published: true
 | 그때까지 안 해 본 것 | 지금까지는 모두 같은 step 수(10 epoch)로만 견줬습니다. |
 | 그래서 한 것 | CODI의 학습 시간(19.1시간)만큼 Middleflow(12.73 epoch)와 Latent 없음(15.52 epoch)을 처음부터 다시 학습하고 있습니다. Latent 없음은 "더 학습한 덕"을 가르는 대조군입니다. |
 | 답 | 아직 없습니다. Middleflow는 11월 25일 20:50, Latent 없음은 26일 06:50쯤 학습이 끝납니다. |
-| 다음 의문 | 같은 시간과 같은 FLOPs는 다른 기준입니다. FLOPs로 맞추면 Middleflow가 더 학습할 수 있는 양은 2.7%뿐입니다([FLOPs와 실제 시간](2026-11-25-mf-p-flops-vs-time.html)). 같은 추론 계산량을 학습부터 맞추는 비교(latent 14개 Middleflow)는 GPU가 비는 대로 합니다. |
+| 다음 의문 | 같은 시간과 같은 FLOPs는 다른 기준입니다. FLOPs로 맞추면 Middleflow가 더 학습할 수 있는 양은 2.7%뿐입니다([FLOPs와 실제 시간](2026-11-25-mf-p-flops-vs-time.html)). 같은 추론 계산량을 학습부터 맞추는 비교(latent 14개 Middleflow)는 11월 25일에 학습을 시작했습니다([기존 모델에서 방법 증명](2026-11-25-mf-r-llama-method-proof.html)). |
 
 질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
 
@@ -121,12 +121,12 @@ Middleflow는 CODI보다 GSM8K에서 2.96점([−5.09, −0.82]), GSM-Hard에서
 
 | 모델 | 시작 | 지금 (10:38) | step당 | 끝 예정 | 그다음 (같은 GPU) |
 |---|---|---|---:|---|---|
-| Middleflow, 38,166 step | 11-25 03:30 | 15,590 step (5.2 epoch) | 1.62초 | 11-25 20:50쯤 | GPT-2 L9→L0 |
-| Latent 없음, 46,554 step | 11-25 05:28 | 9,360 step (3.1 epoch) | 1.95초 | 11-26 06:50쯤 | GPT-2 사선 |
+| Middleflow, 38,166 step | 11-25 03:30 | 15,590 step (5.2 epoch) | 1.62초 | 11-25 20:50쯤 | Llama L6→L0 |
+| Latent 없음, 46,554 step | 11-25 05:28 | 9,360 step (3.1 epoch) | 1.95초 | 11-26 06:50쯤 | Llama L13→L12 |
 
 - step 수는 처음 학습한 GPU에서 잰 학습 시간으로 정했습니다. 지금 GPU는 그 GPU와 속도가 달라, 실제로는 Middleflow 17.2시간, Latent 없음 25.2시간이 걸립니다. 비교 기준은 "처음 GPU에서 CODI가 쓴 19.1시간"입니다.
 - 학습이 끝나면 같은 GPU에서 네 벤치마크를 평가하고, GSM-Symbolic은 10 epoch 모델과 같은 방식으로 평가합니다.
-- 11월 25일 오전에 다음 학습 순서를 바꿨습니다. Middleflow 다음은 사선 대신 GPT-2 L9→L0(목요일 낮까지 결과가 나오도록), Latent 없음 다음은 사선입니다.
+- 11월 25일 낮에 다음 학습을 기존 모델 실험으로 바꿨습니다. Middleflow 다음은 L6→L0(L0부터 7개 layer), Latent 없음 다음은 L13→L12(2개 layer)입니다([기존 모델에서 방법 증명](2026-11-25-mf-r-llama-method-proof.html)).
 
 **같은 시간은 같은 FLOPs가 아닙니다.** 이 실험은 "같은 GPU 시간"을 줍니다. FLOPs로 맞추면 Middleflow는 CODI보다 2.7%(10.27 epoch), Latent 없음은 4.9%(10.49 epoch)만 더 학습할 수 있습니다. latent 계산은 FLOPs로는 작지만 차례로 계산해야 해서 시간이 많이 들기 때문입니다([FLOPs와 실제 시간](2026-11-25-mf-p-flops-vs-time.html)). 결과는 "같은 GPU 시간이면"으로 읽습니다.
 
