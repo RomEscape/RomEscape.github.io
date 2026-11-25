@@ -4,9 +4,34 @@ date: 2026-11-12
 project: Middleflow
 status: 완료
 idea: 후보
+idea_rank: 1
+method_name: InsertDepth
+method_examples:
+  - title: 꺼내는 곳은 같게, 넣는 곳만 L0과 L7로
+    kind: 실제 실험 예시
+    problem: 'Llama-3.2-1B에서 latent를 L13의 출력에서 꺼내는 두 모델을 처음부터 학습합니다. 하나는 다음 자리의 L0에 넣고(L13→L0, latent가 14개 layer를 지남), 다른 하나는 L7에 넣습니다(L13→L7, Middleflow, 7개 layer).'
+    comparison: 'GSM8K 1,319문항에서 두 모델의 정확도를 견주고, 추론 때 latent를 0 벡터로 지웠을 때 얼마나 떨어지는지 봅니다.'
+    assessment: 'L0에 넣은 모델은 53.07로 CODI(53.37)와 같고 Middleflow(50.42)보다 2.65점 [+0.37, +4.94] 높았습니다. latent를 지우면 L0에 넣은 모델은 20.6점, L7에 넣은 모델은 2.2점 떨어졌습니다. 꺼내는 곳이 같아도 넣는 곳이 정확도와 latent에 기대는 정도를 함께 정했습니다.'
 summary: 뽑는 곳(L13)은 그대로 두고 넣는 곳을 L7, L4, L0으로 앞당겼습니다. L13→L0은 CODI와 네 벤치마크 모두 1점 안팎으로 같았고 Middleflow보다 GSM8K가 2.65점 높았습니다. latent를 마지막 layer에서 뽑을 필요는 없었습니다.
 published: true
 ---
+
+<!-- mf-rq-start -->
+
+## 연구 질문
+
+| 순서 | 내용 |
+|---|---|
+| 본 현상 | Middleflow는 CODI보다 GSM8K가 3점 낮고 latent에 덜 기댔습니다. 그런데 Middleflow는 꺼내는 곳(L13)과 넣는 곳(L7)이 둘 다 CODI(L15, L0)와 다릅니다. |
+| 든 의문 | 차이를 만든 것은 꺼내는 곳인가, 넣는 곳인가? |
+| 그때까지 안 해 본 것 | 한쪽만 바꾼 비교가 없었고, latent 논문들도 두 위치를 바꿔 본 적이 없습니다. |
+| 그래서 한 것 | 꺼내는 곳을 L13에 두고 넣는 곳만 L0, L4, L7로 바꿔 처음부터 학습했습니다. |
+| 답 | L13→L0은 CODI와 같았고, L4나 L7에 넣으면 2~3점 낮았습니다. 정확도를 가른 것은 넣는 곳이었고, latent에 기대는 정도도 넣는 곳을 따라갔습니다. |
+| 다음 의문 | 넣는 곳 앞의 layer(L0~L6)는 latent에 무엇을 하길래 빼면 3점을 잃나([쓰지 않는 layer](2026-11-24-mf-n-unused-layer-role.html))? GSM8K에서 같던 L13→L0과 CODI는 바뀐 문항에서도 같은가([더 어려운 문제](2026-11-24-mf-k-harder-benchmarks.html))? |
+
+질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
+
+<!-- mf-rq-end -->
 
 ## 한 줄 요약
 

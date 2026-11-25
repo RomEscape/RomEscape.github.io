@@ -7,6 +7,23 @@ summary: 매 step 직전 latent 대신 첫 latent만 여섯 번 넣도록 처음
 published: true
 ---
 
+<!-- mf-rq-start -->
+
+## 연구 질문
+
+| 순서 | 내용 |
+|---|---|
+| 본 현상 | latent 계산 없이 학습한 모델도 CODI와 정확도가 같았습니다. latent의 역할이 "답 전에 자리를 비워 주는 것"뿐일 수 있습니다. |
+| 든 의문 | step에서 step으로 넘어가는 latent의 내용은 쓰이는가? |
+| 그때까지 안 해 본 것 | latent의 내용만 막고 자리와 계산량은 그대로 둔 모델을 학습한 적이 없었습니다. |
+| 그래서 한 것 | 매 step 직전 latent 대신 첫 latent만 여섯 번 넣도록 처음부터 학습했습니다. |
+| 답 | Middleflow보다 GSM8K가 3.64점 낮았습니다. latent는 쓸모 있는 내용을 넘깁니다. 다만 latent가 아예 없는 모델이 입력 고정보다 높았습니다. |
+| 다음 의문 | 학습된 모델은 답을 쓸 때 latent의 내용을 실제로 읽는가([추론 때 latent 바꾸기](2026-11-12-mf-g-inference-interventions.html))? |
+
+질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
+
+<!-- mf-rq-end -->
+
 ## 한 줄 요약
 
 latent가 step에서 step으로 정보를 넘기지 못하게 막았더니 정확도가 3~4점 떨어졌습니다. latent 내용이 아무 역할도 없는 것은 아닙니다.

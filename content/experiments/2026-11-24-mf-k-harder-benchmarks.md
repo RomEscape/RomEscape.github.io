@@ -7,6 +7,23 @@ summary: GSM8K에서는 latent 없이 학습한 모델과 CODI의 차이가 확�
 published: true
 ---
 
+<!-- mf-rq-start -->
+
+## 연구 질문
+
+| 순서 | 내용 |
+|---|---|
+| 본 현상 | GSM8K에서는 latent 없이 학습한 모델과 CODI의 차이가 확인되지 않았고, 풀이 단계별로 나눠도 판정할 수 없었습니다. |
+| 든 의문 | 학습 자료가 GSM8K 학습 문항에서 만들어져, 익숙한 모양의 문항은 latent 없이도 맞히는 것 아닐까? 이름과 숫자를 바꾸거나 단계를 더한 문항에서는 latent의 몫이 드러나야 합니다. |
+| 그때까지 안 해 본 것 | 같은 모델들을 GSM-Symbolic(같은 문항 틀에서 이름과 숫자를 바꾼 main, 단계를 더한 P1, P2)과 AIME로 견준 적이 없었습니다. |
+| 그래서 한 것 | Llama-1B 아홉 모델을 GSM-Symbolic 세 세트(12,500문항)와 AIME24, AIME25로 평가했습니다. |
+| 답 | AIME는 모두 0점이었습니다. GSM-Symbolic main에서는 CODI가 Latent 없음보다 4.8점 높았습니다. GSM8K에서 CODI와 같던 L13→L0은 바뀐 문항에서 2.5점 낮았습니다. |
+| 다음 의문 | latent의 몫이 확실한 모델에서 Middleflow는 그 몫을 지키는가([GPT-2 Small](2026-11-24-mf-j-gpt2-plan.html))? |
+
+질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
+
+<!-- mf-rq-end -->
+
 ## 한 줄 요약
 
 latent가 "어려운 문제에 강한가"를 보려고 더 어려운 벤치마크로 평가했습니다. 경시 문제(AIME)는 모든 모델이 0점 근처였습니다. GSM8K 문제의 이름과 숫자를 바꾸고 풀이 단계를 더한 GSM-Symbolic에서는, GSM8K에서 보이지 않던 latent의 이득이 나타났습니다.

@@ -4,9 +4,36 @@ date: 2026-11-12
 project: Middleflow
 status: 완료
 idea: 후보
+idea_rank: 3
+method_name: LatentKnockout
+method_examples:
+  - title: 답을 쓰기 직전 latent를 지우면
+    kind: 실제 실험 예시
+    problem: 'GSM8K 50번 "Lloyd has an egg farm. His chickens produce 252 eggs per day and he sells them for $2 per dozen. How much does Lloyd make on eggs per week?" (정답 294)'
+    comparison: '학습은 그대로 두고 추론 때만 latent 6개를 0 벡터로 바꿔, L0에 넣는 CODI와 L7에 넣는 Middleflow가 같은 문항에 무엇을 쓰는지 봅니다.'
+    assessment: 'CODI는 그대로일 때 294, latent를 지우면 42(하루 판매액에서 멈춤)를 썼습니다. Middleflow는 지워도 "<<2*7=14>> <<252/12=21>>The answer is: 294"처럼 풀이를 글로 써서 맞혔습니다. GSM8K 전체에서 지우면 CODI는 26.2점, Middleflow는 2.2점 떨어졌습니다.'
 summary: 학습이 끝난 CODI, L13→L0, Middleflow에서 추론 때만 latent를 비우면 L0에 넣은 두 모델은 15~26점, L7에 넣은 Middleflow는 2~4점 떨어졌습니다. 11-24 다시 보니 latent를 비운 답의 11~46%가 계산식을 글로 쓰고 답했고, Middleflow가 덜 떨어진 데에는 이 몫도 섞여 있었습니다.
 published: true
 ---
+
+<!-- mf-rq-start -->
+
+## 연구 질문
+
+| 순서 | 내용 |
+|---|---|
+| 본 현상 | latent 없이 학습한 모델도 CODI와 정확도가 같았습니다. 그렇다면 CODI의 latent는 답에 쓰이지 않는 장식일 수도 있습니다. |
+| 든 의문 | 답을 쓰기 직전의 latent를 지우거나 엉뚱한 것으로 바꾸면 답이 바뀔까? 답이 그대로면 모델은 latent를 쓰지 않는 것이고, 크게 바뀌면 쓰는 것입니다. |
+| 그때까지 안 해 본 것 | 학습은 그대로 두고 추론 때만 latent를 바꿔, 넣는 layer가 다른 모델끼리 견준 적이 없었습니다. |
+| 그래서 한 것 | 학습한 CODI(L0에 넣음), L13→L0(L0), Middleflow(L7)에 추론 때만 0 벡터(내용만 지우고 자리는 그대로), 건너뜀(계산 없이 자리만), 다른 문항의 latent(틀린 내용), 잡음을 넣었습니다. |
+| 답 | CODI는 지우면 17~26점, 다른 문항의 latent에는 42점 떨어져 내용을 실제로 읽습니다. Middleflow는 지워도 2~4점이지만 다른 문항의 latent에는 26점 떨어졌습니다. Middleflow도 내용을 읽지만, 비어 있으면 풀이를 글로 쓰는 쪽으로 넘어가 맞혔습니다. |
+| 다음 의문 | 같은 방법인데 기대는 정도가 왜 이렇게 다른가? 꺼내는 곳인가 넣는 곳인가([넣는 layer](2026-11-12-mf-f-insert-layer.html))? |
+
+**0 벡터를 넣는 것은 무엇을 보는 시험인가.** latent는 질문을 읽은 결과를 답 쪽으로 흘려보내는 통로입니다. 0 벡터는 그 통로에 "앞 step에서 넘겨받은 내용 없음"을 넣는 것입니다. 정보가 아예 없어지지는 않습니다. 0 벡터를 넣은 자리도 각 layer의 attention이 앞의 질문을 읽어 다시 채우기 때문입니다. 그래서 0 벡터에서 크게 떨어지면 "step 사이로 넘어가는 내용에 기댄다", 거의 그대로면 "그 자리에서 질문을 다시 읽어 메운다"로 읽습니다. 다른 문항의 latent는 반대로 그럴듯하지만 틀린 내용을 넣어, 모델이 내용을 따라가는지 봅니다.
+
+질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
+
+<!-- mf-rq-end -->
 
 ## 한 줄 요약
 

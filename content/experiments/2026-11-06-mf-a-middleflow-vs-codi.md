@@ -4,9 +4,34 @@ date: 2026-11-06
 project: Middleflow
 status: 완료
 idea: 후보
+idea_rank: 2
+method_name: Middleflow
+method_examples:
+  - title: 같은 문항을 latent 16개 layer와 7개 layer로 풀기
+    kind: 실제 실험 예시
+    problem: 'GSM8K 828번 "Mulan has $40. Her father gave her $100. She buys two pairs of jeans at $30 each and a bag for $20. How much money does Mulan have left?" (정답 60)'
+    comparison: 'Llama-3.2-1B에서 CODI는 latent 6개가 각각 16개 layer를 지나고(96번), Middleflow는 L13에서 꺼내 L7에 넣어 7개 layer만 지납니다(42번). 질문과 답은 두 모델 모두 16개 layer를 지납니다.'
+    assessment: '두 모델 모두 60을 맞혔습니다. 1,319문항 평균으로 Middleflow는 추론 98.4 ms로 CODI(127.9 ms)보다 23% 빨랐고 GSM8K는 2.96점 낮았습니다. latent가 꼭 필요한 GPT-2 Small에서는 같은 문항을 CODI만 맞히고 Middleflow는 80(가방 값을 빼지 않음)을 썼습니다.'
 summary: latent를 가운데 7개 layer에서만 계산하는 Middleflow는 같은 설정의 CODI보다 추론이 23%, 학습이 21% 빨랐습니다. SVAMP와 MultiArith는 같았고 GSM8K는 2.96점, GSM-Hard는 1.97점 낮았습니다.
 published: true
 ---
+
+<!-- mf-rq-start -->
+
+## 연구 질문
+
+| 순서 | 내용 |
+|---|---|
+| 본 현상 | CODI는 latent 하나마다 마지막 layer(L15) 출력을 다음 자리의 첫 layer(L0)에 넣어 16개 layer를 모두 지납니다(latent 6개면 96번). 언어 모델 안을 들여다본 연구들은 마지막 layer 근처가 다음 토큰을 고르는 데, 처음 layer가 토큰을 문맥과 묶어 읽는 데 쓰이고, 가운데 layer는 빼거나 순서를 바꿔도 덜 무너진다고 보고했습니다([Lad 외 2024](https://arxiv.org/abs/2406.19384), [Sun 외 2024](https://arxiv.org/abs/2407.09298)). |
+| 든 의문 | 마지막 layer의 출력은 다음 토큰 쪽으로 기운 표현이라 생각을 이어 가기에 깨끗한 상태가 아닐 수 있고, 첫 layer는 토큰이 아닌 latent에는 할 일이 없을 수 있습니다. latent를 가운데에서만 돌려도 같은 정확도를 더 싸게 얻지 않을까? |
+| 그때까지 안 해 본 것 | CODI, Coconut, PCCoT 세 논문 모두 latent를 꺼내는 layer와 넣는 layer를 바꾼 실험이 없습니다. |
+| 그래서 한 것 | 같은 코드, 같은 설정에서 꺼내는 곳(L13)과 넣는 곳(L7)만 바꾼 Middleflow를 CODI와 견줬습니다. |
+| 답 | 추론 23%, 학습 21% 빨라졌습니다. SVAMP, MultiArith는 같고 GSM8K는 2.96점, GSM-Hard는 1.97점 낮았습니다. |
+| 다음 의문 | 이 속도는 Middleflow만의 것인가([latent 3개 CODI](2026-11-09-mf-b-codi-three-latents.html))? 3점은 어디서 잃었나([넣는 layer](2026-11-12-mf-f-insert-layer.html), [쓰지 않는 layer](2026-11-24-mf-n-unused-layer-role.html))? |
+
+질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
+
+<!-- mf-rq-end -->
 
 ## 한 줄 요약
 

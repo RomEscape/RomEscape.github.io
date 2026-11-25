@@ -7,6 +7,23 @@ summary: Middleflow와 같은 7개 layer를 앞쪽(L0~L6)이나 한 칸씩 건�
 published: true
 ---
 
+<!-- mf-rq-start -->
+
+## 연구 질문
+
+| 순서 | 내용 |
+|---|---|
+| 본 현상 | 넣는 곳이 정확도를 갈랐습니다(L13→L0은 CODI와 같고 L13→L7은 3점 낮음). |
+| 든 의문 | latent가 지나는 layer 수(7개)는 그대로 두고 위치만 앞쪽으로 옮기면 어떤가? 한 칸씩 건너뛰어 넓게 두면 어떤가? |
+| 그때까지 안 해 본 것 | layer 수를 고정하고 위치와 배치만 바꾼 비교가 없었습니다. |
+| 그래서 한 것 | 같은 7개 layer를 앞쪽(L0~L6)이나 한 칸씩 건너뛰는 배치 세 가지로 옮겨 1 epoch 학습했고, 띄엄 배치 하나는 10 epoch까지 학습했습니다. |
+| 답 | 1 epoch에서는 다섯 배치 모두 Middleflow와 같았고, 띄엄 배치 10 epoch도 Middleflow와 차이가 확인되지 않았습니다. |
+| 다음 의문 | 이 실험은 본 현상보다 "해 볼 만한 배치"에서 출발했고(점검 결과), 결과도 Middleflow와 같아 나머지는 보류했습니다. layer 수 자체를 줄이면 어떻게 변하는지는 [layer 비율에 따른 정확도](2026-11-25-mf-q-layer-ratio.html)에서 봅니다. |
+
+질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
+
+<!-- mf-rq-end -->
+
 ## 한 줄 요약
 
 latent가 지나는 7개 layer를 어디에 두든, 1 epoch 학습에서는 정확도가 Middleflow와 같고 latent를 거의 쓰지 않았습니다. 같은 1 epoch에서 L13→L0만 정확도가 높고 latent에 크게 기댔습니다.

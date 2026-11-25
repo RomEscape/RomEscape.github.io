@@ -142,16 +142,19 @@ CODI 같은 latent 추론은 세 가지 이유로 나왔다. 이 발표의 결�
 2. **여러 시드.** 1~3점 차이를 판정하려면 선행 연구처럼 시드 3개가 필요하다.
 3. **공식 CODI 코드 재현과 가까운 선행 연구 비교.** 같은 코드의 CODI 설정이 공식 코드와 같은 값을 내는지 확인하고, 가운데 layer를 되풀이하는 선행 연구(ETD, T²MLR)와 차이를 정리한다.
 
-## 회의 뒤 진행 중인 실험 (11월 24일 기준)
+## 회의 뒤 진행 중인 실험 (11월 25일 기준)
 
 회의에서 정한 다음 검증과 그 뒤에 더한 실험의 진행 상황이다. 시각은 한국 시각이다.
 
-| 실험 | 회의의 어느 질문에 답하나 | 상태 (11월 24일) | 기록 |
+| 실험 | 회의의 어느 질문에 답하나 | 상태 (11월 25일) | 기록 |
 |---|---|---|---|
-| GPT-2 Small에서 같은 비교 | 다음 검증 1, 연구 질문 3 | 세 모델 학습 중, 11월 25일 새벽 끝 예정 | [GPT-2 Small 비교](../experiments/2026-11-24-mf-j-gpt2-plan.html) |
-| 더 어려운 문제(GSM-Symbolic, AIME) | latent가 효과를 내는 조건 | Llama-1B 다섯 모델 끝, 나머지 평가 중 | [더 어려운 문제](../experiments/2026-11-24-mf-k-harder-benchmarks.html) |
-| latent 경로 변형(루프, 사선, 후퇴 후 전진, 거꾸로) | 연구 질문 2, 3 | 코드와 시험 끝, 루프는 11월 25일 새벽, 사선과 후퇴 후 전진은 25일 밤, 거꾸로는 26일 낮 학습 시작 | [경로 변형](../experiments/2026-11-24-mf-l-latent-path-plan.html) |
-| Llama 학습 시간을 CODI와 같게 | Middleflow가 아낀 학습 시간을 더 학습에 쓰면 CODI만큼 맞히나 | 코드와 시험 끝, 11월 25일 새벽 학습 시작 | [학습 시간 맞춤](../experiments/2026-11-24-mf-m-llama-codi-time.html) |
+| 연구 질문 다시 쓰기와 글 14편 점검 | 11월 25일 회의 지적(실험마다 어떤 현상을 보고 무엇이 궁금해 설계했는지) | 끝(11월 25일) | [연구 질문 정리](../experiments/2026-11-25-mf-o-research-questions.html) |
+| GPT-2 Small에서 같은 비교 | 다음 검증 1, 연구 질문 3 | 끝(11월 25일). GPT-2에서는 latent가 필요했고(GSM8K +5.0점), Middleflow는 이득의 일부만 지킴 | [GPT-2 Small 비교](../experiments/2026-11-24-mf-j-gpt2-plan.html) |
+| FLOPs와 실제 시간 | 11월 25일 회의 지적(비용을 FLOPs로) | 끝(11월 25일). FLOPs 차이 2~8%, 시간 차이 21~41% | [FLOPs와 실제 시간](../experiments/2026-11-25-mf-p-flops-vs-time.html) |
+| latent가 지나는 layer 비율에 따른 정확도 | 11월 25일 회의 지적(layer 수를 줄여 가며 꺾은선) | Llama 끝(처음부터 학습한 모델 5개, 추론 때만 줄인 19가지), GPT-2는 3점, L9→L0 11월 26일 낮 | [layer 비율](../experiments/2026-11-25-mf-q-layer-ratio.html) |
+| 더 어려운 문제(GSM-Symbolic, AIME) | latent가 효과를 내는 조건 | Llama-1B 아홉 모델과 GPT-2 세 모델 끝 | [더 어려운 문제](../experiments/2026-11-24-mf-k-harder-benchmarks.html) |
+| latent 경로 변형(루프, 사선, 후퇴 후 전진, 거꾸로) | 연구 질문 2, 3 | 루프 학습 중(11월 26일 새벽 끝), 후퇴 후 전진 26일 밤, 사선 27일 새벽, 거꾸로 27일 낮, 비교 모델 L9→L0 26일 낮 | [경로 변형](../experiments/2026-11-24-mf-l-latent-path-plan.html) |
+| Llama 학습 시간을 CODI와 같게 | Middleflow가 아낀 학습 시간을 더 학습에 쓰면 CODI만큼 맞히나 | 학습 중. Middleflow 11월 25일 20:50, Latent 없음 26일 06:50 끝 | [학습 시간 맞춤](../experiments/2026-11-24-mf-m-llama-codi-time.html) |
 | Middleflow가 쓰지 않는 layer의 역할 | 넣는 layer가 latent 의존도를 바꾸는 이유, 연구 질문 2 | 끝(11월 24일 밤, 추론만) | [쓰지 않는 layer](../experiments/2026-11-24-mf-n-unused-layer-role.html) |
 | 띄엄 배치 10 epoch | 연구 질문 2 | 셋 중 하나 끝, 둘 보류 | [띄엄 배치](../experiments/2026-11-14-mf-i-layer-placement-and-stride.html) |
 
@@ -163,7 +166,9 @@ CODI 같은 latent 추론은 세 가지 이유로 나왔다. 이 발표의 결�
 
 *그림 7. GPT-2 Small(layer 12개)에서 같은 설정으로 학습하는 네 모델. 파란 칸이 latent를 계산하는 layer다. Middleflow는 Llama의 L13→L7을 layer 비율대로 옮긴 L9→L5(5개 layer)다.*
 
-CODI 저자가 공개한 GPT-2 체크포인트를 우리 평가 코드로 채점하니 GSM8K 42.46%(논문 43.7%)였고, 공식 평가 방식과 1,319문항의 답이 모두 같았다. 이 모델은 추론 때 latent를 비우면 22% 안팎, 다른 문항의 latent를 넣으면 6.37%로 떨어져 latent에 크게 기댄다. CODI(11월 24일 12:49 시작), Latent 없음(13:13), Middleflow(14:31)를 원본 CODI GPT-2 설정(40 epoch)으로 GPU 한 장씩 학습하고 있고, 11월 25일 03:30~05:45쯤 끝난다. L9→L0은 Llama Latent 없음 학습 시간 맞춤 다음(11월 26일 00:40쯤)에 학습한다.
+CODI 저자가 공개한 GPT-2 체크포인트를 우리 평가 코드로 채점하니 GSM8K 42.46%(논문 43.7%)였고, 공식 평가 방식과 1,319문항의 답이 모두 같았다. 이 모델은 추론 때 latent를 비우면 22% 안팎, 다른 문항의 latent를 넣으면 6.37%로 떨어져 latent에 크게 기댄다. CODI, Latent 없음, Middleflow를 원본 CODI GPT-2 설정(40 epoch)으로 GPU 한 장씩 학습했고 11월 25일 새벽에 끝났다.
+
+**11월 25일 결과.** GPT-2에서는 latent가 필요했다. CODI − Latent 없음은 GSM8K +5.00 [+2.68, +7.33], SVAMP +6.60, MultiArith +24.44, GSM-Hard +1.67, GSM-Symbolic main +6.44로 모두 0을 벗어났다. Middleflow(L9→L5)는 그 이득의 일부만 지켰다. 풀이 단계가 적은 SVAMP(74%)와 MultiArith(68%)에서는 대부분을 지켰고, 단계가 많은 GSM8K(18%)와 GSM-Hard(0%)에서는 거의 잃었다. 첫 layer에 넣는 L9→L0은 11월 26일 낮에 끝난다(자세히는 [GPT-2 Small 비교](../experiments/2026-11-24-mf-j-gpt2-plan.html)).
 
 ### 더 어려운 문제에서 latent의 몫 (latent가 효과를 내는 조건)
 

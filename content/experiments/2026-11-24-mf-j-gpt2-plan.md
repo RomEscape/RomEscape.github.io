@@ -1,15 +1,30 @@
 ---
-title: GPT-2 Small에서 같은 비교 — latent가 필요한 조건에서 Middleflow는 그 이득을 지키는가
+title: GPT-2 Small에서 같은 비교 — latent가 필요한 모델에서 Middleflow는 이득의 일부만 지켰다
 date: 2026-11-24
 project: Middleflow
 status: 진행 중
-summary: 선행 연구에서 latent 계산이 약 9점을 더한 GPT-2 Small로 CODI, Latent 없음, Middleflow를 같은 코드와 시드로 학습하고 있습니다. 코드 이식을 마치고 공개 CODI 체크포인트로 평가 경로를 확인했으며(GSM8K 42.46%), 세 학습은 11월 25일 새벽에 끝날 예정입니다.
+summary: Llama-1B와 달리 GPT-2 Small에서는 latent 계산이 정확도를 올렸습니다(CODI − Latent 없음 GSM8K +5.0점, MultiArith +24.4점). 가운데 5개 layer만 쓰는 Middleflow는 SVAMP, MultiArith에서는 그 이득의 68~74%를, GSM8K, GSM-Hard에서는 0~18%만 지켰습니다. 첫 layer에 넣는 L9→L0은 11월 26일 낮에 끝납니다.
 published: true
 ---
 
+## 연구 질문
+
+| 순서 | 내용 |
+|---|---|
+| 본 현상 | Llama-1B에서는 latent 계산 없이 학습한 모델도 CODI와 정확도가 같아, Middleflow가 "필요 없는 계산을 줄인 것"인지 "필요한 계산을 싸게 한 것"인지 가를 수 없었습니다. PCCoT 논문 표 1에서는 같은 CODI 손실로 학습한 GPT-2 Small에서 latent 계산이 약 9점을 보탰습니다. |
+| 든 의문 | latent가 실제로 필요한 모델에서 Middleflow는 그 이득을 지키는가? |
+| 그때까지 안 해 본 것 | 같은 코드와 설정으로 GPT-2에서 CODI, Latent 없음, Middleflow를 학습해 견준 적이 없었습니다. |
+| 그래서 한 것 | 코드를 GPT-2(layer 12개)로 옮기고 원본 CODI GPT-2 설정(40 epoch)으로 세 모델을 학습해 네 벤치마크, GSM-Symbolic, 추론 때 latent 바꾸기로 평가했습니다. |
+| 답 | GPT-2에서는 latent가 필요했습니다(CODI − Latent 없음 다섯 평가 모두 0을 벗어남). Middleflow는 그 이득의 일부만 지켰습니다(SVAMP 74%, MultiArith 68%, GSM-Symbolic main 39%, GSM8K 18%, GSM-Hard 0%). |
+| 다음 의문 | 얕은 모델에서 latent는 몇 개 layer를 지나야 이득을 지키는가? Llama처럼 첫 layer에 넣으면(L9→L0) CODI만큼 되찾는가? 가운데를 두 번 돌면(루프) 되찾는가? |
+
+질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
+
 ## 한 줄 요약
 
-latent의 효과는 모델에 따라 다를 수 있습니다. latent가 실제로 필요하다고 보고된 GPT-2 Small에서 CODI와 Latent 없음의 차이가 다시 나오는지, 그리고 Middleflow가 그 차이를 지키는지를 봅니다.
+- GPT-2 Small에서는 latent 계산이 정확도를 올렸습니다. CODI는 latent 없이 같은 손실로 학습한 모델보다 GSM8K 5.00점 [+2.68, +7.33], SVAMP 6.60점, MultiArith 24.44점, GSM-Hard 1.67점, GSM-Symbolic main 6.44점 높았습니다. Llama-1B에서는 이 차이가 확인되지 않았습니다.
+- 가운데 5개 layer(L5~L9)만 쓰는 Middleflow는 그 이득의 일부만 지켰습니다. 풀이 단계가 적은 SVAMP(74%)와 MultiArith(68%)에서는 대부분을 지켰고, 단계가 많은 GSM8K(18%)와 GSM-Hard(0%)에서는 거의 잃었습니다.
+- 추론 때 latent를 지우면 CODI는 11~20점, Middleflow는 6~9점 떨어졌습니다. 두 모델 모두 latent를 쓰고, Llama에서처럼 Middleflow가 덜 기댑니다.
 
 ## 왜 궁금했나
 
@@ -30,13 +45,13 @@ Llama-1B에서는 [latent 없이 학습한 모델](2026-11-09-mf-c-no-latent.htm
 
 *GPT-2 Small은 layer가 12개(L0~L11)입니다. 가로는 position(질문, latent 6개, 답), 세로는 layer이고 파란 칸이 latent를 계산하는 layer입니다. 질문과 답 토큰은 네 모델 모두 12개 layer를 다 지나고, 답 토큰은 파란 layer에서만 latent를 볼 수 있습니다. CODI, Latent 없음, Middleflow는 11월 24일부터 학습 중이고 L9→L0은 사선 경로 다음에 학습합니다. 그림을 누르면 원본 크기로 열립니다.*
 
-## 연구 질문
+## 처음에 세운 질문 (11월 24일)
 
 1. latent 계산의 기여는 모델에 따라 달라지는가? (Llama-1B에서는 확인 안 됨, GPT-2 Small에서는?)
 2. latent를 넣는 layer는 정확도와 latent 의존도를 어떻게 바꾸는가?
 3. latent가 기여하는 조건에서, 가운데 layer만으로 계산해도 그 기여를 지키며 비용을 줄일 수 있는가?
 
-## 방법 (계획)
+## 방법
 
 1. 우리 학습 코드를 GPT-2 구조(12개 layer, 위치 정보를 입력에서 더하는 방식)로 옮기고, 전체 깊이 설정이 원래 CODI 반복과 같은 값을 내는지 CPU 시험으로 확인합니다.
 2. CODI 저자가 공개한 GPT-2 체크포인트를 우리 평가 코드로 채점해, 논문 값(GSM8K 43.7) 근처가 나오는지 봅니다.
@@ -68,7 +83,73 @@ latent를 비운 세 경우 모두 첫 단계의 값(2 × 6 = 12)을 답했고, 
 | CODI가 높지만 Middleflow가 그 이득을 잃음 | latent는 앞쪽 layer를 지나야 쓰인다. 넣는 layer와 의존도의 관계를 뒷받침 |
 | CODI와 Latent 없음이 같음 | 선행 연구와 다른 결과. 원인 분석 필요 |
 
-## 진행 상황 (11월 24일)
+## 결과 (11월 25일)
+
+**네 벤치마크와 GSM-Symbolic (GPT-2 Small, 40 epoch, 시드 11).**
+
+| 모델 | GSM8K | SVAMP | MultiArith | GSM-Hard | GSM-Symbolic main | P1 | P2 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| CODI (L11→L0) | 41.47 | 43.10 | 95.00 | 9.55 | 22.30 | 9.92 | 4.64 |
+| Middleflow (L9→L5) | 37.38 | 41.40 | 87.22 | 7.73 | 18.36 | 7.30 | 2.80 |
+| Latent 없음 | 36.47 | 36.50 | 70.56 | 7.88 | 15.86 | 5.88 | 3.36 |
+
+**같은 문항 짝차이와 95% 구간.**
+
+| 비교 | GSM8K | SVAMP | MultiArith | GSM-Hard |
+|---|---|---|---|---|
+| CODI − Latent 없음 | +5.00 [+2.68, +7.33] | +6.60 [+4.27, +8.93] | +24.44 [+17.62, +31.27] | +1.67 [+0.54, +2.80] |
+| Middleflow − Latent 없음 | +0.91 [−1.13, +2.95] | +4.90 [+2.95, +6.85] | +16.67 [+10.41, +22.92] | −0.15 [−1.04, +0.74] |
+| Middleflow − CODI | −4.09 [−6.19, −1.99] | −1.70 [−3.78, +0.38] | −7.78 [−12.51, −3.04] | −1.82 [−2.82, −0.82] |
+| Middleflow가 지킨 몫 | 18% | 74% | 68% | 0% |
+
+| 비교 | GSM-Symbolic main | P1 | P2 |
+|---|---|---|---|
+| CODI − Latent 없음 | +6.44 [+3.76, +9.56] | +4.04 [+1.62, +7.16] | +1.28 [−0.60, +4.00] |
+| Middleflow − Latent 없음 | +2.50 [+1.00, +4.18] | +1.42 [+0.12, +2.92] | −0.56 [−1.84, +0.64] |
+| Middleflow − CODI | −3.94 [−6.66, −1.62] | −2.62 [−5.54, −0.36] | −1.84 [−5.20, +0.36] |
+| Middleflow가 지킨 몫 | 39% | 35% | 0% |
+
+**표 읽는 법.** 대괄호는 같은 문항을 두 모델이 맞혔는지 짝지어 낸 차이의 95% 구간입니다(GSM-Symbolic은 같은 문항 틀 100개 단위로 다시 뽑는 부트스트랩). 구간이 0을 포함하지 않으면 차이가 있다고 봅니다. "지킨 몫"은 (Middleflow − Latent 없음) ÷ (CODI − Latent 없음)이고, Middleflow가 Latent 없음보다 낮으면 0%로 적었습니다.
+
+[![Llama-1B와 GPT-2 Small에서 latent 계산이 더한 점수와 Middleflow가 지킨 몫](../uploads/middleflow/experiments/latent-gain-llama-gpt2.png)](../uploads/middleflow/experiments/latent-gain-llama-gpt2.png)
+
+*파란 막대는 CODI, 주황 막대는 Middleflow가 Latent 없음보다 높은 정도입니다. 막대 끝의 선은 95% 구간, *는 구간이 0을 벗어난 것입니다. 왼쪽 Llama-1B는 GSM-Symbolic main만 CODI가 앞서고, 오른쪽 GPT-2는 다섯 평가 모두 CODI가 앞섭니다. 그림을 누르면 원본 크기로 열립니다.*
+
+**추론 때 latent 바꾸기 (GSM8K, 학습은 그대로).**
+
+| 추론 때 바꾼 것 | CODI | 변화 | Middleflow | 변화 |
+|---|---:|---|---:|---|
+| 그대로 | 41.47 | | 37.38 | |
+| 0 벡터 | 30.63 | −10.84 [−13.34, −8.34] | 28.58 | −8.79 [−10.76, −6.82] |
+| 답할 때 가림 | 22.67 | −18.80 [−21.55, −16.06] | 31.16 | −6.22 [−8.05, −4.38] |
+| latent 건너뜀 | 22.59 | −18.88 [−21.62, −16.14] | 31.31 | −6.07 [−7.90, −4.23] |
+| latent 0개 | 21.46 | −20.02 [−22.75, −17.28] | 31.31 | −6.07 [−7.92, −4.21] |
+| 잡음 | 9.63 | −31.84 [−34.59, −29.09] | 27.60 | −9.78 [−11.86, −7.70] |
+| 다른 문항의 latent | 5.69 | −35.78 [−38.54, −33.03] | 26.99 | −10.39 [−12.54, −8.23] |
+
+**실제 문항과 실제 답.** GSM8K 828번 "Mulan has $40. Her father gave her $100. She buys two pairs of jeans at $30 each and a bag for $20. How much money does Mulan have left?" (정답 60)
+
+| 모델 | 추론 때 바꾼 것 | 모델이 쓴 답 | 채점 |
+|---|---|---|---|
+| CODI | 그대로 | The answer is: 60 | 맞음 |
+| Middleflow | 그대로 | The answer is: 80 | 틀림. 가방 값 20을 빼지 않음 |
+| Latent 없음 | 그대로 | The answer is: 80 | 틀림. 같은 곳에서 멈춤 |
+| CODI | latent 건너뜀 | 60>> <<2\*30+20=100>> <<100+100=200>>The answer is: 160 | 틀림 |
+| CODI | 0 벡터 | 60>> <<2\*30=60>> <<60+20=80>> <<40+100=140>>The answer is: 60 | 맞음. 풀이를 글로 씀 |
+| Middleflow | 0 벡터 | is: 120 | 틀림 |
+
+Middleflow와 Latent 없음은 마지막 빼기 한 번을 빠뜨린 같은 답(80)을 썼습니다. 1,319문항 중 CODI만 맞히고 둘 다 틀린 문항은 92개입니다. 한 문항의 예이고, 이런 "한 단계 모자란" 답이 전체에서 몇 개인지는 세지 않았습니다.
+
+**미리 정한 판정에 대어 보면.** CODI는 다섯 평가 모두 Latent 없음보다 높아 첫째 줄의 앞부분(latent가 필요하다)은 맞습니다. Middleflow가 그 차이를 "대부분 지킴"은 SVAMP와 MultiArith에서만 맞고, GSM8K와 GSM-Hard에서는 둘째 줄("이득을 잃음")에 해당합니다. 판정은 벤치마크에 따라 갈렸습니다.
+
+## 그래서 무슨 뜻인가
+
+- **latent의 몫은 모델에 따라 다릅니다.** 같은 코드, 같은 손실로 학습해도 Llama-1B에서는 latent 계산의 몫이 확인되지 않았고 GPT-2 Small에서는 5~24점이었습니다. PCCoT 논문 표 1과 같은 방향입니다.
+- **Middleflow는 계산 단계가 적은 문제에서는 이득을 지키고, 많은 문제에서는 잃었습니다.** SVAMP와 MultiArith는 계산식 한두 개로 풀리는 문항이 많고, GSM8K와 GSM-Hard는 여러 개를 차례로 이어야 합니다. 가운데 5개 layer만으로는 여러 단계를 이어 계산하기에 모자랄 수 있습니다(가설, 아직 단계별로 나눠 확인하지 않음).
+- **Middleflow도 latent를 씁니다.** 지우면 6~9점, 다른 문항의 latent를 넣으면 10점 떨어졌습니다. 다만 CODI(11~36점)보다 덜 기댑니다. Llama에서 본 "넣는 layer가 latent 의존도를 정한다"와 같은 모습입니다.
+- **Llama에서 본 해결책이 여기서도 통하는지가 다음 질문입니다.** Llama에서는 L13→L0(첫 layer에 넣기)이 CODI와 정확도가 같았습니다. GPT-2에서 같은 위치인 L9→L0이 CODI만큼 되찾는다면, latent는 꺼내는 곳보다 넣는 곳이 중요하다는 결론이 두 모델에서 같아집니다.
+
+## 진행 기록
 
 **코드 이식과 확인.**
 - Middleflow 코드를 GPT-2 구조(layer 12개, 위치 정보를 입력에서 더하는 방식)로 옮겼습니다.
@@ -96,15 +177,29 @@ GPT-2 CODI는 latent를 비우면 20점, 틀린 내용을 넣으면 30~36점 떨
 
 **학습 (모두 원본 CODI GPT-2 설정: 40 epoch, 학습률 3e-3, 119,960 step, 시드 11, 모델마다 GPU 한 장).**
 
-| 모델 | 시작 | step당 | 끝 예정 |
-|---|---|---:|---|
-| CODI (L11→L0, 전체 깊이) | 11-24 12:49 | 0.44초 | 11-25 03:30쯤 |
-| Latent 없음 | 11-24 13:13 | 0.50초 | 11-25 05:45쯤 |
-| Middleflow (L9→L5) | 11-24 14:31 | 0.44초 | 11-25 05:25쯤 |
+| 모델 | 시작 | 끝 |
+|---|---|---|
+| CODI (L11→L0, 전체 깊이) | 11-24 12:49 | 11-25 03:30 |
+| Latent 없음 | 11-24 13:13 | 11-25 05:28 |
+| Middleflow (L9→L5) | 11-24 14:31 | 11-25 05:43 |
 
-step당 시간과 끝 예정은 11월 24일 14:55에 3분 동안 잰 값입니다. 세 GPU의 CPU 성능이 서로 달라 위 step당 시간은 학습 시간 비교에 쓰지 않습니다. 학습 시간은 끝난 뒤 한 기계에서 따로 잽니다.
+세 GPU의 CPU 성능이 서로 달라 학습 시간은 견주지 않습니다. 비용은 [FLOPs와 실제 시간](2026-11-25-mf-p-flops-vs-time.html)에 FLOPs로 적었습니다.
 
-**다음.** 학습이 끝나면 같은 GPU에서 네 벤치마크를 바로 평가하고, 이어서 GSM-Symbolic과 추론 때 latent 바꾸기로 평가합니다. 각 GPU는 지금 학습을 마치는 대로 다음 학습으로 넘어갑니다. CODI 다음은 Llama Middleflow를 CODI와 같은 학습 시간만큼 학습하고([학습 시간 맞춤](2026-11-24-mf-m-llama-codi-time.html)), 그다음 사선을 학습합니다. Middleflow 다음은 루프, 후퇴 후 전진, 거꾸로입니다. Latent 없음 다음은 Llama Latent 없음의 학습 시간 맞춤, 그다음 L9→L0입니다([경로 변형 계획](2026-11-24-mf-l-latent-path-plan.html)). 순서는 11월 24일 22시와 23시에 바꿨습니다.
+**평가.** 학습이 끝난 GPU에서 바로 네 벤치마크, GSM-Symbolic, 추론 때 latent 바꾸기를 평가했습니다. Latent 없음과 Middleflow의 GSM-Symbolic은 처음에 AIME25 단계에서 GPU 오류로 멈춰, 11월 25일 오전에 GSM-Symbolic 세 세트만 다시 평가했습니다. AIME는 세 모델 모두 AIME24에서 0/30이라 GPT-2에서는 평가에서 뺐습니다.
+
+**다음 학습 (11월 25일 오전에 순서를 바꿈).** GPU를 더 빌리지 않고, 목요일(11월 26일) 낮까지 결과가 나오도록 순서만 바꿨습니다.
+
+| GPU | 지금 | 다음 | 끝 예정 |
+|---|---|---|---|
+| 1 | Llama Middleflow 같은 학습 시간 | GPT-2 L9→L0 (첫 layer에 넣기) | 11-25 20:50 → 11-26 11~12시 |
+| 2 | Llama Latent 없음 같은 학습 시간 | GPT-2 사선 | 11-26 06:50 → 11-27 03시쯤 |
+| 3 | GPT-2 루프 | GPT-2 후퇴 후 전진, 거꾸로 | 11-26 02:10 → 11-26 20:30 → 11-27 11:30 |
+
+## 다음 질문
+
+- 첫 layer에 넣으면(L9→L0) CODI만큼 되찾는가? 되찾는다면 Llama와 같은 결론(넣는 곳이 정확도를 정함)이 GPT-2에서도 성립합니다.
+- 얕은 모델에서 latent는 몇 개 layer를 지나야 하는가? 지금 있는 점은 0개, 5개, 12개이고 10개(L9→L0)가 곧 더해집니다. 3개와 7개는 GPU가 비는 대로 학습합니다([layer 비율에 따른 정확도](2026-11-25-mf-q-layer-ratio.html)).
+- 가운데 계산이 모자란 것이라면, 같은 5개 layer를 두 번 도는 루프가 이득을 되찾는가([경로 변형](2026-11-24-mf-l-latent-path-plan.html))?
 
 ## 한계와 주의
 

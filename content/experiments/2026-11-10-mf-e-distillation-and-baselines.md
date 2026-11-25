@@ -7,6 +7,23 @@ summary: latent 없이 학습한 모델에서 distillation 손실만 빼자 네 
 published: true
 ---
 
+<!-- mf-rq-start -->
+
+## 연구 질문
+
+| 순서 | 내용 |
+|---|---|
+| 본 현상 | latent 없이 학습해도 CODI와 같았습니다. 두 모델에 공통으로 남은 것은 세 손실 항(교사 CE, 학생 CE, distillation)입니다. |
+| 든 의문 | 정확도는 latent 계산이 아니라 학습 신호에서 오는가? |
+| 그때까지 안 해 본 것 | 같은 코드에서 "답만 학습 → distillation까지 → latent 계산까지"를 한 줄로 나눈 적이 없었습니다. |
+| 그래서 한 것 | Latent 없음에서 distillation 손실 하나만 빼고 다시 학습했고, 답만 학습한 기준선과 풀이를 글로 쓰는 기준선을 더했습니다. |
+| 답 | 답만 학습 30.86 → distillation까지 52.16 → latent 계산까지 53.37. 오른 22.5점 중 21.3점이 distillation에서 나왔습니다. |
+| 다음 의문 | latent가 보탠 몫이 작은 것은 이 모델(Llama-1B)의 이야기인가? latent가 필요하다고 보고된 모델에서는([GPT-2 Small](2026-11-24-mf-j-gpt2-plan.html))? |
+
+질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
+
+<!-- mf-rq-end -->
+
 ## 한 줄 요약
 
 정확도를 단계별로 나누면 답만 학습 30.86 → distillation까지 학습한 Latent 없음 52.16 → latent 계산까지 더한 CODI 53.37입니다. 오른 22.5점 가운데 21.3점이 distillation 단계에서 나왔습니다.

@@ -7,6 +7,23 @@ summary: latent 계산 없이 같은 손실로 처음부터 학습한 모델이 
 published: true
 ---
 
+<!-- mf-rq-start -->
+
+## 연구 질문
+
+| 순서 | 내용 |
+|---|---|
+| 본 현상 | latent 계산을 크게 줄여도(가운데 7개 layer만, 또는 latent 3개만) 정확도가 3점 안에서 남았습니다. |
+| 든 의문 | latent 계산 자체가 필요한가? |
+| 그때까지 안 해 본 것 | CODI 논문에는 latent 계산만 빼고 같은 손실로 학습한 모델이 없습니다(PCCoT 논문 표 1에 비슷한 기준선이 있습니다). |
+| 그래서 한 것 | latent 계산 없이 답의 자리만 6칸 띄우고 같은 손실로 처음부터 학습했습니다. CODI와 Middleflow는 latent를 어디서 계산하는지만 다르므로 이 모델이 둘의 공통 대조군입니다. |
+| 답 | GSM8K 52.16으로 CODI(53.37)와 차이가 확인되지 않았고, 추론과 학습이 가장 빨랐습니다. |
+| 다음 의문 | 정확도는 어디서 오나([distillation 제거](2026-11-10-mf-e-distillation-and-baselines.html))? latent는 무엇을 넘기나([입력 고정](2026-11-09-mf-d-frozen-input.html))? 학습된 CODI는 latent의 내용을 쓰기는 하나([추론 때 latent 바꾸기](2026-11-12-mf-g-inference-interventions.html))? |
+
+질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
+
+<!-- mf-rq-end -->
+
 ## 한 줄 요약
 
 latent를 아예 계산하지 않고 답의 position만 6칸 띄운 모델을 CODI와 같은 손실로 학습했더니 GSM8K 52.16으로 CODI(53.37)와 차이가 확인되지 않았습니다. 추론 75.0 ms, 학습 12.3시간으로 가장 빨랐습니다.
