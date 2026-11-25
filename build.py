@@ -126,7 +126,15 @@ def method_examples(d, *, expanded=False):
     return ''.join(blocks)
 
 
-def exp_row(d, r, *, show_rank=False):
+def support_list(sup, r):  # 머리말 supports: 방법 이름, supports_role: 역할. 그 방법(후보)의 근거 글이라 따로 순위를 매기지 않고 방법 아래에 묶어 보인다
+    if not sup:
+        return ''
+    items = ''.join(f'<li>{esc(e.get("supports_role") or "근거")}: <a href="{r}experiments/{quote(e["slug"])}.html">{esc(e.get("title") or e["slug"])}</a></li>'
+                    for e in sorted(sup, key=lambda e: (e['date'], e['slug'])))
+    return f'<div class="method-example"><span class="small">이 방법의 근거 글 {len(sup)}편</span><ul class="small">{items}</ul></div>'
+
+
+def exp_row(d, r, *, show_rank=False, sup=()):
     proj = f'<span class="proj">{esc(d.get("project"))}</span>' if d.get('project') else ''
     summ = f'<p>{esc(d.get("summary"))}</p>' if d.get('summary') else ''
     date = f'<time>{d["date"].isoformat()}</time>'
@@ -137,7 +145,7 @@ def exp_row(d, r, *, show_rank=False):
     return (f'<li class="row" data-status="{esc(d.get("status"))}" data-project="{esc(d.get("project"))}" data-idea="{idea_mark(d)}">'
             f'{date}{pill(d.get("status"))}{idea_pill(d)}'
             f'<a class="title" href="{r}experiments/{quote(d["slug"])}.html">{method_name(d)}{esc(d.get("title") or d["slug"])}</a>{proj}{summ}'
-            f'{method_examples(d) if show_rank else ""}</li>')
+            f'{method_examples(d) + support_list(sup, r) if show_rank else ""}</li>')
 
 
 def event_row(d, r, section):
@@ -231,10 +239,13 @@ def build(root=ROOT, out=None):
         rel = [e for e in exps if d.get('project') and e.get('project') == d.get('project')]
         # 아이디어 후보의 순위는 연구 주제 안에서만 매긴다(여러 연구가 섞인 실험 기록 목록에서는 순위를 보이지 않는다).
         cands = sorted([e for e in rel if idea_mark(e) == '1'], key=lambda e: idea_rank(e) or float('inf'))
-        rest = [e for e in rel if idea_mark(e) != '1']
+        names = {e['method_name'] for e in cands if e.get('method_name')}
+        sup = [e for e in rel if idea_mark(e) != '1' and e.get('supports') in names]  # 후보의 근거 글은 그 후보 아래에만 보인다
+        rest = [e for e in rel if idea_mark(e) != '1' and e.get('supports') not in names]
         cand_html = (f'<section class="related"><div class="sec-head"><h2>{IDEA}</h2></div>'
-                     '<p class="small">이 연구 안에서 논문으로 발전시킬 우선순위입니다. 정확도와 토큰 비용을 함께 평가한 결과, 다른 문항에서의 재현 여부, 후속 실험에서 확인할 수 있는 차이를 기준으로 정했습니다.</p>'
-                     '<ul class="list">' + ''.join(exp_row(e, '../', show_rank=True) for e in cands) + '</ul></section>') if cands else ''
+                     '<p class="small">이 연구 안에서 논문으로 발전시킬 우선순위입니다. 정확도와 토큰 비용을 함께 평가한 결과, 다른 문항에서의 재현 여부, 후속 실험에서 확인할 수 있는 차이를 기준으로 정했습니다. 한 줄이 방법 하나이고, 그 방법의 근거가 된 실험 글은 방법 아래에 역할과 함께 묶었습니다.</p>'
+                     '<ul class="list">' + ''.join(exp_row(e, '../', show_rank=True, sup=[s for s in sup if s['supports'] == e.get('method_name')])
+                                                   for e in cands) + '</ul></section>') if cands else ''
         rel_html = cand_html + (('<section class="related"><div class="sec-head"><h2>관련 실험 기록</h2></div><ul class="list">'
                                  + ''.join(exp_row(e, '../') for e in rest) + '</ul></section>') if rest else '')
         meta = ' · '.join(x for x in [pill(d.get('status')), esc(d.get('project')) if d.get('project') else ''] if x)
@@ -268,9 +279,12 @@ document.querySelectorAll('.filters button').forEach(function(x){{x.setAttribute
 pj.addEventListener('change',apply);apply();}})();
 </script>'''
     write('experiments/index.html', page(site, '실험 기록', body, 1, 'experiments'))
+    by_name = {e['method_name']: e['slug'] for e in exps if e.get('method_name')}
     for d in exps:
         meta = ' · '.join(x for x in [d['date'].isoformat(), esc(d.get('project')) if d.get('project') else '', pill(d.get('status')), idea_pill(d),
-                                      f'방법 이름 <strong>{esc(d["method_name"])}</strong>' if d.get('method_name') else ''] if x)
+                                      f'방법 이름 <strong>{esc(d["method_name"])}</strong>' if d.get('method_name') else '',
+                                      f'<a href="{quote(by_name[d["supports"]])}.html"><strong>{esc(d["supports"])}</strong></a>의 {esc(d.get("supports_role") or "근거")} 글'
+                                      if d.get('supports') in by_name else ''] if x)
         examples = method_examples(d, expanded=True)
         if examples:
             examples = f'<section class="prose" id="method-examples"><h2>방법론 예시</h2>{examples}</section>'
@@ -389,12 +403,13 @@ def selftest():
                 meta['method_examples'] = [dict(kind='실험 설계 예시', title='부등식 풀기',
                                                problem='1 < x < 3', comparison='두 조건', assessment='정답 2')]
             path.write_text('---\n' + yaml.safe_dump(meta, allow_unicode=True) + '---\n', encoding='utf-8')
+        (t / 'content/experiments/2026-11-09-s.md').write_text('---\ntitle: 근거 기록\ndate: 2026-11-09\nproject: QFFT\nsupports: TopName\nsupports_role: 근거 분석\n---\n본문\n', encoding='utf-8')
         (t / 'uploads').mkdir()
         (t / 'uploads/meeting.pptx').write_bytes(b'x')
         (t / '_converted').mkdir()
         (t / '_converted/meeting.pdf').write_bytes(b'%PDF')
         out, ne, nt = build(t, t / '_site')
-        assert (ne, nt) == (4, 1)
+        assert (ne, nt) == (5, 1)
         assert not (out / 'experiments/2026-11-07-b.html').exists()
         e = (out / 'experiments/2026-11-08-a.html').read_text(encoding='utf-8')
         assert '<table>' in e and 'src="../uploads/x.png"' in e and 'class="pill s2"' in e and 'class="pill idea"' in e
@@ -411,6 +426,9 @@ def selftest():
         assert rp.index(f'<h2>{IDEA}</h2>') < rp.index('>1순위<') < rp.index('2026-10-01-top</a>') < rp.index('>2순위<') < rp.index('>2026-11-10-second</a>') < rp.index('>순위 검토 중<') < rp.index('>공개 기록</a>')
         assert rp.count('>공개 기록</a>') == 1 and rp.count('<strong>TopName</strong>: 2026-10-01-top</a>') == 1
         assert '방법 이름 <strong>TopName</strong>' in top and '<strong>TopName</strong>: 2026-10-01-top</a>' in ix
+        # 근거 글은 그 방법 아래에 한 번만, 순위 없이 역할과 함께. 글 머리 줄에는 방법 글로 가는 연결
+        assert rp.count('>근거 기록</a>') == 1 and rp.index('2026-10-01-top</a>') < rp.index('근거 분석: <a') < rp.index('>2순위<')
+        assert 'href="2026-10-01-top.html"><strong>TopName</strong></a>의 근거 분석 글' in (out / 'experiments/2026-11-09-s.html').read_text(encoding='utf-8')
         # 여러 연구가 섞인 실험 기록 목록에는 순위도 후보 묶음도 없다
         assert '순위<' not in ix and f'<h2>{IDEA}</h2>' not in ix and '<details class="method-example">' not in ix
         assert ix.index('<h2>2026년 11월</h2>') < ix.index('>공개 기록</a>') < ix.index('>뺀 기록</a>') and ix.count('>공개 기록</a>') == 1
@@ -420,7 +438,7 @@ def selftest():
         k = (out / 'talks/2026-11-03-c.html').read_text(encoding='utf-8')
         assert 'data="../uploads/pdf/meeting.pdf"' in k and 'href="../uploads/meeting.pptx" download' in k
         assert (out / 'uploads/pdf/meeting.pdf').exists() and '<strong>소개</strong>' in (out / 'index.html').read_text(encoding='utf-8')
-        assert 'href="../experiments/2026-11-08-a.html"' in rp and '숨긴 기록' not in rp and '실험 기록 3개' in (out / 'research/index.html').read_text(encoding='utf-8')
+        assert 'href="../experiments/2026-11-08-a.html"' in rp and '숨긴 기록' not in rp and '실험 기록 4개' in (out / 'research/index.html').read_text(encoding='utf-8')
         assert 'href="research/index.html"' in (out / 'index.html').read_text(encoding='utf-8')
         assert 'static/style.css?v=' + hashlib.md5(b'body{}').hexdigest()[:8] in (out / 'index.html').read_text(encoding='utf-8')
         j = t / 'j.md'
