@@ -22,7 +22,7 @@ published: true
 - 빼 버린 layer의 역할: 답은 latent를 주로 가운데 layer에서 읽었고, 앞쪽 layer는 latent를 거의 바꾸지 않았으며, 뒤쪽 layer는 latent를 숫자 토큰으로 읽히는 모양으로 바꿨습니다. 처음부터 그 경로로 학습하면 layer를 빼도 거의 그대로지만, 학습 없이 빼면 크게 떨어집니다.
 - 비용: FLOPs로는 Middleflow가 CODI보다 추론 4.4% 적을 뿐인데 실제 시간은 23% 짧습니다. 시간은 latent 계산에서 차례로 지나야 하는 layer 수에 비례합니다.
 - 쓰는 layer와 안 쓰는 layer의 차이: 학습한 CODI에서 latent가 질문과 앞선 latent를 읽는 일은 가운데 7개 layer에 몰려 있었습니다(질문 읽기를 막으면 가운데 −12.13, 앞쪽 7개 −1.36, 뒤쪽 2개 −1.52). 앞쪽은 latent를 거의 그대로 통과시켰고, 앞쪽 7개만 쓰도록 학습한 모델의 latent에는 중간 계산값이 거의 담기지 않았습니다(13%, Middleflow 50%).
-- 같은 학습 시간, 같은 추론 시간(Llama): 아낀 학습 시간만큼 더 학습해도 Middleflow와 Latent 없음 모두 오르지 않았고, CODI가 GSM8K 3.49점 높았습니다. 이미 학습한 모델에서 추론 때만 latent 수를 바꿔 시간을 맞추면 각 모델은 학습한 latent 수에서 가장 높았습니다. 같은 추론 시간의 공정한 비교는 처음부터 그 수로 학습한 모델로 합니다(11월 26일 13:25쯤 끝).
+- 같은 학습 시간, 같은 추론 시간(Llama): 아낀 학습 시간만큼 더 학습해도 Middleflow와 Latent 없음 모두 오르지 않았고, CODI가 GSM8K 3.49점 높았습니다. 이미 학습한 모델에서 추론 때만 latent 수를 바꿔 시간을 맞추면 각 모델은 학습한 latent 수에서 가장 높았습니다. latent 14개로 처음부터 학습해 학습 시간과 추론 시간을 모두 CODI와 맞춘 Middleflow도 GSM8K 50.57로 latent 6개와 같았고 CODI보다 2.81점 낮았습니다.
 
 ### 메인 표
 
@@ -64,7 +64,7 @@ GPT-2는 세 모델을 서로 다른 GPU에서 학습해 시간을 견주지 않
 
 ### 지금 열려 있는 질문
 
-1. 같은 추론 계산량이면 Middleflow가 CODI만큼 맞히는가. 학습한 Middleflow에 추론 때만 latent를 14개로 늘리면 CODI보다 4.47점 낮았습니다. latent 14개로 처음부터 학습한 Middleflow가 11월 26일 13:25쯤 끝납니다(12시쯤 예비 평가).
+1. 계산량 때문이 아니라면 Middleflow의 3점은 어디서 오는가. latent 14개로 처음부터 학습해 학습 시간과 추론 시간을 모두 CODI와 맞춰도 GSM8K 50.57(CODI −2.81)이었습니다. 학습 시간, 추론 계산량, 앞쪽 layer의 계산은 원인이 아니었습니다.
 2. 앞쪽 layer가 latent를 바꾸지 않는데, L0에 넣는 L13→L0은 왜 Middleflow보다 2.65점 높은가. L0부터 7개만 지나는 L6→L0은 가운데 7개보다 낫지 않았습니다(GSM8K 49.36). latent가 앞쪽 layer에도 남아 답이 거기서도 읽을 수 있기 때문인지 확인이 필요합니다.
 3. 처음부터 학습하면 layer를 몇 개까지 줄여도 되는가. 4개(L13→L10)와 2개(L13→L12)를 학습합니다(11월 27일 07:30쯤, 02시쯤).
 4. 뒤쪽 두 layer가 latent에 더하는 것은 새 내용인가, 읽히기 쉬운 모양인가. 선형 분류기로는 뒤쪽에서 2~7점이 더 오르지만, 그 layer를 빼고 학습한 모델은 CODI와 같았습니다. ("첫 layer는 latent에 할 일이 없는가"는 11월 26일에 답했습니다. latent 자리에서 L1~L4의 attention은 66~90%가 맨 앞 토큰에 머물고, 읽기를 막아도 1.36점만 떨어졌습니다.)
@@ -158,7 +158,7 @@ Middleflow
 - **FLOPs로 다시 잰 비용.** FLOPs 차이는 2~8%, 시간 차이는 21~41%였고, 시간은 차례로 지나는 layer 수에 비례했습니다([FLOPs와 실제 시간](../experiments/2026-11-25-mf-p-flops-vs-time.html)).
 - **latent가 지나는 layer 비율에 따른 정확도.** 처음부터 학습한 모델과, 학습한 CODI에서 추론 때만 layer를 줄인 경우를 한 그림에 놓았습니다([layer 비율](../experiments/2026-11-25-mf-q-layer-ratio.html)).
 - **쓰지 않는 layer의 역할(11월 24일).** 답은 latent를 주로 가운데 layer에서 읽었고, 뺀 layer는 질문을 읽고 답을 쓰는 데 쓰였습니다([쓰지 않는 layer](../experiments/2026-11-24-mf-n-unused-layer-role.html)).
-- **학습 중(11월 25일 낮에 바꿈).** GPT-2 추가 학습을 멈추고 기존 모델(Llama-3.2-1B)에서 방법을 먼저 증명합니다. 추론 계산량을 CODI와 맞춘 Middleflow(latent 14개, 26일 13:25쯤), latent가 4개와 2개 layer만 지나는 모델(27일 07:30쯤, 02시쯤)입니다. L0부터 7개 layer를 지나는 L6→L0은 끝났습니다([기존 모델에서 방법 증명](../experiments/2026-11-25-mf-r-llama-method-proof.html)). GPT-2 루프는 13.3 epoch에서 멈췄고 나머지 경로 변형과 L9→L0은 미뤘습니다([경로 변형](../experiments/2026-11-24-mf-l-latent-path-plan.html)).
+- **학습 중(11월 25일 낮에 바꿈).** GPT-2 추가 학습을 멈추고 기존 모델(Llama-3.2-1B)에서 방법을 먼저 증명합니다. latent가 4개와 2개 layer만 지나는 모델(27일 07:30쯤, 02시쯤)이 남았습니다. 추론 계산량을 CODI와 맞춘 Middleflow(latent 14개)와 L0부터 7개 layer를 지나는 L6→L0은 끝났습니다([기존 모델에서 방법 증명](../experiments/2026-11-25-mf-r-llama-method-proof.html)). GPT-2 루프는 13.3 epoch에서 멈췄고 나머지 경로 변형과 L9→L0은 미뤘습니다([경로 변형](../experiments/2026-11-24-mf-l-latent-path-plan.html)).
 - 11월 12일 회의의 결과와 질문은 [11월 12일 회의록](../meetings/2026-11-12-middleflow-research-meeting.html)에 있습니다.
 
 ## 관련 연구
