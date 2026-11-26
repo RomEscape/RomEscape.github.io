@@ -154,8 +154,8 @@ CODI 같은 latent 추론은 세 가지 이유로 나왔다. 이 발표의 결�
 | latent가 지나는 layer 비율에 따른 정확도 | 11월 25일 회의 지적(layer 수를 줄여 가며 꺾은선) | Llama 끝(처음부터 학습한 모델 5개, 추론 때만 줄인 19가지), 처음부터 학습한 4개와 2개 layer 점은 학습 중, GPT-2는 3점(추가 학습은 미룸) | [layer 비율](../experiments/2026-11-25-mf-q-layer-ratio.html) |
 | 더 어려운 문제(GSM-Symbolic, AIME) | latent가 효과를 내는 조건 | Llama-1B 아홉 모델과 GPT-2 세 모델 끝 | [더 어려운 문제](../experiments/2026-11-24-mf-k-harder-benchmarks.html) |
 | latent 경로 변형(루프, 사선, 후퇴 후 전진, 거꾸로) | 연구 질문 2, 3 | 보류(11월 25일 낮). GPT-2 루프를 13.3 epoch에서 멈췄고 나머지와 L9→L0은 시작하지 않음 | [경로 변형](../experiments/2026-11-24-mf-l-latent-path-plan.html) |
-| 기존 모델(Llama)에서 방법 증명 | 11월 25일 회의 지적(추론 시간을 같게, layer 수 꺾은선)과 넣는 layer 결과 | 학습 중. L0부터 7개 layer(L6→L0)는 11월 26일 오전, 추론 계산량을 맞춘 Middleflow(latent 14개)는 26일 13:20쯤, layer 2개와 4개는 27일 새벽과 아침 | [기존 모델에서 방법 증명](../experiments/2026-11-25-mf-r-llama-method-proof.html) |
-| Llama 학습 시간을 CODI와 같게 | Middleflow가 아낀 학습 시간을 더 학습에 쓰면 CODI만큼 맞히나 | 학습 중. Middleflow 11월 25일 20:50, Latent 없음 26일 06:50 끝 | [학습 시간 맞춤](../experiments/2026-11-24-mf-m-llama-codi-time.html) |
+| 기존 모델(Llama)에서 방법 증명 | 11월 25일 회의 지적(추론 시간을 같게, layer 수 꺾은선)과 넣는 layer 결과 | 학습 중. L0부터 7개 layer(L6→L0)는 11월 26일 10:55쯤, 추론 계산량을 맞춘 Middleflow(latent 14개)는 26일 13:25쯤, layer 2개와 4개는 27일 02시와 07:30쯤. 추론 때만 latent 수를 바꾼 시간 맞춤은 끝(각 모델은 학습한 latent 수에서 가장 높음) | [기존 모델에서 방법 증명](../experiments/2026-11-25-mf-r-llama-method-proof.html) |
+| Llama 학습 시간을 CODI와 같게 | Middleflow가 아낀 학습 시간을 더 학습에 쓰면 CODI만큼 맞히나 | 끝(11월 26일 새벽). 둘 다 10 epoch 때보다 오르지 않았고, GSM8K에서 CODI보다 3.49점, 2.65점 낮음 | [학습 시간 맞춤](../experiments/2026-11-24-mf-m-llama-codi-time.html) |
 | Middleflow가 쓰지 않는 layer의 역할 | 넣는 layer가 latent 의존도를 바꾸는 이유, 연구 질문 2 | 끝(11월 24일 밤, 추론만) | [쓰지 않는 layer](../experiments/2026-11-24-mf-n-unused-layer-role.html) |
 | 띄엄 배치 10 epoch | 연구 질문 2 | 셋 중 하나 끝, 둘 보류 | [띄엄 배치](../experiments/2026-11-14-mf-i-layer-placement-and-stride.html) |
 
