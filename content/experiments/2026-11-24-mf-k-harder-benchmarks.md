@@ -71,6 +71,8 @@ P1 문항은 360 ÷ 5 = 72, 72 ÷ 3 = 24, 24 ÷ 6 = 4로 세 번 차례로 계�
 
 **AIME (9개 변형 모두).** CODI, L13→L0, L13→L4, 띄엄 배치, CODI latent 3개, 입력 고정은 두 시험 모두 0/30이었습니다. Middleflow, Latent 없음, Distillation 제거는 AIME24에서 1/30이었는데, 세 모델이 맞힌 것은 모두 같은 문항(정답 25)이었습니다. 초등 수준 문장제로만 학습한 1B 모델이라 경시 문제는 모두 바닥이며, 이 시험으로는 비교할 수 없습니다.
 
+**11월 26일에 더한 AIME 평가.** 그 뒤에 학습한 모델(L6→L0, Middleflow latent 14개, 같은 학습 시간 Middleflow, 같은 학습 시간 Latent 없음)은 두 시험 모두 0/30이었습니다. 학습은 그대로 두고 추론 때만 latent 수를 바꾼 조건은 AIME24에서 CODI 6 → 3개 0/30, Middleflow 6 → 14개 1/30(원래 Middleflow가 맞힌 것과 같은 문항), 같은 학습 시간 Middleflow 6 → 14개 0/30이었고, AIME25는 셋 다 0/30이었습니다. GPT-2 Small의 CODI와 Middleflow는 두 시험 모두 0/30입니다. GPT-2 Middleflow의 AIME25는 질문과 생성 길이의 합이 GPT-2의 위치 한도(1,024)를 넘어 처음 평가가 멈췄고, 생성 길이를 한도 안으로 줄여 다시 평가했습니다. 여전히 모든 모델이 바닥입니다.
+
 **GSM-Symbolic 정확도(%).**
 
 | 모델 | main | P1 | P2 |
