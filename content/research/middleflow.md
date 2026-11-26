@@ -66,7 +66,7 @@ GPT-2는 세 모델을 서로 다른 GPU에서 학습해 시간을 견주지 않
 
 1. 계산량 때문이 아니라면 Middleflow의 3점은 어디서 오는가. latent 14개로 처음부터 학습해 학습 시간과 추론 시간을 모두 CODI와 맞춰도 GSM8K 50.57(CODI −2.81)이었습니다. 학습 시간, 추론 계산량, 앞쪽 layer의 계산은 원인이 아니었습니다.
 2. 앞쪽 layer가 latent를 바꾸지 않는데, L0에 넣는 L13→L0은 왜 Middleflow보다 2.65점 높은가. L0부터 7개만 지나는 L6→L0은 가운데 7개보다 낫지 않았습니다(GSM8K 49.36). latent가 앞쪽 layer에도 남아 답이 거기서도 읽을 수 있기 때문인지 확인이 필요합니다.
-3. 처음부터 학습하면 layer를 몇 개까지 줄여도 되는가. 4개(L13→L10)와 2개(L13→L12)를 학습합니다(11월 27일 07:30쯤, 02시쯤).
+3. 처음부터 학습하면 layer를 몇 개까지 줄여도 되는가. 4개(L13→L10)와 2개(L13→L12)를 학습합니다(11월 27일 05시쯤, 17시쯤).
 4. 뒤쪽 두 layer가 latent에 더하는 것은 새 내용인가, 읽히기 쉬운 모양인가. 선형 분류기로는 뒤쪽에서 2~7점이 더 오르지만, 그 layer를 빼고 학습한 모델은 CODI와 같았습니다. ("첫 layer는 latent에 할 일이 없는가"는 11월 26일에 답했습니다. latent 자리에서 L1~L4의 attention은 66~90%가 맨 앞 토큰에 머물고, 읽기를 막아도 1.36점만 떨어졌습니다.)
 5. GPT-2에서는 latent가 몇 개 layer를 지나야 CODI와 같은 정확도가 나오는가. GPT-2 추가 학습(L9→L0, 경로 변형)은 기존 모델 실험 뒤로 미뤘습니다.
 6. 학습을 한 번 더 해도 같은가. 모두 시드 하나입니다. 시드를 바꾼 학습은 위 실험들 뒤에 합니다.
@@ -158,7 +158,7 @@ Middleflow
 - **FLOPs로 다시 잰 비용.** FLOPs 차이는 2~8%, 시간 차이는 21~41%였고, 시간은 차례로 지나는 layer 수에 비례했습니다([FLOPs와 실제 시간](../experiments/2026-11-25-mf-p-flops-vs-time.html)).
 - **latent가 지나는 layer 비율에 따른 정확도.** 처음부터 학습한 모델과, 학습한 CODI에서 추론 때만 layer를 줄인 경우를 한 그림에 놓았습니다([layer 비율](../experiments/2026-11-25-mf-q-layer-ratio.html)).
 - **쓰지 않는 layer의 역할(11월 24일).** 답은 latent를 주로 가운데 layer에서 읽었고, 뺀 layer는 질문을 읽고 답을 쓰는 데 쓰였습니다([쓰지 않는 layer](../experiments/2026-11-24-mf-n-unused-layer-role.html)).
-- **학습 중(11월 25일 낮에 바꿈).** GPT-2 추가 학습을 멈추고 기존 모델(Llama-3.2-1B)에서 방법을 먼저 증명합니다. latent가 4개와 2개 layer만 지나는 모델(27일 07:30쯤, 02시쯤)이 남았습니다. 추론 계산량을 CODI와 맞춘 Middleflow(latent 14개)와 L0부터 7개 layer를 지나는 L6→L0은 끝났습니다([기존 모델에서 방법 증명](../experiments/2026-11-25-mf-r-llama-method-proof.html)). GPT-2 루프는 13.3 epoch에서 멈췄고 나머지 경로 변형과 L9→L0은 미뤘습니다([경로 변형](../experiments/2026-11-24-mf-l-latent-path-plan.html)).
+- **학습 중(11월 25일 낮에 바꿈).** GPT-2 추가 학습을 멈추고 기존 모델(Llama-3.2-1B)에서 방법을 먼저 증명합니다. latent가 4개와 2개 layer만 지나는 모델(27일 05시쯤, 17시쯤)이 남았습니다. 추론 계산량을 CODI와 맞춘 Middleflow(latent 14개)와 L0부터 7개 layer를 지나는 L6→L0은 끝났습니다([기존 모델에서 방법 증명](../experiments/2026-11-25-mf-r-llama-method-proof.html)). GPT-2 루프는 13.3 epoch에서 멈췄고 나머지 경로 변형과 L9→L0은 미뤘습니다([경로 변형](../experiments/2026-11-24-mf-l-latent-path-plan.html)).
 - 11월 12일 회의의 결과와 질문은 [11월 12일 회의록](../meetings/2026-11-12-middleflow-research-meeting.html)에 있습니다.
 
 ## 관련 연구

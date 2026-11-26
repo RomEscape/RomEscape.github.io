@@ -142,7 +142,7 @@ Middleflow는 latent 계산을 가운데 7개 layer로 줄였는데도 정확도
 
 ## 다음 질문
 
-- Llama에서 latent가 4개(L13→L10), 2개(L13→L12) layer만 지나도록 처음부터 학습해 꺾은선의 빈 곳을 채웁니다(11월 27일 새벽과 아침, [기존 모델에서 방법 증명](2026-11-25-mf-r-llama-method-proof.html)). GPT-2의 10개, 7개, 3개 layer 학습은 그 뒤로 미뤘습니다.
+- Llama에서 latent가 4개(L13→L10), 2개(L13→L12) layer만 지나도록 처음부터 학습해 꺾은선의 빈 곳을 채웁니다(11월 27일 새벽과 오후, [기존 모델에서 방법 증명](2026-11-25-mf-r-llama-method-proof.html)). GPT-2의 10개, 7개, 3개 layer 학습은 그 뒤로 미뤘습니다.
 - 앞쪽 layer는 latent 벡터를 거의 바꾸지 않았습니다. 그 layer의 attention이 latent 자리에서 무엇을 읽는지(질문을 읽는지, 첫 토큰에 몰리는지)를 보면 "첫 layer는 latent에 할 일이 적다"를 더 직접 확인할 수 있습니다.
 
 ## 일지에서의 이름
