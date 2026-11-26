@@ -1,9 +1,9 @@
 ---
-title: GPT-2 Small에서 같은 비교 — latent가 필요한 모델에서 Middleflow는 이득의 일부만 지켰다
+title: GPT-2 Small에서 같은 비교 — GSM8K는 CODI 41.47, Middleflow 37.38, Latent 없음 36.47
 date: 2026-11-24
 project: Middleflow
 status: 진행 중
-summary: Llama-1B와 달리 GPT-2 Small에서는 latent 계산이 정확도를 올렸습니다(CODI − Latent 없음 GSM8K +5.0점, MultiArith +24.4점). 가운데 5개 layer만 쓰는 Middleflow는 SVAMP, MultiArith에서는 그 이득의 68~74%를, GSM8K, GSM-Hard에서는 0~18%만 지켰습니다. GPT-2 추가 학습(L9→L0 등)은 기존 모델 실험 뒤로 미뤘습니다.
+summary: Llama-1B와 달리 GPT-2 Small에서는 CODI가 Latent 없음보다 높았습니다(GSM8K +5.0점, MultiArith +24.4점). 가운데 5개 layer만 쓰는 Middleflow와 Latent 없음의 차이는 SVAMP, MultiArith에서는 그 68~74%, GSM8K, GSM-Hard에서는 0~18%였습니다. GPT-2 추가 학습(L9→L0 등)은 기존 모델 실험 뒤로 미뤘습니다.
 published: true
 ---
 
@@ -11,19 +11,19 @@ published: true
 
 | 순서 | 내용 |
 |---|---|
-| 본 현상 | Llama-1B에서는 latent 계산 없이 학습한 모델도 CODI와 정확도가 같아, Middleflow가 "필요 없는 계산을 줄인 것"인지 "필요한 계산을 싸게 한 것"인지 가를 수 없었습니다. PCCoT 논문 표 1에서는 같은 CODI 손실로 학습한 GPT-2 Small에서 latent 계산이 약 9점을 보탰습니다. |
-| 든 의문 | latent가 실제로 필요한 모델에서 Middleflow는 그 이득을 지키는가? |
+| 본 현상 | Llama-1B에서는 latent 계산 없이 학습한 모델도 CODI와 정확도가 같아, Middleflow가 "필요 없는 계산을 줄인 것"인지 "필요한 계산을 싸게 한 것"인지 가를 수 없었습니다. PCCoT 논문 표 1에서는 같은 CODI 손실로 학습한 GPT-2 Small에서 latent 계산이 있는 모델이 없는 모델보다 약 9점 높았습니다. |
+| 든 의문 | CODI와 Latent 없음의 정확도가 다른 모델에서 Middleflow의 정확도는 어디에 놓이는가? |
 | 그때까지 안 해 본 것 | 같은 코드와 설정으로 GPT-2에서 CODI, Latent 없음, Middleflow를 학습해 견준 적이 없었습니다. |
 | 그래서 한 것 | 코드를 GPT-2(layer 12개)로 옮기고 원본 CODI GPT-2 설정(40 epoch)으로 세 모델을 학습해 네 벤치마크, GSM-Symbolic, 추론 때 latent 바꾸기로 평가했습니다. |
-| 답 | GPT-2에서는 latent가 필요했습니다(CODI − Latent 없음 다섯 평가 모두 0을 벗어남). Middleflow는 그 이득의 일부만 지켰습니다(SVAMP 74%, MultiArith 68%, GSM-Symbolic main 39%, GSM8K 18%, GSM-Hard 0%). |
-| 다음 의문 | 얕은 모델에서 latent는 몇 개 layer를 지나야 이득을 지키는가? Llama처럼 첫 layer에 넣으면(L9→L0) CODI만큼 되찾는가? 이 질문에 답할 GPT-2 추가 학습은 미루고, 같은 질문을 지금까지 써 온 Llama에서 먼저 봅니다([기존 모델에서 방법 증명](2026-11-25-mf-r-llama-method-proof.html)). |
+| 답 | GPT-2에서는 CODI가 Latent 없음보다 높았습니다(CODI − Latent 없음이 다섯 평가 모두 0을 벗어남). Middleflow − Latent 없음은 그 차이의 일부였습니다(SVAMP 74%, MultiArith 68%, GSM-Symbolic main 39%, GSM8K 18%, GSM-Hard 0%). |
+| 다음 의문 | 얕은 모델에서 latent가 몇 개 layer를 지나야 CODI와 같은 정확도가 나오는가? Llama처럼 첫 layer에 넣으면(L9→L0) CODI와 같아지는가? 이 질문에 답할 GPT-2 추가 학습은 미루고, 같은 질문을 지금까지 써 온 Llama에서 먼저 봅니다([기존 모델에서 방법 증명](2026-11-25-mf-r-llama-method-proof.html)). |
 
 질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
 
 ## 한 줄 요약
 
-- GPT-2 Small에서는 latent 계산이 정확도를 올렸습니다. CODI는 latent 없이 같은 손실로 학습한 모델보다 GSM8K 5.00점 [+2.68, +7.33], SVAMP 6.60점, MultiArith 24.44점, GSM-Hard 1.67점, GSM-Symbolic main 6.44점 높았습니다. Llama-1B에서는 이 차이가 확인되지 않았습니다.
-- 가운데 5개 layer(L5~L9)만 쓰는 Middleflow는 그 이득의 일부만 지켰습니다. 풀이 단계가 적은 SVAMP(74%)와 MultiArith(68%)에서는 대부분을 지켰고, 단계가 많은 GSM8K(18%)와 GSM-Hard(0%)에서는 거의 잃었습니다.
+- GPT-2 Small에서는 CODI가 Latent 없음보다 높았습니다. CODI는 latent 없이 같은 손실로 학습한 모델보다 GSM8K 5.00점 [+2.68, +7.33], SVAMP 6.60점, MultiArith 24.44점, GSM-Hard 1.67점, GSM-Symbolic main 6.44점 높았습니다. Llama-1B에서는 이 차이가 확인되지 않았습니다.
+- 가운데 5개 layer(L5~L9)만 쓰는 Middleflow와 Latent 없음의 차이는 그 일부였습니다. 풀이 단계가 적은 SVAMP(74%)와 MultiArith(68%)에서는 컸고, 단계가 많은 GSM8K(18%)와 GSM-Hard(0%)에서는 작았습니다.
 - 추론 때 latent를 지우면 CODI는 11~20점, Middleflow는 6~9점 떨어졌습니다. 두 모델 모두 latent를 쓰고, Llama에서처럼 Middleflow가 덜 기댑니다.
 
 ## 왜 궁금했나
@@ -100,18 +100,18 @@ latent를 비운 세 경우 모두 첫 단계의 값(2 × 6 = 12)을 답했고, 
 | CODI − Latent 없음 | +5.00 [+2.68, +7.33] | +6.60 [+4.27, +8.93] | +24.44 [+17.62, +31.27] | +1.67 [+0.54, +2.80] |
 | Middleflow − Latent 없음 | +0.91 [−1.13, +2.95] | +4.90 [+2.95, +6.85] | +16.67 [+10.41, +22.92] | −0.15 [−1.04, +0.74] |
 | Middleflow − CODI | −4.09 [−6.19, −1.99] | −1.70 [−3.78, +0.38] | −7.78 [−12.51, −3.04] | −1.82 [−2.82, −0.82] |
-| Middleflow가 지킨 몫 | 18% | 74% | 68% | 0% |
+| (Middleflow − Latent 없음) ÷ (CODI − Latent 없음) | 18% | 74% | 68% | 0% |
 
 | 비교 | GSM-Symbolic main | P1 | P2 |
 |---|---|---|---|
 | CODI − Latent 없음 | +6.44 [+3.76, +9.56] | +4.04 [+1.62, +7.16] | +1.28 [−0.60, +4.00] |
 | Middleflow − Latent 없음 | +2.50 [+1.00, +4.18] | +1.42 [+0.12, +2.92] | −0.56 [−1.84, +0.64] |
 | Middleflow − CODI | −3.94 [−6.66, −1.62] | −2.62 [−5.54, −0.36] | −1.84 [−5.20, +0.36] |
-| Middleflow가 지킨 몫 | 39% | 35% | 0% |
+| (Middleflow − Latent 없음) ÷ (CODI − Latent 없음) | 39% | 35% | 0% |
 
-**표 읽는 법.** 대괄호는 같은 문항을 두 모델이 맞혔는지 짝지어 낸 차이의 95% 구간입니다(GSM-Symbolic은 같은 문항 틀 100개 단위로 다시 뽑는 부트스트랩). 구간이 0을 포함하지 않으면 차이가 있다고 봅니다. "지킨 몫"은 (Middleflow − Latent 없음) ÷ (CODI − Latent 없음)이고, Middleflow가 Latent 없음보다 낮으면 0%로 적었습니다.
+**표 읽는 법.** 대괄호는 같은 문항을 두 모델이 맞혔는지 짝지어 낸 차이의 95% 구간입니다(GSM-Symbolic은 같은 문항 틀 100개 단위로 다시 뽑는 부트스트랩). 구간이 0을 포함하지 않으면 차이가 있다고 봅니다. 마지막 줄은 위 두 차이의 비율이고, Middleflow가 Latent 없음보다 낮으면 0%로 적었습니다.
 
-[![Llama-1B와 GPT-2 Small에서 latent 계산이 더한 점수와 Middleflow가 지킨 몫](../uploads/middleflow/experiments/latent-gain-llama-gpt2.png)](../uploads/middleflow/experiments/latent-gain-llama-gpt2.png)
+[![Llama-1B와 GPT-2 Small에서 CODI, Middleflow와 Latent 없음의 정확도 차이](../uploads/middleflow/experiments/latent-gain-llama-gpt2.png)](../uploads/middleflow/experiments/latent-gain-llama-gpt2.png)
 
 *파란 막대는 CODI, 주황 막대는 Middleflow가 Latent 없음보다 높은 정도입니다. 막대 끝의 선은 95% 구간, *는 구간이 0을 벗어난 것입니다. 왼쪽 Llama-1B는 GSM-Symbolic main만 CODI가 앞서고, 오른쪽 GPT-2는 다섯 평가 모두 CODI가 앞섭니다. 그림을 누르면 원본 크기로 열립니다.*
 
@@ -140,14 +140,14 @@ latent를 비운 세 경우 모두 첫 단계의 값(2 × 6 = 12)을 답했고, 
 
 Middleflow와 Latent 없음은 마지막 빼기 한 번을 빠뜨린 같은 답(80)을 썼습니다. 1,319문항 중 CODI만 맞히고 둘 다 틀린 문항은 92개입니다. 한 문항의 예이고, 이런 "한 단계 모자란" 답이 전체에서 몇 개인지는 세지 않았습니다.
 
-**미리 정한 판정에 대어 보면.** CODI는 다섯 평가 모두 Latent 없음보다 높아 첫째 줄의 앞부분(latent가 필요하다)은 맞습니다. Middleflow가 그 차이를 "대부분 지킴"은 SVAMP와 MultiArith에서만 맞고, GSM8K와 GSM-Hard에서는 둘째 줄("이득을 잃음")에 해당합니다. 판정은 벤치마크에 따라 갈렸습니다.
+**미리 정한 판정에 대어 보면.** CODI는 다섯 평가 모두 Latent 없음보다 높아 첫째 줄의 앞부분(CODI가 Latent 없음보다 높음)은 맞습니다. Middleflow가 그 차이를 "대부분 지킴"은 SVAMP와 MultiArith에서만 맞고, GSM8K와 GSM-Hard에서는 둘째 줄에 해당합니다. 판정은 벤치마크에 따라 갈렸습니다. 위 표의 "해석" 열은 결과를 보기 전에 적어 둔 것입니다. 이 결과로 확인된 것은 정확도의 차이이고, "latent가 필요하다"는 해석까지 확인된 것은 아닙니다.
 
 ## 그래서 무슨 뜻인가
 
-- **latent의 몫은 모델에 따라 다릅니다.** 같은 코드, 같은 손실로 학습해도 Llama-1B에서는 latent 계산의 몫이 확인되지 않았고 GPT-2 Small에서는 5~24점이었습니다. PCCoT 논문 표 1과 같은 방향입니다.
-- **Middleflow는 계산 단계가 적은 문제에서는 이득을 지키고, 많은 문제에서는 잃었습니다.** SVAMP와 MultiArith는 계산식 한두 개로 풀리는 문항이 많고, GSM8K와 GSM-Hard는 여러 개를 차례로 이어야 합니다. 가운데 5개 layer만으로는 여러 단계를 이어 계산하기에 모자랄 수 있습니다(가설, 아직 단계별로 나눠 확인하지 않음).
+- **CODI와 Latent 없음의 차이는 모델에 따라 다릅니다.** 같은 코드, 같은 손실로 학습해도 Llama-1B의 GSM8K에서는 차이가 확인되지 않았고 GPT-2 Small에서는 1.7~24.4점이었습니다(다섯 평가 모두 0을 벗어남). PCCoT 논문 표 1과 같은 방향입니다. 두 모델은 크기, layer 수, 사전학습 자료가 모두 달라, 무엇 때문에 다른지는 확인하지 않았습니다.
+- **Middleflow와 Latent 없음의 차이는 계산 단계가 적은 문제에서 크고, 많은 문제에서 작았습니다.** SVAMP와 MultiArith는 계산식 한두 개로 풀리는 문항이 많고, GSM8K와 GSM-Hard는 여러 개를 차례로 이어야 합니다. 가운데 5개 layer만으로는 여러 단계를 이어 계산하기에 모자랄 수 있습니다(가설, 아직 단계별로 나눠 확인하지 않음).
 - **Middleflow도 latent를 씁니다.** 지우면 6~9점, 다른 문항의 latent를 넣으면 10점 떨어졌습니다. 다만 CODI(11~36점)보다 덜 기댑니다. Llama에서 본 "넣는 layer가 latent 의존도를 정한다"와 같은 모습입니다.
-- **Llama에서 본 해결책이 여기서도 통하는지가 다음 질문입니다.** Llama에서는 L13→L0(첫 layer에 넣기)이 CODI와 정확도가 같았습니다. GPT-2에서 같은 위치인 L9→L0이 CODI만큼 되찾는다면, latent는 꺼내는 곳보다 넣는 곳이 중요하다는 결론이 두 모델에서 같아집니다.
+- **Llama에서 본 해결책이 여기서도 통하는지가 다음 질문입니다.** Llama에서는 L13→L0(첫 layer에 넣기)이 CODI와 정확도가 같았습니다. GPT-2에서 같은 위치인 L9→L0이 CODI와 같은 정확도를 낸다면, latent는 꺼내는 곳보다 넣는 곳이 중요하다는 결론이 두 모델에서 같아집니다.
 
 ## 진행 기록
 
@@ -191,7 +191,7 @@ GPT-2 CODI는 latent를 비우면 20점, 틀린 내용을 넣으면 30~36점 떨
 
 ## 다음 질문
 
-- 첫 layer에 넣으면(L9→L0) CODI만큼 되찾는가? 되찾는다면 Llama와 같은 결론(넣는 곳이 정확도를 정함)이 GPT-2에서도 성립합니다. 이 학습은 기존 모델 실험 뒤로 미뤘습니다.
+- 첫 layer에 넣으면(L9→L0) CODI와 같은 정확도가 나오는가? 그렇다면 Llama와 같은 결론(넣는 곳이 정확도를 정함)이 GPT-2에서도 성립합니다. 이 학습은 기존 모델 실험 뒤로 미뤘습니다.
 - 얕은 모델에서 latent는 몇 개 layer를 지나야 하는가? 지금 있는 점은 0개, 5개, 12개입니다([layer 비율에 따른 정확도](2026-11-25-mf-q-layer-ratio.html)).
 - 같은 질문을 기존 모델에서 먼저 봅니다. L0부터 7개 layer를 지나는 L6→L0, 추론 계산량을 CODI와 맞춘 Middleflow, layer 4개와 2개입니다([기존 모델에서 방법 증명](2026-11-25-mf-r-llama-method-proof.html)).
 

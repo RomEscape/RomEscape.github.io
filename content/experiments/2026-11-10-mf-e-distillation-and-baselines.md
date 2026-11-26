@@ -18,7 +18,7 @@ published: true
 | 그때까지 안 해 본 것 | 같은 코드에서 "답만 학습 → distillation까지 → latent 계산까지"를 한 줄로 나눈 적이 없었습니다. |
 | 그래서 한 것 | Latent 없음에서 distillation 손실 하나만 빼고 다시 학습했고, 답만 학습한 기준선과 풀이를 글로 쓰는 기준선을 더했습니다. |
 | 답 | 답만 학습 30.86 → distillation까지 52.16 → latent 계산까지 53.37. 오른 22.5점 중 21.3점이 distillation에서 나왔습니다. |
-| 다음 의문 | latent가 보탠 몫이 작은 것은 이 모델(Llama-1B)의 이야기인가? latent가 필요하다고 보고된 모델에서는([GPT-2 Small](2026-11-24-mf-j-gpt2-plan.html))? |
+| 다음 의문 | CODI와 Latent 없음의 차이가 확인되지 않은 것은 이 모델(Llama-1B)의 이야기인가? 선행 연구에서 두 조건의 정확도가 달랐던 모델에서는([GPT-2 Small](2026-11-24-mf-j-gpt2-plan.html))? |
 
 질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
 

@@ -11,7 +11,7 @@ method_examples:
     kind: 실제 실험 예시
     problem: 'GSM8K 828번 "Mulan has $40. Her father gave her $100. She buys two pairs of jeans at $30 each and a bag for $20. How much money does Mulan have left?" (정답 60)'
     comparison: 'Llama-3.2-1B에서 CODI는 latent 6개가 각각 16개 layer를 지나고(96번), Middleflow는 L13에서 꺼내 L7에 넣어 7개 layer만 지납니다(42번). 질문과 답은 두 모델 모두 16개 layer를 지납니다.'
-    assessment: '두 모델 모두 60을 맞혔습니다. 1,319문항 평균으로 Middleflow는 추론 98.4 ms로 CODI(127.9 ms)보다 23% 빨랐고 GSM8K는 2.96점 낮았습니다. latent가 꼭 필요한 GPT-2 Small에서는 같은 문항을 CODI만 맞히고 Middleflow는 80(가방 값을 빼지 않음)을 썼습니다.'
+    assessment: '두 모델 모두 60을 맞혔습니다. 1,319문항 평균으로 Middleflow는 추론 98.4 ms로 CODI(127.9 ms)보다 23% 빨랐고 GSM8K는 2.96점 낮았습니다. GPT-2 Small에서는 같은 문항을 CODI만 맞히고 Middleflow는 80(가방 값을 빼지 않음)을 썼습니다.'
 summary: latent를 가운데 7개 layer에서만 계산하는 Middleflow는 같은 설정의 CODI보다 추론이 23%, 학습이 21% 빨랐습니다. SVAMP와 MultiArith는 같았고 GSM8K는 2.96점, GSM-Hard는 1.97점 낮았습니다.
 published: true
 ---
@@ -98,7 +98,7 @@ GSM8K 167번 문항으로 따라가 봅니다.
 
 - latent를 가운데 layer로 좁히면 계산과 시간은 확실히 줄어듭니다.
 - 정확도는 계산이 여러 단계인 GSM8K, GSM-Hard에서 조금 떨어졌습니다.
-- 다만 같은 계산량의 CODI(latent 3개)와 비교하면 속도와 정확도 모두 비슷해서, 속도 이점이 Middleflow만의 것은 아닙니다([latent 3개 CODI 기록](2026-11-09-mf-b-codi-three-latents.html)). 또 latent 없이 학습한 모델도 정확도가 같아([Latent 없음 기록](2026-11-09-mf-c-no-latent.html)), 이 모델에서는 latent 계산 자체의 몫이 작습니다. Middleflow의 효과는 latent가 실제로 필요한 조건에서 다시 봐야 합니다.
+- 다만 같은 계산량의 CODI(latent 3개)와 비교하면 속도와 정확도 모두 비슷해서, 속도 이점이 Middleflow만의 것은 아닙니다([latent 3개 CODI 기록](2026-11-09-mf-b-codi-three-latents.html)). 또 latent 없이 학습한 모델도 정확도가 같아([Latent 없음 기록](2026-11-09-mf-c-no-latent.html)), 이 모델에서는 CODI와 Latent 없음의 차이가 확인되지 않았습니다. Middleflow의 효과는 두 조건의 정확도가 다른 모델에서 다시 봐야 합니다.
 
 ## 한계
 

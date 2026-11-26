@@ -128,7 +128,7 @@ CODI 같은 latent 추론은 세 가지 이유로 나왔다. 이 발표의 결�
 
 **latent가 없을 때 잃는 것.** 추론 때 latent 수를 늘려 계산을 더 쓰는 선택지가 없다(학습된 CODI는 추론 latent 0개 36.2%에서 6개 53.4%로 올랐다). 답 직전의 중간 상태를 들여다보거나 바꿔 보는 분석 지점이 없다. 계산 여유가 부족한 모델에서는 정확도를 잃을 수 있다(선행 연구의 GPT-2 결과). 또 이 모델은 답의 position을 띄운 상태에 맞춰 학습되어, 띄우지 않으면 풀이를 글로 쓰기 시작한다(간격 0에서 출력 22.4토큰, 57.85%). 이 값은 latent 없이 푼 결과와 나란히 놓으면 안 된다.
 
-**Middleflow의 효과를 말하는 방식.** Middleflow는 latent 계산을 가운데 layer로 좁혀 비용을 줄였고, 넣는 곳에 따라 답이 latent에 기대는 정도가 크게 달라진다는 것을 보여 주었다. 다만 이 모델에서는 latent 계산의 기여 자체가 작아서, 비용을 줄인 효과와 정확도를 지킨 효과를 구분해 보이기 어렵다. Middleflow의 이점은 **latent가 실제로 필요한 조건**에서 확인해야 분명해진다.
+**Middleflow의 효과를 말하는 방식.** Middleflow는 latent 계산을 가운데 layer로 좁혀 비용을 줄였고, 넣는 곳에 따라 답이 latent에 기대는 정도가 크게 달라진다는 것을 보여 주었다. 다만 이 모델에서는 CODI와 Latent 없음의 차이가 확인되지 않아서, 비용을 줄인 효과와 정확도를 지킨 효과를 구분해 보이기 어렵다. Middleflow의 이점은 **CODI와 Latent 없음의 정확도가 다른 조건**에서 확인해야 분명해진다.
 
 ### 다시 세운 연구 질문
 
@@ -149,7 +149,7 @@ CODI 같은 latent 추론은 세 가지 이유로 나왔다. 이 발표의 결�
 | 실험 | 회의의 어느 질문에 답하나 | 상태 (11월 25일) | 기록 |
 |---|---|---|---|
 | 연구 질문 다시 쓰기와 글 14편 점검 | 11월 25일 회의 지적(실험마다 어떤 현상을 보고 무엇이 궁금해 설계했는지) | 끝(11월 25일) | [연구 질문 정리](../experiments/2026-11-25-mf-o-research-questions.html) |
-| GPT-2 Small에서 같은 비교 | 다음 검증 1, 연구 질문 3 | 끝(11월 25일). GPT-2에서는 latent가 필요했고(GSM8K +5.0점), Middleflow는 이득의 일부만 지킴 | [GPT-2 Small 비교](../experiments/2026-11-24-mf-j-gpt2-plan.html) |
+| GPT-2 Small에서 같은 비교 | 다음 검증 1, 연구 질문 3 | 끝(11월 25일). GPT-2에서는 CODI가 Latent 없음보다 높았고(GSM8K +5.0점), Middleflow − Latent 없음은 +0.9점(확인 안 됨) | [GPT-2 Small 비교](../experiments/2026-11-24-mf-j-gpt2-plan.html) |
 | FLOPs와 실제 시간 | 11월 25일 회의 지적(비용을 FLOPs로) | 끝(11월 25일). FLOPs 차이 2~8%, 시간 차이 21~41% | [FLOPs와 실제 시간](../experiments/2026-11-25-mf-p-flops-vs-time.html) |
 | latent가 지나는 layer 비율에 따른 정확도 | 11월 25일 회의 지적(layer 수를 줄여 가며 꺾은선) | Llama 끝(처음부터 학습한 모델 5개, 추론 때만 줄인 19가지), 처음부터 학습한 4개와 2개 layer 점은 학습 중, GPT-2는 3점(추가 학습은 미룸) | [layer 비율](../experiments/2026-11-25-mf-q-layer-ratio.html) |
 | 더 어려운 문제(GSM-Symbolic, AIME) | latent가 효과를 내는 조건 | Llama-1B 아홉 모델과 GPT-2 세 모델 끝 | [더 어려운 문제](../experiments/2026-11-24-mf-k-harder-benchmarks.html) |
@@ -170,7 +170,7 @@ CODI 같은 latent 추론은 세 가지 이유로 나왔다. 이 발표의 결�
 
 CODI 저자가 공개한 GPT-2 체크포인트를 우리 평가 코드로 채점하니 GSM8K 42.46%(논문 43.7%)였고, 공식 평가 방식과 1,319문항의 답이 모두 같았다. 이 모델은 추론 때 latent를 비우면 22% 안팎, 다른 문항의 latent를 넣으면 6.37%로 떨어져 latent에 크게 기댄다. CODI, Latent 없음, Middleflow를 원본 CODI GPT-2 설정(40 epoch)으로 GPU 한 장씩 학습했고 11월 25일 새벽에 끝났다.
 
-**11월 25일 결과.** GPT-2에서는 latent가 필요했다. CODI − Latent 없음은 GSM8K +5.00 [+2.68, +7.33], SVAMP +6.60, MultiArith +24.44, GSM-Hard +1.67, GSM-Symbolic main +6.44로 모두 0을 벗어났다. Middleflow(L9→L5)는 그 이득의 일부만 지켰다. 풀이 단계가 적은 SVAMP(74%)와 MultiArith(68%)에서는 대부분을 지켰고, 단계가 많은 GSM8K(18%)와 GSM-Hard(0%)에서는 거의 잃었다. 첫 layer에 넣는 L9→L0은 11월 26일 낮에 끝난다(자세히는 [GPT-2 Small 비교](../experiments/2026-11-24-mf-j-gpt2-plan.html)).
+**11월 25일 결과.** GPT-2에서는 CODI가 Latent 없음보다 높았다. CODI − Latent 없음은 GSM8K +5.00 [+2.68, +7.33], SVAMP +6.60, MultiArith +24.44, GSM-Hard +1.67, GSM-Symbolic main +6.44로 모두 0을 벗어났다. Middleflow(L9→L5) − Latent 없음은 그 차이의 일부였다. 풀이 단계가 적은 SVAMP(74%)와 MultiArith(68%)에서는 컸고, 단계가 많은 GSM8K(18%)와 GSM-Hard(0%)에서는 작았다. 첫 layer에 넣는 L9→L0은 11월 26일 낮에 끝난다(자세히는 [GPT-2 Small 비교](../experiments/2026-11-24-mf-j-gpt2-plan.html)).
 
 ### 더 어려운 문제에서 latent의 몫 (latent가 효과를 내는 조건)
 

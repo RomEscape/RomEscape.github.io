@@ -17,8 +17,8 @@ published: true
 | 든 의문 | 뺀 앞쪽(L0~L6)과 뒤쪽(L14~L15) layer는 latent에 무엇을 하고 있었나? 마지막 layer가 다음 토큰 고르기에 매여 있다면, 첫 layer도 토큰 읽기에 매여 latent에는 쓸모가 적은 것 아닐까? 그렇다면 어떤 의미에서, 왜 필요 없었나? |
 | 그때까지 안 해 본 것 | 학습한 CODI에서 latent가 지나는 layer, 답이 latent를 보는 layer, layer별로 학습된 변화(LoRA)를 따로 떼어 본 적이 없었습니다. |
 | 그래서 한 것 | 학습한 CODI와 Middleflow에서 추론 때만 latent가 지나는 layer를 빼고, 답이 latent를 보는 layer를 막고, layer별 LoRA를 껐습니다. layer별로 latent가 얼마나 바뀌는지와 logit lens도 쟀습니다. |
-| 답 | 답은 latent를 주로 가운데(L7~L13)에서 읽었고, 앞쪽 layer는 latent를 거의 바꾸지 않았으며, 뒤쪽 layer는 latent를 숫자 토큰으로 읽히는 모양으로 바꿨습니다. 학습 없이 빼면 크게 떨어지지만 처음부터 학습하면 거의 그대로였고, 뺀 layer는 질문을 읽고 답을 쓰는 데는 꼭 필요했습니다. |
-| 다음 의문 | layer를 몇 개까지 줄여도 되는가([layer 비율에 따른 정확도](2026-11-25-mf-q-layer-ratio.html))? latent가 꼭 필요한 모델에서도 가운데만으로 되는가([GPT-2 Small](2026-11-24-mf-j-gpt2-plan.html))? 뺀 layer와 남긴 layer가 latent 자리에서 하는 일은 어떻게 다른가([쓰는 layer와 안 쓰는 layer의 차이](2026-11-26-mf-s-layer-difference.html))? |
+| 답 | 답은 latent를 주로 가운데(L7~L13)에서 읽었고, 앞쪽 layer는 latent를 거의 바꾸지 않았으며, 뒤쪽 layer는 latent를 숫자 토큰으로 읽히는 모양으로 바꿨습니다. 학습 없이 빼면 크게 떨어지지만 처음부터 학습하면 거의 그대로였고, 뺀 layer의 LoRA를 끄면 30점 넘게 떨어졌습니다. |
+| 다음 의문 | layer를 몇 개까지 줄여도 되는가([layer 비율에 따른 정확도](2026-11-25-mf-q-layer-ratio.html))? CODI와 Latent 없음의 정확도가 다른 모델에서도 가운데만으로 되는가([GPT-2 Small](2026-11-24-mf-j-gpt2-plan.html))? 뺀 layer와 남긴 layer가 latent 자리에서 하는 일은 어떻게 다른가([쓰는 layer와 안 쓰는 layer의 차이](2026-11-26-mf-s-layer-difference.html))? |
 
 질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
 
@@ -123,7 +123,7 @@ CODI에서는 중간값 9가 마지막 두 layer(L14, L15)에서야 읽힙니다
 - **latent 계산에서도 가운데 layer의 몫이 더 큽니다.** CODI 가중치로 바깥 9개 layer를 건너뛰면 GSM8K가 11.9점, 같은 수의 가운데 layer를 건너뛰면 24.3점 떨어졌습니다. 앞쪽 layer는 latent를 덜 바꿉니다(변화량 0.06~0.30).
 - **뒤쪽 L14~L15는 latent를 숫자로 읽히는 모양으로 바꿉니다.** 중간 계산값은 CODI에서 주로 L12~L15에서 읽혔습니다(예시 문항의 9). 하지만 답은 latent를 주로 L7~L13에서 읽으므로, 이 layer를 건너뛸 때의 손실(−7.0)은 가운데를 건너뛸 때보다 작았습니다.
 - **남은 차이는 학습이 메웁니다.** CODI 가중치에 Middleflow 경로만 쓰면 GSM8K가 11.9점 떨어지지만, 그 경로로 처음부터 학습한 Middleflow는 CODI보다 3.0점 낮을 뿐이었습니다.
-- **"쓰지 않는 layer"는 latent에 쓰지 않을 뿐, 질문을 읽고 답을 쓰는 데는 꼭 필요합니다.** 그 layer의 LoRA를 끄면 30점 넘게 떨어졌습니다. 질문과 답 토큰은 16개 layer를 모두 지나고, 학습은 그 layer들도 함께 고쳤습니다. latent가 지나지 않는 뒤쪽 L14~L15의 LoRA를 끄면 Middleflow는 47.5점 떨어져, CODI(37.6점)보다 이 layer의 학습된 변화에 더 기댔습니다.
+- **"쓰지 않는 layer"는 latent에 쓰지 않을 뿐, 질문을 읽고 답을 쓰는 데는 쓰입니다.** 그 layer의 LoRA를 끄면 30점 넘게 떨어졌습니다. 질문과 답 토큰은 16개 layer를 모두 지나고, 학습은 그 layer들도 함께 고쳤습니다. latent가 지나지 않는 뒤쪽 L14~L15의 LoRA를 끄면 Middleflow는 47.5점 떨어져, CODI(37.6점)보다 이 layer의 학습된 변화에 더 기댔습니다.
 - **Middleflow의 7개 layer도 모두 쓰입니다.** 추론 때 3개를 더 빼면 3.6~5.8점 떨어졌고, 뒤쪽 3개(L11~L13)를 뺄 때 더 떨어졌습니다.
 
 ## 한계와 주의

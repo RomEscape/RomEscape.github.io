@@ -95,7 +95,7 @@ GSM8K 80번 문항: "Two girls each got 1/6 of the 24 liters of water. Then a bo
 ## 한계
 
 - 뽑는 곳은 L13 하나만 봤습니다.
-- 이 모델에서는 latent 계산 자체의 몫이 작아([Latent 없음 기록](2026-11-09-mf-c-no-latent.html)), 넣는 곳이 정확도에 주는 영향도 작게 보일 수 있습니다.
+- 이 모델에서는 CODI와 Latent 없음의 차이가 확인되지 않아([Latent 없음 기록](2026-11-09-mf-c-no-latent.html)), 넣는 곳이 정확도에 주는 영향도 작게 보일 수 있습니다.
 - 시드 하나입니다.
 
 ## 일지에서의 이름

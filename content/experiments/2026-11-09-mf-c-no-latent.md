@@ -39,6 +39,8 @@ CODI와 Middleflow의 정확도가 latent 계산에서 오는지 확인하려면
 | Latent 없음 | 학습할 때도 추론할 때도 latent를 계산하지 않고 따로 학습한 모델. 학습이 끝난 CODI에서 latent를 뺀 것이 아니다 | 기본 Llama-3.2-1B-Instruct에서 출발해 10 epoch |
 | 답 position 간격 | 질문 끝과 답 사이에 비워 둔 position 번호 수. latent 6개가 있을 때와 같은 번호를 답에 주려고 띄운다 | 학습 때 6 |
 | 손실 세 항 | ① 교사 CE: 질문과 풀이를 보고 맞힘, ② 학생 CE: 풀이 없이 답을 맞힘, ③ distillation: 답 직전 위치에서 학생의 내부 표현을 교사와 같게 맞춤 | CODI와 같음(③의 계수 20) |
+| distillation이 걸리는 자리 | latent끼리 맞추는 것이 아니다. 교사 쪽에는 latent가 없다(교사는 풀이를 글로 읽는다). 교사 입력과 학생 입력에 모두 있는 답 숫자 바로 앞 토큰 자리에서 layer 경계 17곳의 내부 표현을 맞춘다. 그래서 latent가 없는 이 모델에도 그대로 걸린다 | "The answer is: 16"에서 16 바로 앞 토큰 |
+| 답만 학습과의 차이 | 질문과 답만으로 학습한 모델에는 ②만 있다. 이 모델에는 ①과 ③이 더 있다 | GSM8K: 답만 학습 30.86, ③만 뺀 모델 36.69, 이 모델 52.16 |
 
 ## 방법
 
@@ -86,7 +88,7 @@ GSM8K 30번 문항: "Darrell and Allen's ages are in the ratio of 7:11. If their
 ## 그래서 무슨 뜻인가
 
 - 이 모델과 이 과제에서는 latent 계산이 정확도에 더하는 몫이 확인되지 않았습니다. 같은 현상은 PCCoT 논문(arXiv 2506.18582) 표 1의 Llama-1B 기준선에도 있습니다.
-- 그렇다고 "latent는 의미 없다"는 뜻은 아닙니다. 같은 표에서 GPT-2 Small은 latent 계산이 약 9점을 더했습니다. 계산 여유가 부족한 모델에서는 latent가 필요할 수 있습니다.
+- 그렇다고 "latent는 의미 없다"는 뜻은 아닙니다. 같은 표에서 GPT-2 Small은 latent 계산이 있는 모델이 없는 모델보다 약 9점 높았습니다. 모델에 따라 결과가 다릅니다.
 - latent가 없으면 학습과 추론이 가장 빠르지만, 추론 때 latent 수를 늘려 더 생각하게 할 수 없고, 중간 상태를 들여다볼 수도 없습니다.
 - 이 모델의 정확도가 어디서 오는지는 [distillation 제거 기록](2026-11-10-mf-e-distillation-and-baselines.html)에서 봅니다.
 
