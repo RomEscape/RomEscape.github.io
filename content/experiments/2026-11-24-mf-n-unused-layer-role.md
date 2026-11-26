@@ -18,7 +18,7 @@ published: true
 | 그때까지 안 해 본 것 | 학습한 CODI에서 latent가 지나는 layer, 답이 latent를 보는 layer, layer별로 학습된 변화(LoRA)를 따로 떼어 본 적이 없었습니다. |
 | 그래서 한 것 | 학습한 CODI와 Middleflow에서 추론 때만 latent가 지나는 layer를 빼고, 답이 latent를 보는 layer를 막고, layer별 LoRA를 껐습니다. layer별로 latent가 얼마나 바뀌는지와 logit lens도 쟀습니다. |
 | 답 | 답은 latent를 주로 가운데(L7~L13)에서 읽었고, 앞쪽 layer는 latent를 거의 바꾸지 않았으며, 뒤쪽 layer는 latent를 숫자 토큰으로 읽히는 모양으로 바꿨습니다. 학습 없이 빼면 크게 떨어지지만 처음부터 학습하면 거의 그대로였고, 뺀 layer는 질문을 읽고 답을 쓰는 데는 꼭 필요했습니다. |
-| 다음 의문 | layer를 몇 개까지 줄여도 되는가([layer 비율에 따른 정확도](2026-11-25-mf-q-layer-ratio.html))? latent가 꼭 필요한 모델에서도 가운데만으로 되는가([GPT-2 Small](2026-11-24-mf-j-gpt2-plan.html))? |
+| 다음 의문 | layer를 몇 개까지 줄여도 되는가([layer 비율에 따른 정확도](2026-11-25-mf-q-layer-ratio.html))? latent가 꼭 필요한 모델에서도 가운데만으로 되는가([GPT-2 Small](2026-11-24-mf-j-gpt2-plan.html))? 뺀 layer와 남긴 layer가 latent 자리에서 하는 일은 어떻게 다른가([쓰는 layer와 안 쓰는 layer의 차이](2026-11-26-mf-s-layer-difference.html))? |
 
 질문의 사슬 전체는 [연구 질문으로 다시 쓴 Middleflow 연구](2026-11-25-mf-o-research-questions.html)에 있습니다.
 
